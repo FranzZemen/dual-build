@@ -80,6 +80,9 @@ Get a copy of the default bootstrap-options.json, presumably to make changes pri
 As a rule for all dual-build commands, npx can be called with or without the -p package specifier.  We will 
 show it once
 npm[^1]
+
+[^1]: ddd
+
 ``` 
 npx dual-build bootstrap-options
 
@@ -103,7 +106,7 @@ Example output:
 
 ```
 
-[^1]: ddd
+
 
 Depending on how bootstrapping is invoked, it will either leverage default, saved or provided 
 options.  Bootstrapping can also combine both in one step, which will create prompts 
