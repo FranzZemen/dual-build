@@ -1,19 +1,8 @@
 {
-  "name": "dual-build",
-  "version": "0.0.1",
-  "description": "provides services to build esm and commonjs distributions from the same source",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "dependencies": {
+    "fast-glob": "^3.2.12"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/FranzZemen/dual-build.git"
-  },
-  "author": "Franz Zemen",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/FranzZemen/dual-build/issues"
-  },
-  "homepage": "https://github.com/FranzZemen/dual-build#readme"
+  "devDependencies": {
+    "typescript": "^4.9.3"
+  }
 }
