@@ -75,14 +75,9 @@ purpose and structure is.
 
 ### Get bootstrap-options.json
 
-Get a copy of the default bootstrap-options.json, presumably to make changes prior to bootstrapping
+Get a copy of the default bootstrap-options.json, presumably to make changes prior to bootstrapping.
 
-As a rule for all dual-build commands, npx can be called with or without the -p package specifier.  We will 
-show it once
 npm[^1]
-
-[^1]: ddd
-
 ``` 
 npx dual-build bootstrap-options
 
@@ -154,7 +149,8 @@ npx dual-build bootstrap --sub <subdirectory>
 
 
 
-
+[^1]: As a rule for all dual-build commands, npx can be called with or without the -p package specifier.  We will
+  show it once with the -p specifier.
 
 [scaffolding]:    #scaffolding
 [nodejs]:         https://www.nodejs.org
