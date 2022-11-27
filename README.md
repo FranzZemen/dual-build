@@ -103,7 +103,7 @@ Example output:
 
 ```
 
-[1]: ddd
+[^1]: ddd
 
 Depending on how bootstrapping is invoked, it will either leverage default, saved or provided 
 options.  Bootstrapping can also combine both in one step, which will create prompts 
