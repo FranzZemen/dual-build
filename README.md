@@ -103,6 +103,8 @@ Example output:
 
 ```
 
+[1]: ddd
+
 Depending on how bootstrapping is invoked, it will either leverage default, saved or provided 
 options.  Bootstrapping can also combine both in one step, which will create prompts 
 for the user leveraging saved or default options.
@@ -148,7 +150,7 @@ npx dual-build bootstrap --sub <subdirectory>
 ```
 
 
-[^npmdashp]:      ddd
+
 
 
 [scaffolding]:    #scaffolding
