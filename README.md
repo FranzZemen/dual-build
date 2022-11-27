@@ -47,6 +47,42 @@ process but can be installed later as well.
 All of these features may co-exist.  If you select more than one test framework, it will be reflected in the 
 scaffolding.
 
+# Invoking dual-build commands with the package managers is straightforward:
+
+```
+// command = package in the first line below
+[package manager command cli] command
+[package manager command cli]  -p package -c command
+
+```
+
+
+where:
+
+| Package Manager | [package manager command cli] |
+|-----------------|-------------------------------|
+| npm             | npx                           |
+| pnpm            | pnpm dlx                      |
+| yarn            | yarn dlx                      |
+
+We will use "binx" in our examples to remain neutral
+
+dual-build has been deployed in such a way that we don't need the -p and -c command line options.  This is because
+the binary dual-build:
+
+```
+binx dual-bin  
+```
+
+Does nothing. In fact, if used on its own it will output "Missing Command".  It actually expects an argument,
+specifically the actual command to be executed.
+
+So all our commands will look like
+
+npx dual-bin command
+
+More on this in [Binaries][]
+
 # Bootstrapping a project
 
 Bootstrapping will achieve some or all of the following, depending on configuration or input.
@@ -73,32 +109,212 @@ purpose and structure is.
 
 ## Bootstrapping commands and utilities
 
+Conventions
+: [-c]: Square brackets implies what's between them is optional, in this case -c
+: <path_to_file>:  Angular brackets means supply what is described between them, in this case path_to_file
+
+
+Common Flags
+: -c Print to console
+
+
+### Get bootstrap-options.json from defaults
+
+Get a copy of the default bootstrap-options.json, presumably to make changes prior to bootstrapping.  As a rule for
+dual-build, npx commands can be called with or without the -p option.  We show it without.
+
+Package Manager:
+
+``` 
+Call        binx dual-build defaut-bootstrap-options <-c> <-f> 
+            binx dual-build defaut-bootstrap-options -c         
+            binx dual-build defaut-bootstrap-options -f
+            binx dual-build defaut-bootstrap-options -s <filename> 
+            binx dual-build defaut-bootstrap-options -s <filename> -f
+                    
+Returns     bootstrap options
+
+Flags       None:         saves to file bootstrap-options.json in process.cwd() 
+            -c --console: Print to console
+            -s --save:    save to a provided file <filename> relative to process.cwd()
+            -f --force:   force save to a file  
+                         
+Errors      1. file already exists and -f not set
+            2. combination of -c and -s
+```
+
+API 
+
+```typescript
+import {BootstrapOptions, 
+        defaultBootstrapOptions} from 'dual-build';
+
+let options:BootstrapOptions;
+options = await defaultBootstrapOptions();
+options = await defaultBootstrapOptions({console: true});
+options = await defaultBootstrapOptions({path: 'bootstrap-options.json'});
+options = await defaultBootstrapOptions({path: 'bootstrap-options.json', force:true});
+```
+
+### Get bootstrap-options.json from user configuration
+Get a copy of the bootstrap-options saved in the [user configuration][].  Note that capability to save to the user 
+configuration is not provided.  It will be re-saved if bootstrap-options.json are set to save to configuration, 
+after a successful bootstrapping.
+
+Package Manager:
+
+``` 
+Call        binx dual-build user-bootstrap-options [-
+            binx dual-build user-bootstrap-options -o
+            binx dual-build user-bootstrap-options -c          
+            binx dual-build user-bootstrap-options -f <filename>
+            binx dual-build user-bootstrap-options -f <filename> -o
+            
+Returns     bootstrap options
+
+Flags       None:         saves to file bootstrap-options.json in process.cwd() 
+            -c --console: Print to console
+            -s --save:    save to a provided file <filename> relative to process.cwd()
+            -f --force:   force save to a file  
+                         
+Errors      1. file already exists and -f not set
+            2. combination of -c and -s
+```
+
+API
+
+```typescript
+import {BootstrapOptions, 
+        userBootstrapOptions} from 'dual-build';
+
+
+let options:BootstrapOptions;
+options = await userBootstrapOptions();
+options = await userBootstrapOptions({console: true});
+options = await userBootstrapOptions({path: 'bootstrap-options.json'});
+options = await userBootstrapOptions({path: 'bootstrap-options.json', force:true});
+```
+
+### Delete bootstrap-options from user configuration
+Delete the boostrap-options from user configuration.  Note - this does not delete the overall user configuration file.
+See [Delete configuration][]  for that.
+
+```
+Call:       binx dual-build delete-user-bootstrap-options
+            binx dual-build delete-user-bootstrap-options -c
+
+Returns:    void
+
+Flags       None:         quietly deletes
+            -c --console: prints 'success' on complettion
+                         
+Errors      n/a
+```
+
+
+```typescript
+import {BootstrapOptions, 
+        deleteUserBootstrapOptions} from 'dual-build';
+
+let success: 'success';
+success = deleteUserBootstrapOptions();
+success = deleteUserBootstrapOptions({console: true});
+```
+
+### Bootstrap
+Bootstrap a new project
+
+Package Manager:
+
+``` 
+Call        binx dual-build bootstrap 
+            binx dual-build bootstrap -rf
+            binx dual-build user-bootstrap-options -c          
+            binx dual-build user-bootstrap-options -f <filename>
+            binx dual-build user-bootstrap-options -f <filename> -o
+            
+Returns     bootstrap options
+
+Parameters  n/a:  saves to file bootstrap-options.json in process.cwd() 
+            -f:   save to a provided file <filename> relative to process.cwd()
+            -o:   overwrite if file exists
+            -c:   stream options to console
+            
+Errors      file already exists and -o not set
+```
+
+API
+
+```typescript
+import {BootstrapOptions, 
+        getUserBootstrapOptions,
+        streamUserBootstrapOptions,
+        writeUserBootstrapOptions} from 'dual-build';
+
+const options:BootstrapOptions  = getUserBootstrapOptions();
+consoleUserBootstrapOptions();
+writeUserBootstrapOptions();
+writeUserBootstrapOptions({force:true});
+writeUserBootstrapOptions('bootstrap-options.json');
+writeUserBootstrapOptions('bootstrap-options.json', {force: true});
+```
+
+
+
+
+
+
+# Delete Configuration Files
+
+# User Configuration Files
+
+TBD
+
+# Binaries
+
+As mentioned earlier, dual-repo commands are  set up to have but one to use the syntax
+
+```
+[package manager command cli] dual-repo command
+```
+
+As per convention all of dual-repo's commands are registered in its package.json "bin" section.  
+
+In addition, dual-repo supports the concept of registering custom binaries through the command 
+
+```
+register binary <pathspec>
+```
+
+TBD
+
+
 ### Get bootstrap-options.json
 
-Get a copy of the default bootstrap-options.json, presumably to make changes prior to bootstrapping.
+Get a copy of the default bootstrap-options.json, presumably to make changes prior to bootstrapping.  As a rule for 
+dual-build, npx commands can be called with or without the -p option.  We show it without.
 
-npm[^1]
+The p
+
+
+npm:
 ``` 
-npx dual-build bootstrap-options
-
-or
-
-npx -p dual-build bootstrap-options
-
-or
-
-npm i dual-build
 npx dual-build bootstrap-options
 ```
 
 yarn:
 ```
-yarn dlx dual-build bootstrap-optoins
+yarn dlx dual-build bootstrap-options
+```
+
+pnpm:
+```
+pnpm dlx dual-build bootstrap-options
 ```
 
 Example output:
 ``` json
-
+TBD
 ```
 
 
@@ -148,17 +364,16 @@ npx dual-build bootstrap --sub <subdirectory>
 ```
 
 
-
-[^1]: As a rule for all dual-build commands, npx can be called with or without the -p package specifier.  We will
-  show it once with the -p specifier.
-
-[scaffolding]:    #scaffolding
-[nodejs]:         https://www.nodejs.org
-[typescript]:     https://www.typescriptlang.org/download
-[npm]:            https://docs.npmjs.com/getting-started
-[yarn]:           https://yarnpkg.com/getting-started/install
-[pnpm]:           https://pnpm.io/installation
-[mocha]:          https://mochajs.org/#installation
-[chai]:           https://www.chaijs.com/
-[jest]:           https://jestjs.io/docs/getting-started
-[jasmine]:        https://jasmine.github.io/pages/getting_started.html
+[nodejs]:                 https://www.nodejs.org
+[typescript]:             https://www.typescriptlang.org/download
+[npm]:                    https://docs.npmjs.com/getting-started
+[yarn]:                   https://yarnpkg.com/getting-started/install
+[pnpm]:                   https://pnpm.io/installation
+[mocha]:                  https://mochajs.org/#installation
+[chai]:                   https://www.chaijs.com/
+[jest]:                   https://jestjs.io/docs/getting-started
+[jasmine]:                https://jasmine.github.io/pages/getting_started.html
+[user configuration]      https://github.com/sindresorhus/env-paths#pathsconfig
+[Delete configuration]:   #Delete configuration
+[Binaries]:               #Binaries
+[scaffolding]:            #scaffolding
