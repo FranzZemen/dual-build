@@ -435,6 +435,6 @@ A command can take arguments (also known as parameters)
 
 
 # Footnotes
-
-[npx commands can be called with or without the -p option]:  ##calling-npx-commands-with-or-without-the--p_option
+ 
+[npx commands can be called with or without the -p option]:  ##calling-npx-commands-with-or-without-the--p-option
 ## Calling npx commands with or without the -p option
