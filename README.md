@@ -109,21 +109,34 @@ purpose and structure is.
 
 ## Bootstrapping commands and utilities
 
-Conventions
-: [-c]: Square brackets implies what's between them is optional, in this case -c
-: <path_to_file>:  Angular brackets means supply what is described between them, in this case path_to_file
+Conventions are used throughout.  Documentation will only cover what's unique or an exception from conventions.
+
+Conventions:
+
+| Convention         | Explanation                                                                                                                                                                                                                            |
+|--------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| -c                 | A letter preceded by a dash - is a flag                                                                                                                                                                                                |
+| --console          | A word preceded by two dashes -- is a flag, and may be a synonym to a single letter flag                                                                                                                                               |
+| -s <path_to_file>  | Angular brackets means supply the parameter is described between them, in this case path_to_file                                                                                                                                       |
+| -sf <path_to_file> | Single letter flags may combine as long as their instructions don't conflict (causing an error).  Only one of the combinations may require a parameter, which must follow as usual.  The order of single letter flags is not important |
+| [-c]               | Square brackets implies what's between them is optional, in this case -c                                                                                                                                                               |
 
 
-Common Flags
-: -c Print to console
+Common Flags:
+
+| Flag | Synonyms  | Parameter(s) | Unless documented otherwise, functions to                                  |
+|------|-----------|--------------|----------------------------------------------------------------------------|
+| -c   | --console |              | Print to console                                                           |
+| -s   | --save    | <filename>   | Saves to filename relative to process.cwd(), unless absolute path provided |
+| -f   | --force   |              | Forces a behavior (forcing overwrite, deletes etc)                         |
 
 
 ### Get bootstrap-options.json from defaults
 
 Get a copy of the default bootstrap-options.json, presumably to make changes prior to bootstrapping.  As a rule for
-dual-build, npx commands can be called with or without the -p option.  We show it without.
+dual-build [npx commands can be called with or without the -p option][].  We show it without.
 
-Package Manager:
+From Package Manager:
 
 ``` 
 Call        binx dual-build defaut-bootstrap-options <-c> <-f> 
@@ -143,7 +156,7 @@ Errors      1. file already exists and -f not set
             2. combination of -c and -s
 ```
 
-API 
+From code: 
 
 ```typescript
 import {BootstrapOptions, 
@@ -164,13 +177,16 @@ after a successful bootstrapping.
 Package Manager:
 
 ``` 
-Call        binx dual-build user-bootstrap-options [-
-            binx dual-build user-bootstrap-options -o
-            binx dual-build user-bootstrap-options -c          
-            binx dual-build user-bootstrap-options -f <filename>
-            binx dual-build user-bootstrap-options -f <filename> -o
+Call        binx dual-build user-bootstrap-options [-c] [-s <path_to_file>] [-f] 
             
 Returns     bootstrap options
+
+Default     Saves to file bootstrap-options.json in process.cwd().  Use -f to force overwrite.
+                        
+Errors      1. file already exists and -f not set
+            2. combination of -c and -s
+            
+Notes:      -cf has no effect and will be treated as -c        
 
 Flags       None:         saves to file bootstrap-options.json in process.cwd() 
             -c --console: Print to console
@@ -364,6 +380,45 @@ npx dual-build bootstrap --sub <subdirectory>
 ```
 
 
+
+
+
+
+
+
+# How to use the build system
+
+Before explaining how to use the dual-build build system, this is a framework that is intended to be transparent. 
+Walking away from the documentation, a software engineer should feel equally comfortable using the build API as they 
+would be using the raw tools.  If something is not clear on what is happening or how it's happening, please post 
+that in the project issues.  The intent is to automate, not obfuscate, and to allow for the build system to be 
+extended to other use cases.
+
+The build system is based on three key concepts:
+
+- **commands** which represent composable, aggregate, multistep capability based on _actions_. Commands are also the 
+  API into the build system. 
+- **actions** which represent complete units of work
+- **tasks** which represent sub-unit functionality that often need to be combined with other tasks to generate 
+  useful output.
+
+At times, it is very clear what should be commands, actions and tasks, but things sometimes get blurry.  If building 
+any of these, just go with your gut.  For instance, is "clean" a command or an action?  Maybe it is both, i.e. an 
+action, so it can be composed into many commands, and a command so that it can be executed as an API.
+
+# Commands
+
+If you have executed the bootstrapping process to create a new project, then you are already familiar with commands. 
+A command is distinct in that it can be executed with npx or pnpm/yarn dlx.
+
+```
+npx dual-build bootstrap
+```
+
+A command can take arguments (also known as parameters)
+
+
+
 [nodejs]:                 https://www.nodejs.org
 [typescript]:             https://www.typescriptlang.org/download
 [npm]:                    https://docs.npmjs.com/getting-started
@@ -377,3 +432,9 @@ npx dual-build bootstrap --sub <subdirectory>
 [Delete configuration]:   #Delete configuration
 [Binaries]:               #Binaries
 [scaffolding]:            #scaffolding
+
+
+# Footnotes
+
+[npx commands can be called with or without the -p option]:  ##calling-npx-commands-with-or-without-the--p_option
+## Calling npx commands with or without the -p option

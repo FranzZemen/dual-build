@@ -1,6 +1,11 @@
 {
   "dependencies": {
-    "fast-glob": "^3.2.12"
+    "@franzzemen/module-factory": "^7.0.1",
+    "@types/node": "^18.11.9",
+    "@types/uuid": "^8.3.4",
+    "fast-glob": "^3.2.12",
+    "is-stream": "^3.0.0",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "typescript": "^4.9.3"

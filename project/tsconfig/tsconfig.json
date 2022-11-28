@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "Node",
+    "sourceMap": true,
+    "removeComments": true,
+    "declaration": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "checkJs": true,
+  },
+  "exclude": [
+    "node_modules"
+  ],
+}
+
