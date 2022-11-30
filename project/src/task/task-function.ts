@@ -35,7 +35,6 @@ export type PromiseTaskFunction<T extends TaskOptions, R> = TaskFunction<T, Prom
  */
 export type AnyTaskFunction<T extends TaskOptions> = TaskFunction<T, NotStreamOrPromise<any>>;
 
-
 /* -----------
    Type Guards
    ----------- */

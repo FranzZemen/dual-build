@@ -5,7 +5,7 @@ dual-build provides services to build esm and commonjs distributions from the sa
 # Critical Dependencies
 
 Critical dependencies mean that functionality internal to dual-build depends on these in a way that would
-render build-tools useless without them.  They must be pre-installed.
+render build-tools useless without them. They must be pre-installed.
 
 - **[nodejs][]**
 - **Package Manager** ([npm][] | [pnpm][] | [yarn][])
@@ -18,7 +18,7 @@ render build-tools useless without them.  They must be pre-installed.
 | [pnpm][]            | If using pnpm, >= 7.17                                       |
 | [yarn][]            | If using yarn, >= 3.30                                       |                                                             
 
-<sup>1</sup> Prior versions may work, they just haven't been tested.  Report any successes or issues with these!
+<sup>1</sup> Prior versions may work, they just haven't been tested. Report any successes or issues with these!
 <sup>2</sup> Strictly speaking, dual-build provides an option to work without git.
 
 Worth noting:
@@ -31,9 +31,8 @@ Worth noting:
 
 # Optional Dependencies
 
-Optional dependencies are specific to features dual-build offers.  These are usually installed by the bootstrap 
+Optional dependencies are specific to features dual-build offers. These are usually installed by the bootstrap
 process but can be installed later as well.
-
 
 | Dependency     | Usage                     | Supported Versions <sup>1</sup> |
 |----------------|---------------------------|---------------------------------|
@@ -43,8 +42,8 @@ process but can be installed later as well.
 | [Jest][]       | Test with Jest framework  | >= 29.3.1                       |  
 | [Jasmine][]    | Jasmine                   | >= 4.5                          |
 
-<sup>1</sup> Prior versions may work, they just haven't been tested.  Report any successes or issues with these!  
-All of these features may co-exist.  If you select more than one test framework, it will be reflected in the 
+<sup>1</sup> Prior versions may work, they just haven't been tested. Report any successes or issues with these!  
+All of these features may co-exist. If you select more than one test framework, it will be reflected in the
 scaffolding.
 
 # Invoking dual-build commands with the package managers is straightforward:
@@ -56,7 +55,6 @@ scaffolding.
 
 ```
 
-
 where:
 
 | Package Manager | [package manager command cli] |
@@ -67,14 +65,14 @@ where:
 
 We will use "binx" in our examples to remain neutral
 
-dual-build has been deployed in such a way that we don't need the -p and -c command line options.  This is because
+dual-build has been deployed in such a way that we don't need the -p and -c command line options. This is because
 the binary dual-build:
 
 ```
 binx dual-bin  
 ```
 
-Does nothing. In fact, if used on its own it will output "Missing Command".  It actually expects an argument,
+Does nothing. In fact, if used on its own it will output "Missing Command". It actually expects an argument,
 specifically the actual command to be executed.
 
 So all our commands will look like
@@ -101,15 +99,15 @@ Bootstrapping will achieve some or all of the following, depending on configurat
 - Complete a basic build to ensure things are working
 - Provide results output
 
-<sup>a</sup> The only contents of the empty directory is an optional valid bootstrap-options.json file with that 
+<sup>a</sup> The only contents of the empty directory is an optional valid bootstrap-options.json file with that
 exact name.
 
-This documentation will fully explain what bootstrapping is doing, how the scaffolding works, what each file's 
+This documentation will fully explain what bootstrapping is doing, how the scaffolding works, what each file's
 purpose and structure is.
 
 ## Bootstrapping commands and utilities
 
-Conventions are used throughout.  Documentation will only cover what's unique or an exception from conventions.
+Conventions are used throughout. Documentation will only cover what's unique or an exception from conventions.
 
 Conventions:
 
@@ -121,7 +119,6 @@ Conventions:
 | -sf <path_to_file> | Single letter flags may combine as long as their instructions don't conflict (causing an error).  Only one of the combinations may require a parameter, which must follow as usual.  The order of single letter flags is not important |
 | [-c]               | Square brackets implies what's between them is optional, in this case -c                                                                                                                                                               |
 
-
 Common Flags:
 
 | Flag | Synonyms  | Parameter(s) | Unless documented otherwise, functions to                                  |
@@ -130,11 +127,10 @@ Common Flags:
 | -s   | --save    | <filename>   | Saves to filename relative to process.cwd(), unless absolute path provided |
 | -f   | --force   |              | Forces a behavior (forcing overwrite, deletes etc)                         |
 
-
 ### Get bootstrap-options.json from defaults
 
-Get a copy of the default bootstrap-options.json, presumably to make changes prior to bootstrapping.  As a rule for
-dual-build [npx commands can be called with or without the -p option][].  We show it without.
+Get a copy of the default bootstrap-options.json, presumably to make changes prior to bootstrapping. As a rule for
+dual-build [npx commands can be called with or without the -p option][]. We show it without.
 
 From Package Manager:
 
@@ -158,18 +154,19 @@ Errors      1. file already exists and -f not set
             2. combination of -c and -s
 ```
 
-From code: 
+From code:
 
 ```typescript
 options = await defaultBootstrapOptions();
 options = await defaultBootstrapOptions({console: true});
 options = await defaultBootstrapOptions({path: 'bootstrap-options.json'});
-options = await defaultBootstrapOptions({path: 'bootstrap-options.json', force:true});
+options = await defaultBootstrapOptions({path: 'bootstrap-options.json', force: true});
 ```
 
 ### Get bootstrap-options.json from user configuration
-Get a copy of the bootstrap-options saved in the [user configuration][].  Note that capability to save to the user 
-configuration is not provided.  It will be re-saved if bootstrap-options.json are set to save to configuration, 
+
+Get a copy of the bootstrap-options saved in the [user configuration][]. Note that capability to save to the user
+configuration is not provided. It will be re-saved if bootstrap-options.json are set to save to configuration,
 after a successful bootstrapping.
 
 Package Manager:
@@ -200,11 +197,12 @@ API
 options = await userBootstrapOptions();
 options = await userBootstrapOptions({console: true});
 options = await userBootstrapOptions({path: 'bootstrap-options.json'});
-options = await userBootstrapOptions({path: 'bootstrap-options.json', force:true});
+options = await userBootstrapOptions({path: 'bootstrap-options.json', force: true});
 ```
 
 ### Delete bootstrap-options from user configuration
-Delete the boostrap-options from user configuration.  Note - this does not delete the overall user configuration file.
+
+Delete the boostrap-options from user configuration. Note - this does not delete the overall user configuration file.
 See [Delete configuration][]  for that.
 
 ```
@@ -223,10 +221,11 @@ Flags       none:         quietly deletes
 Errors      n/a
 ```
 
-
 ```typescript
-import {BootstrapOptions, 
-        deleteUserBootstrapOptions} from 'dual-build';
+import {
+  BootstrapOptions,
+  deleteUserBootstrapOptions
+} from 'dual-build';
 
 let success: 'success';
 success = deleteUserBootstrapOptions();
@@ -234,55 +233,34 @@ success = deleteUserBootstrapOptions({console: true});
 ```
 
 ### Bootstrap
+
 Bootstrap a new project
 
 Package Manager:
 
 ``` 
-Call        binx dual-build bootstrap [-p] [-d <path_to_project>] [-o <path_to_options>] [-v <verbose_level> [-w] [--logger <path_to_logger.js|mjs|cjs>] 
+Call        binx dual-build bootstrap path_to_project [-p | -o <path_to_options>] [-p] [-v <verbose_level> [-w | --logger <path_to_logger>] 
             
 Returns     1. creates project scaffolding and files
             2. depending on verbose levels and configuration, logs progress
             
 Flags       ** all flags are optional **
-            -p --prompt:    options are prompted prior to launching
-            -d --diretory:  specify the project path
-            -o --options:   provide the path to bootstrap options
-            -v --verbose:   set verbose level to one of "debug", "info", "warn", or "error"  
-            -w --write:     log to file (in _logs directory)
-            --logger:       specify custom logger (console is the default with file option), can also be set via options file 
+
+            -p --prompt: Options are prompted prior to launching.  Mutually exclusive with -o.  
+
+            -o --options: Options are provided in the path_to_options file.  Mutually exclusive with -p.
+                        
+            -v --verbose: Set verbose level to one of "debug", "info", "warn", or "error".  Default is "info".  
+            
+            -w --write: The default logging is to console, this setting forces the to log to file (in .logs 
+            directory).  Mutually exclusive with --logger
+            
+            --logger: Specify custom logger.  This option removes the default logger, and will determine entirely 
+            where logs appear.  However, the verbose level will still be governed by -v.  Mutually exclusive with -w.
                   
 
-Notes       A. The directory to be bootstraped will be in the bootstrap-options.json "path to project" property.
 
-            B. Where does bootstrap-options.json come from?
-                        
-              1. If none of -p, -d or -o are provided, options will be loaded (in decreasing priority order) from:              
-                i)   A valid 'bootstrap-options.json' file exists in process.cwd() 
-                ii)  A valid 'bootstrap-options.json' exists in the user's profile
-                iii) build-dual/defaults/bootstrap-options.json
-                
-                In all these cases, the "path to project" property is updated to process.cwd() prior to bootstrapping.
-                
-              2. If prompts (-p) is specified, user will be prompted for options.  However, the prompts will be 
-                 loaded with defaults from the following, in priority order:
-                 
-                i)   A valid bootstrap file pointed to by the -o option
-                ii)  A valid 'bootstrap-options.json' file located at path_to_object, if -d is specified
-                iii) A valid 'bootstrap-options.json' file exists in process.cwd() 
-                iv)  A valid 'bootstrap-options.json' exists in the user's profile
-                iv)  build-dual/defaults/bootstrap-options.json 
-                
-                In all these cases, if -d is specified, the "path to project" prompt default will be set to that.
-                
-              3. If -d is provided, but NOT -p or -o, options will be loaded from:
-                i)   A valid 'bootstrap-options.json' file located at path_to_object 
-                ii)  A valid 'bootstrap-options.json' file exists in process.cwd() 
-                iii) A valid 'bootstrap-options.json' exists in the user's profile
-                iv)  build-dual/defaults/bootstrap-options.json 
-                
-                In all these cases, the "path to project" property will be updated to the value provided by -d 
-                (path_to_options)
+             
             
 Errors      error code: 500 subcode: N    generally unable to complete command (reason will depend on subcode)
             error code: 404 subcode: 1    options file does not exist in path specified (-o)
@@ -291,6 +269,130 @@ Errors      error code: 500 subcode: N    generally unable to complete command (
             error code: 403 subcode: 4    not permitted to execute file(s)
             error code: 409 subcode: 5    project folder is not empty (only file allowed is bootstrap options file
 ```
+
+#### Notes      
+
+1. path_to_project points a directory that bootstrap will create.  ** Intermediate ** directories will not be created. bootstrap-options.json resolution
+
+ 
+2. bootstrap-options.json 
+   1. There are two optional, mutually exclusive command line entries to specify the options.  If one of these is set, 
+   that will be where the options are pulled from.
+      1. If -p is provided, options will be created from prompts.  See C. prompts, below.
+      2. If -o <path_to_options> is provided, that will be used.
+                
+   2. If neither -p nor -o are specified
+      1. If there is a build-dual user profile, the options will be pulled from that (see D, Profile below)
+      2. If there is a bootstrap-options.json file in process.cwd() it is used.
+      3. If the options will be pulled from node_modules/build-dual/defaults/bootstrap-options.json
+
+
+3. prompts:  When -p is selected prompts drive the bootstrap options.  Prompts are preloaded with defaults, as follows. 
+   1. Within prompts, the first question will be whether user wants to load a bootstrap options file.  If that is 
+      affirmative, it will be used (if it exists).
+   2. If there exists a valid bootstrap-options.json file in process.cwd() then it will be used.
+   3. If there exists a valid dual-build user profile it will be used.  (see D. Profile below)
+   4. If build-dual/defaults/bootstrap-options.json will be used as prompt defaults. 
+   
+   At the end of the prompting, the user can save the options to the user profile for use on other 
+                         projects.  Also see Commands to manage the user profile directly.
+
+              
+4. Profile: A build-dual profile allows for settings to optionally be re-used from project to project.  A profile 
+   can be created through a number of ways including some Commands specific to that.  During bootstrapping, if the  
+   -p option is used, bootstrap-options.json may be optionally saved to the profile, creating it if it did not 
+   already exist.  If saving to the profile, it will overwrite and any previois bootstrap-options.json. 
+
+
+5. Scaffolding
+   
+    The following scaffolding will be created in the base directory targeted by bootstrap
+
+```
+base ─┬─ .git/
+      ├─ .gitignore
+      ├─ node_modules/
+      ├─ package.json
+      │      
+      ├─ project/─┬─ logs/─┬─ bootstrap.log
+      │           │        ├─ clean.log
+      │           │        ├─ ...
+      │           │        └─ [command].log4
+      │           │
+      │           ├─ options/─┬─ bootstrap-options.json
+      │           │           ├─ ...
+      │           │           └─ [command]-options.json
+      │           │
+      │           ├─ pacakages/─┬─ package.base.json
+      │           │             ├─ package.build.json
+      │           │             ├─ package.publish.json
+      │           │             ├─ package.publish.esm.json
+      │           │             ├─ package.publish.commonjs.json
+      │           │             └─ package.ide.json
+      │           │              
+      │           └─ tsconfigs/─┬─ tsconfig.base.json
+      │                         ├─ tsconfig.buildsource.esm.json
+      │                         ├─ tsconfig.buildsource.commonjs.json
+      │                         ├─ tsconfig.buildtest.esm.json
+      │                         ├─ tsconfig.buildtest.commonjs.json
+      │                         └─ tsconfig.ide.json       
+      │
+      ├─ src/─┬─ package.json
+      │       ├─ tsconfig.json  
+      │       └─ (files hierarchy)       
+      │
+      ├─ test─┬─ package.json
+      │       ├─ tsconfig.json  
+      │       └─ (files hierarchy)    
+      │    
+      └─ transient/─┬─ build/ 
+                    ├─ publish/─┬─ package.json
+                    │           ├─ esm/─┬─ package.json
+                    │           │       ├─ index.js
+                    │           │       └─ (files hierarchy)        
+                    │           │ 
+                    │           └─ commonjs/─┬─ package.json
+                    │                        ├─ index.js
+                    │                        └─ (files hierarchy)   
+                    │    
+                    └─ test/─┬─ package.json
+                             ├─ esm/─┬─ package.json
+                             │       ├─ index.js
+                             │       └─ (files hierarchy)        
+                             │ 
+                             └─ commonjs/─┬─ package.json
+                                          ├─ index.js
+                                          └─ (files hierarchy)   
+
+```
+
+
+
+| scaffold item                      | f/d <sup>1</sup> | git<sup>2</sup> | gitignore<sup>3</sup> | description                                                                                                |
+|:-----------------------------------|:----------------:|:---------------:|:---------------------:|:-----------------------------------------------------------------------------------------------------------|
+|                                    |                  |                 |                       |                                                                                                            |
+| sources/                           |        d         |       yes       |          no           | contains all sourcing and source build files                                                               |
+| sources/src/                       |        d         |       yes       |          no           | this is the source root for .ts, .mts, .cts, .js, .mjs, .cjs, .json . md etc                               |
+| [sources/package.json][]           |        f         |       yes       |          no           | minimal package.json file to assist IDEs with type="module" or type="commonjs"                             |  
+| [sources/tsconfig.json][]          |        f         |       yes       |          no           | minimal tsconfig.json file to assist IDEs with typescript "compilerOptions"                                |
+| [sources/.tsconfig.esm.json]       |                  |                 |                       |                                                                                                            |
+| [sources/.tsconfig.commons.json]   |                  |                 |                       |                                                                                                            |
+|                                    |                  |                 |                       |                                                                                                            |
+| tests/                             |        d         |       yes       |          no           | contains all test and test build files                                                                     |
+| tests/test/                        |                  |                 |                       |                                                                                                            |
+| [test/package.json][]              |                  |                 |                       |                                                                                                            |
+| [test/tsconfig.json][]             |                  |                 |                       |                                                                                                            |
+| [test/.tsconfig.esm.json]          |                  |                 |                       |                                                                                                            |
+| [test/.tsconfig.commonjs.json]     |                  |                 |                       |                                                                                                            |
+|                                    |                  |                 |                       |                                                                                                            |
+| [.build/][]                        |        d         |       no        |          yes          |                                                                                                            |
+| [publish][]                        |        d         |       no        |          yes          | final build location and root of npm publish                                                               |
+|                                    |                  |                 |                       |                                                                                                            |
+
+<sup>1</sup> file or directory
+<sup>2</sup> added to git
+
+
 
 API
 
@@ -308,13 +410,196 @@ bootstrap(bootstrapJSON);
 
 #### Project scaffolding and files
 
-The following scaffolding will be created in the base directory targeted by bootstrap 
+
+IMPORTANT IDEA
+
+glob->files newer than build files->build
+
+### Repair Bootstrap
+
+# Delete Configuration Files
+
+# User Configuration Files
+
+TBD
+
+# Binaries
+
+As mentioned earlier, dual-repo commands are set up to have but one to use the syntax
+
+```
+[package manager command cli] dual-repo command
+```
+
+As per convention all of dual-repo's commands are registered in its package.json "bin" section.
+
+In addition, dual-repo supports the concept of registering custom binaries through the command
+
+```
+register binary <pathspec>
+```
+
+TBD
+
+### Get bootstrap-options.json
+
+Get a copy of the default bootstrap-options.json, presumably to make changes prior to bootstrapping. As a rule for
+dual-build, npx commands can be called with or without the -p option. We show it without.
+
+The p
+
+npm:
+
+``` 
+npx dual-build bootstrap-options
+```
+
+yarn:
+
+```
+yarn dlx dual-build bootstrap-options
+```
+
+pnpm:
+
+```
+pnpm dlx dual-build bootstrap-options
+```
+
+Example output:
+
+``` json
+TBD
+```
+
+Depending on how bootstrapping is invoked, it will either leverage default, saved or provided
+options. Bootstrapping can also combine both in one step, which will create prompts
+for the user leveraging saved or default options.
+
+
+Terms
+: **Default options** are within dual-repo itself and provided to the bootstrapping process. They cannot be altered
+prior to bootstrapping.
+: **Saved options** is on the users machine in the usual conf location saved through prior action by
+the user
+: **Provided options** is provided explicitly by a path pointing to a JSON file that contains bootstrap options.
+
+Provided options override saved options which override default options. The override is incremental, meaning only those
+fields present override the same fields, i.e. implemented by _.merge() in lodash.
+
+If saved options exist, they will be updated with final options for the next project, unless options are explicitly
+not to be saved anymore.
+
+# How to use the dual-build
+
+Before explaining how to use the dual-build dual-build, this is a framework that is intended to be transparent.
+Walking away from the documentation, a software engineer should feel equally comfortable using the build API as they
+would be using the raw tools. If something is not clear on what is happening or how it's happening, please post
+that in the project issues. The intent is to automate, not obfuscate, and to allow for the dual-build to be
+extended to other use cases.
+
+The dual-build is based on three key concepts:
+
+- **commands** which represent composable, aggregate, multistep capability based on _actions_. Commands are also the
+  API into the dual-build.
+- **actions** which represent complete units of work
+- **tasks** which represent sub-unit functionality that often need to be combined with other tasks to generate
+  useful output.
+
+At times, it is very clear what should be commands, actions and tasks, but things sometimes get blurry. If building
+any of these, just go with your gut. For instance, is "clean" a command or an action? Maybe it is both, i.e. an
+action, so it can be composed into many commands, and a command so that it can be executed as an API.
+
+# Commands
+
+If you have executed the bootstrapping process to create a new project, then you are already familiar with commands.
+A command is distinct in that it can be executed with npx or pnpm/yarn dlx.
+
+```
+npx dual-build bootstrap -j 
+```
+
+A command can take command line arguments or (parameters when accessed via API).
+
+
+[nodejs]:                 https://www.nodejs.org
+
+[typescript]:             https://www.typescriptlang.org/download
+
+[npm]:                    https://docs.npmjs.com/getting-started
+
+[yarn]:                   https://yarnpkg.com/getting-started/install
+
+[pnpm]:                   https://pnpm.io/installation
+
+[mocha]:                  https://mochajs.org/#installation
+
+[chai]:                   https://www.chaijs.com/
+
+[jest]:                   https://jestjs.io/docs/getting-started
+
+[jasmine]:                https://jasmine.github.io/pages/getting_started.html
+[profile location]:      https://github.com/sindresorhus/env-paths#pathsconfig
+[Delete configuration]:   #Delete configuration
+[Binaries]:               #Binaries
+[scaffolding]:            #scaffolding
+
+# Footnotes
+
+[npx commands can be called with or without the -p option]:  #calling-npx-commands-with-or-without-the--p-option
+
+## Calling npx commands with or without the -p option
+
+As mentioned, normally binaries are called by package managers as follows:
+
+```
+npx package
+```
+
+This is done because it turns out the first binary in the package/bin also bears the package's name. It won't work if
+the first binary doesn't have the exact same name.
+
+To overcome this, or to call any binary that is not the first binary command in a package the call must be made as
+follows, specifying both the package and command explicitly.
+
+```
+npx -p package -c binary
+```
+
+In the case of dual-build this would look like
+
+```
+npx -p dual-build -c bootstrap
+```
+
+However, dual-build is configured with a first binary command named dual-build. Moreover, the dual-build command by
+itself is a no-op. It does nothing. In fact, it expects one argument, the actual command to execute. Any
+additional arguments are consumed by _that_ command.
+
+Specify package, command and command's argument.
+
+```
+npx -p dual-build -c bootstrap -c
+```
+
+Specify first command, second command and second command's arguments
+
+```
+npx dual-build bootstrap -s -f my-file.json
+```
+
+Each of these is equivalent (aside from the arguments).
+
+
+
 
 | scaffold item                      | f/d <sup>1</sup> | git<sup>2</sup> | gitignore<sup>3</sup> | description                                                                                                |
 |:-----------------------------------|:----------------:|:---------------:|:---------------------:|:-----------------------------------------------------------------------------------------------------------|
 | .git/                              |        d         |       no        |          no           | git file                                                                                                   |
 | .gitignore                         |        f         |       yes       |          no           | .gitignore                                                                                                 |
 |                                    |                  |                 |                       |                                                                                                            |
+| [project/][]                       |                  |                 |                       |                                                                                                            |
+| ........[options/][]               |                  |                 |                       |                                                                                                            |
 | [.options/][]                      |        d         |       yes       |          no           | options files used by the dual-build, including the bootstrap-options.json file that was used to bootstrap |
 |                                    |                  |                 |                       |                                                                                                            |
 | package.json                       |        f         |       yes       |          no           | minimal package.json for node_modules                                                                      |
@@ -349,213 +634,3 @@ The following scaffolding will be created in the base directory targeted by boot
 <sup>1</sup> file or directory
 <sup>2</sup> added to git
 
-
-
-
-IMPORTANT IDEA
-
-glob->files newer than build files->build
-
-
-### Repair Bootstrap
-
-
-
-
-# Delete Configuration Files
-
-# User Configuration Files
-
-TBD
-
-# Binaries
-
-As mentioned earlier, dual-repo commands are  set up to have but one to use the syntax
-
-```
-[package manager command cli] dual-repo command
-```
-
-As per convention all of dual-repo's commands are registered in its package.json "bin" section.  
-
-In addition, dual-repo supports the concept of registering custom binaries through the command 
-
-```
-register binary <pathspec>
-```
-
-TBD
-
-
-### Get bootstrap-options.json
-
-Get a copy of the default bootstrap-options.json, presumably to make changes prior to bootstrapping.  As a rule for 
-dual-build, npx commands can be called with or without the -p option.  We show it without.
-
-The p
-
-
-npm:
-``` 
-npx dual-build bootstrap-options
-```
-
-yarn:
-```
-yarn dlx dual-build bootstrap-options
-```
-
-pnpm:
-```
-pnpm dlx dual-build bootstrap-options
-```
-
-Example output:
-``` json
-TBD
-```
-
-
-
-Depending on how bootstrapping is invoked, it will either leverage default, saved or provided 
-options.  Bootstrapping can also combine both in one step, which will create prompts 
-for the user leveraging saved or default options.
-
-
-Terms
-: **Default options** are within dual-repo itself and provided to the bootstrapping process.  They cannot be altered 
-prior to bootstrapping.
-: **Saved options** is on the users machine in the usual conf location saved through prior action by 
-the user
-: **Provided options** is provided explicitly by a path pointing to a JSON file that contains bootstrap options.
-
-Provided options override saved options which override default options.  The override is incremental, meaning only those
-fields present override the same fields, i.e. implemented by _.merge() in lodash.
-
-If saved options exist, they will be updated with final options for the next project, unless options are explicitly 
-not to be saved anymore.
-
-### Bootstrapping and support commands
-
-Although you can use one package manager
-
-pkggr
-
-### Bootstrapping from an empty/mostly empty directory
-
-The only file allowed in the directory is a valid bootstrap-options.json file.
-
-```
-npx -p dual-build bootstrap
-
-npx dual-build bootstrap
-```
-
-Note that the directory must be empty or an error code will be returned.
-
-### Create a project in a new subdirectory
-
-```
-npx -p dual-build bootstrap --sub <subdirectory>
-
-npx dual-build bootstrap --sub <subdirectory>
-```
-
-
-[Go to read me](#read-me)
-            
-[Also to read me][]
-            
-            
-[Also to read me]: #read-me
-
-
-
-
-
-# How to use the dual-build
-
-Before explaining how to use the dual-build dual-build, this is a framework that is intended to be transparent. 
-Walking away from the documentation, a software engineer should feel equally comfortable using the build API as they 
-would be using the raw tools.  If something is not clear on what is happening or how it's happening, please post 
-that in the project issues.  The intent is to automate, not obfuscate, and to allow for the dual-build to be 
-extended to other use cases.
-
-The dual-build is based on three key concepts:
-
-- **commands** which represent composable, aggregate, multistep capability based on _actions_. Commands are also the 
-  API into the dual-build. 
-- **actions** which represent complete units of work
-- **tasks** which represent sub-unit functionality that often need to be combined with other tasks to generate 
-  useful output.
-
-At times, it is very clear what should be commands, actions and tasks, but things sometimes get blurry.  If building 
-any of these, just go with your gut.  For instance, is "clean" a command or an action?  Maybe it is both, i.e. an 
-action, so it can be composed into many commands, and a command so that it can be executed as an API.
-
-# Commands
-
-If you have executed the bootstrapping process to create a new project, then you are already familiar with commands. 
-A command is distinct in that it can be executed with npx or pnpm/yarn dlx.
-
-```
-npx dual-build bootstrap -j 
-```
-
-A command can take command line arguments or (parameters when accessed via API).
-
-
-
-[nodejs]:                 https://www.nodejs.org
-[typescript]:             https://www.typescriptlang.org/download
-[npm]:                    https://docs.npmjs.com/getting-started
-[yarn]:                   https://yarnpkg.com/getting-started/install
-[pnpm]:                   https://pnpm.io/installation
-[mocha]:                  https://mochajs.org/#installation
-[chai]:                   https://www.chaijs.com/
-[jest]:                   https://jestjs.io/docs/getting-started
-[jasmine]:                https://jasmine.github.io/pages/getting_started.html
-[user configuration]      https://github.com/sindresorhus/env-paths#pathsconfig
-[Delete configuration]:   #Delete configuration
-[Binaries]:               #Binaries
-[scaffolding]:            #scaffolding
-
-
-# Footnotes
- 
-[npx commands can be called with or without the -p option]:  #calling-npx-commands-with-or-without-the--p-option
-## Calling npx commands with or without the -p option
-
-As mentioned, normally  binaries are called by package managers as follows:
-
-```
-npx package
-```
-
-This is done because it turns out the first binary in the package/bin also bears the package's name.  It won't work if 
-the first binary doesn't have the exact same name.
-
-To overcome this, or to call any binary that is not the first binary command in a package the call must be made as 
-follows, specifying both the package and command explicitly.
-
-```
-npx -p package -c binary
-```
-In the case of dual-build this would look like
-
-```
-npx -p dual-build -c bootstrap
-```
-However, dual-build is configured with a first binary command named dual-build.  Moreover, the dual-build command by 
-itself is a no-op.  It does nothing.  In fact, it expects one argument, the actual command to execute.  Any 
-additional arguments are consumed by _that_ command.
-
-Specify package, command and command's argument.
-```
-npx -p dual-build -c bootstrap -c
-```
-Specify first command, second command and second command's arguments
-```
-npx dual-build bootstrap -s -f my-file.json
-```
-Each of these is equivalent (aside from the arguments).
