@@ -139,30 +139,28 @@ dual-build [npx commands can be called with or without the -p option][].  We sho
 From Package Manager:
 
 ``` 
-Call        binx dual-build defaut-bootstrap-options <-c> <-f> 
-            binx dual-build defaut-bootstrap-options -c         
-            binx dual-build defaut-bootstrap-options -f
-            binx dual-build defaut-bootstrap-options -s <filename> 
-            binx dual-build defaut-bootstrap-options -s <filename> -f
+Call        binx dual-build defaut-bootstrap-options [-c] [-s <path_to_json>] [-f] [-v <verbose_level>
                     
 Returns     bootstrap options
 
-Flags       None:         saves to file bootstrap-options.json in process.cwd() 
-            -c --console: Print to console
-            -s --save:    save to a provided file <filename> relative to process.cwd()
-            -f --force:   force save to a file  
+Default     1. saves to file bootstrap-options.json in process.cwd().  Use -f to force overwrite.
+            2. depending on verbose levels and configuration, logs progress
+            
+Notes:      -cf has no effect and will be treated as -c     
+
+Flags       None:               saves to file bootstrap-options.json in process.cwd() 
+            -c --console:       Print to console
+            -s --save:          save to a provided JSON file <path_to_json> relative to process.cwd()
+            -f --force:         force save to a file  
+            -v --verbose_level: set verbose level <verbose_level>, i..e debug info warn error suppress
                          
-Errors      1. file already exists and -f not set
+Errors      1. file already exists and -f not set 
             2. combination of -c and -s
 ```
 
 From code: 
 
 ```typescript
-import {BootstrapOptions, 
-        defaultBootstrapOptions} from 'dual-build';
-
-let options:BootstrapOptions;
 options = await defaultBootstrapOptions();
 options = await defaultBootstrapOptions({console: true});
 options = await defaultBootstrapOptions({path: 'bootstrap-options.json'});
@@ -177,22 +175,21 @@ after a successful bootstrapping.
 Package Manager:
 
 ``` 
-Call        binx dual-build user-bootstrap-options [-c] [-s <path_to_file>] [-f] 
+Call        binx dual-build user-bootstrap-options [-c] [-s <path_to_json>] [-f] [-v <verbose_level>
             
-Returns     bootstrap options
+Returns     1. bootstrap options
+            2. depending on verbose levels and configuration, logs progress
 
-Default     Saves to file bootstrap-options.json in process.cwd().  Use -f to force overwrite.
-                        
-Errors      1. file already exists and -f not set
-            2. combination of -c and -s
-            
+Default     saves to file bootstrap-options.json in process.cwd().  Use -f to force overwrite.
+
 Notes:      -cf has no effect and will be treated as -c        
 
-Flags       None:         saves to file bootstrap-options.json in process.cwd() 
+Flags       none:         saves to file bootstrap-options.json in process.cwd() 
             -c --console: Print to console
-            -s --save:    save to a provided file <filename> relative to process.cwd()
+            -s --save:    save to a provided JSON file <path_to_json> relative to process.cwd()
             -f --force:   force save to a file  
-                         
+            -v --verbose_level: set verbose level <verbose_level>, i..e debug info warn error suppress
+                                    
 Errors      1. file already exists and -f not set
             2. combination of -c and -s
 ```
@@ -200,11 +197,6 @@ Errors      1. file already exists and -f not set
 API
 
 ```typescript
-import {BootstrapOptions, 
-        userBootstrapOptions} from 'dual-build';
-
-
-let options:BootstrapOptions;
 options = await userBootstrapOptions();
 options = await userBootstrapOptions({console: true});
 options = await userBootstrapOptions({path: 'bootstrap-options.json'});
@@ -216,13 +208,17 @@ Delete the boostrap-options from user configuration.  Note - this does not delet
 See [Delete configuration][]  for that.
 
 ```
-Call:       binx dual-build delete-user-bootstrap-options
-            binx dual-build delete-user-bootstrap-options -c
+Call:       binx dual-build delete-user-bootstrap-options [-c] [-v <verbose_level>]
 
-Returns:    void
+Returns:    depending on verbose levels and configuration, logs progress
 
-Flags       None:         quietly deletes
+Default     delete bootstrap options from user configuration
+
+Notes:      n/a
+
+Flags       none:         quietly deletes
             -c --console: prints 'success' on complettion
+            -v --verbose_level: set verbose level <verbose_level>, i..e debug info warn error suppress
                          
 Errors      n/a
 ```
@@ -243,39 +239,125 @@ Bootstrap a new project
 Package Manager:
 
 ``` 
-Call        binx dual-build bootstrap 
-            binx dual-build bootstrap -rf
-            binx dual-build user-bootstrap-options -c          
-            binx dual-build user-bootstrap-options -f <filename>
-            binx dual-build user-bootstrap-options -f <filename> -o
+Call        binx dual-build bootstrap [-p] [-d <path_to_project>] [-o <path_to_options>] [-v <verbose_level> [-w] [--logger <path_to_logger.js|mjs|cjs>] 
             
-Returns     bootstrap options
+Returns     1. creates project scaffolding and files
+            2. depending on verbose levels and configuration, logs progress
+            
+Flags       ** all flags are optional **
+            -p --prompt:    options are prompted prior to launching
+            -d --diretory:  specify the project path
+            -o --options:   provide the path to bootstrap options
+            -v --verbose:   set verbose level to one of "debug", "info", "warn", or "error"  
+            -w --write:     log to file (in _logs directory)
+            --logger:       specify custom logger (console is the default with file option), can also be set via options file 
+                  
 
-Parameters  n/a:  saves to file bootstrap-options.json in process.cwd() 
-            -f:   save to a provided file <filename> relative to process.cwd()
-            -o:   overwrite if file exists
-            -c:   stream options to console
+Notes       A. The directory to be bootstraped will be in the bootstrap-options.json "path to project" property.
+
+            B. Where does bootstrap-options.json come from?
+                        
+              1. If none of -p, -d or -o are provided, options will be loaded (in decreasing priority order) from:              
+                i)   A valid 'bootstrap-options.json' file exists in process.cwd() 
+                ii)  A valid 'bootstrap-options.json' exists in the user's profile
+                iii) build-dual/defaults/bootstrap-options.json
+                
+                In all these cases, the "path to project" property is updated to process.cwd() prior to bootstrapping.
+                
+              2. If prompts (-p) is specified, user will be prompted for options.  However, the prompts will be 
+                 loaded with defaults from the following, in priority order:
+                 
+                i)   A valid bootstrap file pointed to by the -o option
+                ii)  A valid 'bootstrap-options.json' file located at path_to_object, if -d is specified
+                iii) A valid 'bootstrap-options.json' file exists in process.cwd() 
+                iv)  A valid 'bootstrap-options.json' exists in the user's profile
+                iv)  build-dual/defaults/bootstrap-options.json 
+                
+                In all these cases, if -d is specified, the "path to project" prompt default will be set to that.
+                
+              3. If -d is provided, but NOT -p or -o, options will be loaded from:
+                i)   A valid 'bootstrap-options.json' file located at path_to_object 
+                ii)  A valid 'bootstrap-options.json' file exists in process.cwd() 
+                iii) A valid 'bootstrap-options.json' exists in the user's profile
+                iv)  build-dual/defaults/bootstrap-options.json 
+                
+                In all these cases, the "path to project" property will be updated to the value provided by -d 
+                (path_to_options)
             
-Errors      file already exists and -o not set
+Errors      error code: 500 subcode: N    generally unable to complete command (reason will depend on subcode)
+            error code: 404 subcode: 1    options file does not exist in path specified (-o)
+            error code: 400 subcode: 2    options file does not validate
+            error code: 403 subcode: 3    not permitted to access / read / write file(s) or director(ies)
+            error code: 403 subcode: 4    not permitted to execute file(s)
+            error code: 409 subcode: 5    project folder is not empty (only file allowed is bootstrap options file
 ```
 
 API
 
 ```typescript
-import {BootstrapOptions, 
-        getUserBootstrapOptions,
-        streamUserBootstrapOptions,
-        writeUserBootstrapOptions} from 'dual-build';
-
-const options:BootstrapOptions  = getUserBootstrapOptions();
-consoleUserBootstrapOptions();
-writeUserBootstrapOptions();
-writeUserBootstrapOptions({force:true});
-writeUserBootstrapOptions('bootstrap-options.json');
-writeUserBootstrapOptions('bootstrap-options.json', {force: true});
+bootstrap();
+bootstrap({});
+bootstrap({'logger path': './path/to/my/logger/my-logger.js'});
+bootstrap({logger: new MyLogger()});
+bootstrap({prompt: true});
+bootstrap({'project path': './my-project'});
+bootstrap({'bootstrap-options.json': './my-bootstrap-options.json'});
+const bootstrapJSON = loadSomehow(...somhhow);
+bootstrap(bootstrapJSON);
 ```
 
+#### Project scaffolding and files
 
+The following scaffolding will be created in the base directory targeted by bootstrap 
+
+| scaffold item                      | f/d <sup>1</sup> | git<sup>2</sup> | gitignore<sup>3</sup> | description                                                                                                |
+|:-----------------------------------|:----------------:|:---------------:|:---------------------:|:-----------------------------------------------------------------------------------------------------------|
+| .git/                              |        d         |       no        |          no           | git file                                                                                                   |
+| .gitignore                         |        f         |       yes       |          no           | .gitignore                                                                                                 |
+|                                    |                  |                 |                       |                                                                                                            |
+| [.options/][]                      |        d         |       yes       |          no           | options files used by the dual-build, including the bootstrap-options.json file that was used to bootstrap |
+|                                    |                  |                 |                       |                                                                                                            |
+| package.json                       |        f         |       yes       |          no           | minimal package.json for node_modules                                                                      |
+| node_modules/                      |        d         |       no        |          yes          | node_modules                                                                                               |
+|                                    |                  |                 |                       |                                                                                                            |
+| logs/                              |        d         |       no        |          yes          | logs location for default logger in file mode                                                              | 
+|                                    |                  |                 |                       |                                                                                                            |
+| [.package.base.json][]             |        f         |       yes       |          no           | package.json settings shared across the project and used by dual-build                                     |
+| [.tsconfig.base.json][]            |        f         |       yes       |          no           | tsconfig.json settings shared across the project and used by dual-build                                    |
+| [.package.publish.json][]          |        f         |       yes       |          no           | Template for "the" package.json that will be published.                                                    |
+| [.package.publish.esm.json][]      |        f         |       yes       |          no           | package.json for publish/esm directory                                                                     |
+| [.package.publish.commonjs.json][] |        f         |       yes       |          no           | package.json for <br/>publish/commonjs director                                                            |
+|                                    |                  |                 |                       |                                                                                                            |
+| sources/                           |        d         |       yes       |          no           | contains all sourcing and source build files                                                               |
+| sources/src/                       |        d         |       yes       |          no           | this is the source root for .ts, .mts, .cts, .js, .mjs, .cjs, .json . md etc                               |
+| [sources/package.json][]           |        f         |       yes       |          no           | minimal package.json file to assist IDEs with type="module" or type="commonjs"                             |  
+| [sources/tsconfig.json][]          |        f         |       yes       |          no           | minimal tsconfig.json file to assist IDEs with typescript "compilerOptions"                                |
+| [sources/.tsconfig.esm.json]       |                  |                 |                       |                                                                                                            |
+| [sources/.tsconfig.commons.json]   |                  |                 |                       |                                                                                                            |
+|                                    |                  |                 |                       |                                                                                                            |
+| tests/                             |        d         |       yes       |          no           | contains all test and test build files                                                                     |
+| tests/test/                        |                  |                 |                       |                                                                                                            |
+| [test/package.json][]              |                  |                 |                       |                                                                                                            |
+| [test/tsconfig.json][]             |                  |                 |                       |                                                                                                            |
+| [test/.tsconfig.esm.json]          |                  |                 |                       |                                                                                                            |
+| [test/.tsconfig.commonjs.json]     |                  |                 |                       |                                                                                                            |
+|                                    |                  |                 |                       |                                                                                                            |
+| [.build/][]                        |        d         |       no        |          yes          |                                                                                                            |
+| [publish][]                        |        d         |       no        |          yes          | final build location and root of npm publish                                                               |
+|                                    |                  |                 |                       |                                                                                                            |
+
+<sup>1</sup> file or directory
+<sup>2</sup> added to git
+
+
+
+
+IMPORTANT IDEA
+
+glob->files newer than build files->build
+
+
+### Repair Bootstrap
 
 
 
@@ -391,18 +473,18 @@ npx dual-build bootstrap --sub <subdirectory>
 
 
 
-# How to use the build system
+# How to use the dual-build
 
-Before explaining how to use the dual-build build system, this is a framework that is intended to be transparent. 
+Before explaining how to use the dual-build dual-build, this is a framework that is intended to be transparent. 
 Walking away from the documentation, a software engineer should feel equally comfortable using the build API as they 
 would be using the raw tools.  If something is not clear on what is happening or how it's happening, please post 
-that in the project issues.  The intent is to automate, not obfuscate, and to allow for the build system to be 
+that in the project issues.  The intent is to automate, not obfuscate, and to allow for the dual-build to be 
 extended to other use cases.
 
-The build system is based on three key concepts:
+The dual-build is based on three key concepts:
 
 - **commands** which represent composable, aggregate, multistep capability based on _actions_. Commands are also the 
-  API into the build system. 
+  API into the dual-build. 
 - **actions** which represent complete units of work
 - **tasks** which represent sub-unit functionality that often need to be combined with other tasks to generate 
   useful output.
@@ -417,10 +499,10 @@ If you have executed the bootstrapping process to create a new project, then you
 A command is distinct in that it can be executed with npx or pnpm/yarn dlx.
 
 ```
-npx dual-build bootstrap
+npx dual-build bootstrap -j 
 ```
 
-A command can take arguments (also known as parameters)
+A command can take command line arguments or (parameters when accessed via API).
 
 
 
@@ -442,5 +524,38 @@ A command can take arguments (also known as parameters)
 # Footnotes
  
 [npx commands can be called with or without the -p option]:  #calling-npx-commands-with-or-without-the--p-option
-
 ## Calling npx commands with or without the -p option
+
+As mentioned, normally  binaries are called by package managers as follows:
+
+```
+npx package
+```
+
+This is done because it turns out the first binary in the package/bin also bears the package's name.  It won't work if 
+the first binary doesn't have the exact same name.
+
+To overcome this, or to call any binary that is not the first binary command in a package the call must be made as 
+follows, specifying both the package and command explicitly.
+
+```
+npx -p package -c binary
+```
+In the case of dual-build this would look like
+
+```
+npx -p dual-build -c bootstrap
+```
+However, dual-build is configured with a first binary command named dual-build.  Moreover, the dual-build command by 
+itself is a no-op.  It does nothing.  In fact, it expects one argument, the actual command to execute.  Any 
+additional arguments are consumed by _that_ command.
+
+Specify package, command and command's argument.
+```
+npx -p dual-build -c bootstrap -c
+```
+Specify first command, second command and second command's arguments
+```
+npx dual-build bootstrap -s -f my-file.json
+```
+Each of these is equivalent (aside from the arguments).
