@@ -1,13 +1,30 @@
 {
+  "name": "dual-build",
+  "version": "0.0.1",
+  "type": "module",
+  "imports": {
+    "#commands/*": "./publish/bin/*"
+  },
+  "scripts": {
+    "clean-toolx": "rm -rf ./toolx.publish && rm -rf ./dual-build",
+    "build-toolx": "npm run clean-toolx && npx tsc -p toolx.tsconfig.json && cp ./toolx.package.json ./toolx.publish/package.json",
+    "publish-toolx": "npm run build-toolx && npm publish ./toolx.publish"
+  },
   "dependencies": {
-    "@franzzemen/module-factory": "^7.0.1",
-    "@types/node": "^18.11.9",
-    "@types/uuid": "^8.3.4",
     "fast-glob": "^3.2.12",
+    "fastest-validator": "^1.15.0",
     "is-stream": "^3.0.0",
-    "uuid": "^9.0.0"
+    "lodash": "^4.17.21",
+    "npm-check-updates": "^16.5.6",
+    "tsconfig.d.ts": "^0.1.14",
+    "uuid": "^9.0.0",
+    "yargs": "^17.6.2"
   },
   "devDependencies": {
-    "typescript": "^4.9.3"
+    "@types/lodash": "^4.14.191",
+    "@types/node": "^18.11.13",
+    "@types/uuid": "^9.0.0",
+    "@types/yargs": "^17.0.17",
+    "typescript": "^4.9.4"
   }
 }

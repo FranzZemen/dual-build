@@ -1,0 +1,15 @@
+{
+  "name": "package.d.ts",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "publish": "rm -rf ../package.d.ts.publish && npx tsc && cp ./package.json ../package.d.ts.publish && cd .. && npm i ./pacakge.d.ts.publish"
+  },
+  "description": "A type definition for package.json and some minor utilities",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Franz Zemen",
+  "license": "MIT"
+}

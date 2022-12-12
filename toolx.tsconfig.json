@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "target": "ESNext",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "outDir": "./toolx.publish",
+    "sourceMap": true
+  },
+  "include": ["src/.dual-build/**/*","src/options/**/*","src/toolx/**/*"],
+  "exclude": ["node_modules"
+  ]
+}

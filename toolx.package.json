@@ -1,0 +1,11 @@
+{
+  "name": "toolx",
+  "version": "0.0.1",
+  "type": "module",
+  "imports": {
+  },
+  "scripts": {
+  },
+  "bin": {
+  }
+}
