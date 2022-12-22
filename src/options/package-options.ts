@@ -21,16 +21,15 @@ export const npxCommands : NpxCommands = {
 
 export const packageJson = 'package.old.json';
 
-type PackageFields = 'description' | 'license' | 'author';
 
-export type PackageOptions = Pick<Package, PackageFields> &  {
+export type PackageOptions = {
+  author?: string,
+  description?: string,
+  license?: string, // Replace with list of licenses
   'package manager'?: PackageManager | undefined;
   'initial version'?: Version | undefined;
 }
 export const packageOptions: PackageOptions = {
   'package manager': PackageManager.npm,
-  author: undefined,
-  description: undefined,
   'initial version': '0.0.1',
-  license: 'MIT'
 };

@@ -1,4 +1,4 @@
-import {basename, join} from 'node:path';
+import {basename, join} from 'node:path/posix';
 import {cwd} from 'node:process';
 import {directories} from './directories.js';
 import {packageJson} from './package-options.js';
@@ -19,9 +19,13 @@ export type GitOptions = {
   'git push current branch on successful build'?: boolean;
   'git push current branch on successful publish'?: boolean;
 }
+
+export type ContainsGitOptions = {
+  gitOptions: GitOptions;
+}
+
 export const gitOptions: GitOptions = {
   useGit: true,
-  username: undefined,
   repository: basename(cwd()),
   protocol: GitProtocol.https,
   'git init': true,

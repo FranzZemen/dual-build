@@ -7,7 +7,10 @@ import {ValidatorConstructorOptions} from 'fastest-validator';
 import Validator from 'fastest-validator';
 const options: ValidatorConstructorOptions = {useNewCustomCheckerFunction: true};
 
-export const getValidator: () => Validator = () => {
+const getValidator: () => Validator = () => {
   return new Validator(options);
 }
 
+export {
+  getValidator
+}

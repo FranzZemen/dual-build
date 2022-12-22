@@ -1,8 +1,3 @@
 {
-  "compilerOptions": {
-    "module": "ES2022",
-    "target": "ESNext",
-    "moduleResolution": "NodeNext",
-    "esModuleInterop": true,
-  },
+  "extends": "../toolx.tsconfig.json"
 }

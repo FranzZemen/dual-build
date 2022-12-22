@@ -5,7 +5,7 @@ License Type: MIT
 
 import {ValidationSchema} from 'fastest-validator';
 
-export type DirectoryPath = (
+export type DirectoryPath =
   '.git'
   | 'node_modules'
   | '.dual-build'
@@ -29,8 +29,7 @@ export type DirectoryPath = (
   | 'transient/publish/bin'
   | 'transient/testing'
   | 'transient/testing/esm'
-  | 'transient/testing/commonjs');
-
+  | 'transient/testing/commonjs';
 
 export enum Folder {
   git = '.git',
@@ -56,25 +55,31 @@ export enum Folder {
   publishBin = 'bin',
   testing = 'testing',
   testingEsm = 'esm',
-  testingCommonJS = 'commonjs'
+  testingCommonJS = 'commonjs',
+  notDefined = 'FOLDER_NOT_DEFINED'
 }
 
 
 export type Directory = {
-  directoryPath: DirectoryPath;
-  folder: Folder;
+  directoryPath: DirectoryPath | string | 'NOT_DEFINED';
+  folder: Folder | string;
   transient: boolean;
 };
 
 export type Directories = {
-  [key in DirectoryPath]: Directory;
-} & {
-  root: string | undefined;
+  [key in DirectoryPath | 'root']: Directory;
 };
 
 
+
+
 export const directories: Directories = {
-  root: undefined,
+  'root': {
+    // This is set on a per-invocation basis
+    directoryPath: 'NOT_DEFINED',
+    folder: Folder.notDefined,
+    transient: false
+  },
   '.git': {
     directoryPath: '.git',
     folder: Folder.git,
@@ -97,7 +102,7 @@ export const directories: Directories = {
   },
   '.dual-build': {
     directoryPath: '.dual-build',
-    folder: Folder.assets,
+    folder: Folder.dualBuild,
     transient: false
   },
   '.dual-build/logs': {
@@ -196,6 +201,11 @@ export const directories: Directories = {
     transient: true
   }
 };
+
+export type ContainsDirectories = {
+  directories: Directories;
+}
+
 
 export function isDirectory (dir: any | Directory): dir is Directory {
   return 'directoryPath' in dir && 'folder' in dir && 'transient' in dir;

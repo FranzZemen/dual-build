@@ -2,15 +2,15 @@
 Created by Franz Zemen 12/10/2022
 License Type: MIT
 */
-
+/*
 
 import {existsSync} from 'fs';
 import {mkdirSync} from 'node:fs';
 import {join, sep, normalize} from 'node:path';
 import {inspect} from 'node:util';
-import {bootstrapOptions, validate} from '../../options/bootstrap-options.js';
-import {BootstrapOptions} from '../../options/index.js';
-import {ActionStreamHookFunction, ActionOptions, DuplexAction, Payload} from '../action.js';
+import {bootstrapOptions, validate} from '../options/bootstrap-options.js';
+import {BootstrapOptions} from '../options/index.js';
+import {ActionStreamHookFunction, ActionOptions, DuplexAction, Payload} from './action.js';
 
 export type BootstrapPayload = Payload<BootstrapOptions>
 
@@ -88,27 +88,7 @@ export class DirectoriesAction extends DuplexAction<boolean> {
   execute() {
     return true;
   }
-
-  /*
-  createDirectory (path: string ) {
-    const path = normalize(payload.options.directories.root);
-    console.log(`Root: ${path}`)
-
-    path
-      .split(sep)
-      .reduce((prevPath, folder) => {
-        const currentPath = join(prevPath, folder, sep);
-        if (!existsSync(currentPath)) {
-          console.log(`Creating directory ${currentPath}`);
-          mkdirSync(currentPath);
-        } else {
-          console.log(`Not creating directory ${currentPath} already exists`)
-        }
-        return currentPath;
-      }, '');
-  }
-
-   */
 }
 
 
+*/

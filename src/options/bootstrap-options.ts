@@ -1,11 +1,13 @@
 
 import {getValidator} from '../util/validator.cjs';
+
 import {ValidationSchema, ValidationError, SyncCheckFunction, AsyncCheckFunction} from 'fastest-validator';
 import {Directories, directories, directoriesWrappedSchema} from './directories.js';
 import {gitignore, gitOptions, GitOptions} from './git-options.js';
 import {packageOptions, PackageOptions} from './package-options.js';
 import {Sources, sources} from './sources.js';
 import {Options} from './options.js';
+
 
 
 export type InstallModuleLoader = 'install esm' | 'install commonjs' | 'install both';
@@ -32,7 +34,7 @@ export type BootstrapOptions = Options & {
 
 export const bootstrapOptions: BootstrapOptions = {
   filename: 'bootstrap-options.json',
-  modified: undefined,
+  // modified: undefined,  Case by case
   'save profile': true,
   'git options': gitOptions,
   'install module loader': 'install both',
@@ -59,7 +61,12 @@ const bootstrapWrappedSchema: ValidationSchema = {
 
 
 const compiled: SyncCheckFunction | AsyncCheckFunction =  (getValidator()).compile(bootstrapSchema);
-const check:SyncCheckFunction = compiled.async === false ? compiled : (()=>{if(compiled.async) {throw new Error('Unexpected AsyncCheckFunction')} else { return undefined;}})();
+let check: SyncCheckFunction;
+if(compiled.async) {
+  console.error('Unreachable Code');
+} else {
+  check = compiled; //!compiled.async ? compiled : (()=>{if(compiled.async) {throw new Error('Unexpected AsyncCheckFunction')} else { return undefined;}})();
+}
 
 export function validate(options: BootstrapOptions): true | ValidationError[] {
   return check(options);

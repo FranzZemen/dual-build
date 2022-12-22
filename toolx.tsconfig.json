@@ -5,7 +5,14 @@
     "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "outDir": "./toolx.publish",
-    "sourceMap": true
+    "sourceMap": true,
+    "strict": true,
+    "strictPropertyInitialization": true,
+    "strictNullChecks": true,
+    "allowUnreachableCode": false,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitAny": true,
+    "lib": ["ES2021.String"]
   },
   "include": ["src/.dual-build/**/*","src/options/**/*","src/toolx/**/*"],
   "exclude": ["node_modules"

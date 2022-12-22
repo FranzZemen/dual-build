@@ -9,9 +9,7 @@ export type JSONReplacementPattern<PatternKey extends string> = ReplacementPatte
 
 
 export abstract class TemplateReplacement<PatternKey extends string, ToString extends ReplacementPattern<any, any, any>> {
-  key: PatternKey;
-  constructor(key?: PatternKey) {
-    if(key) this.key = key;
+  protected constructor(protected key: PatternKey) {
   }
 
  abstract toString(): ToString;
@@ -19,7 +17,7 @@ export abstract class TemplateReplacement<PatternKey extends string, ToString ex
 
 
 export class JSONTemplateReplacement<PatternKey extends string> extends TemplateReplacement<PatternKey, JSONReplacementPattern<PatternKey>> {
-  constructor(key?: PatternKey) {
+  constructor(key: PatternKey) {
     super(key);
   }
 
@@ -28,7 +26,7 @@ export class JSONTemplateReplacement<PatternKey extends string> extends Template
   }
 
   toJSON(): JSONReplacementPattern<PatternKey> {
-    return `${'?:<<'}${this.key}${'>>'}`;
+    return `?:<<${this.key}>>`;
   }
 }
 
