@@ -4,7 +4,6 @@
     "target": "ESNext",
     "moduleResolution": "NodeNext",
     "esModuleInterop": true,
-    "outDir": "./toolx.publish",
     "sourceMap": true,
     "strict": true,
     "strictPropertyInitialization": true,
@@ -13,8 +12,5 @@
     "exactOptionalPropertyTypes": true,
     "noImplicitAny": true,
     "noImplicitReturns": true
-  },
-  "include": ["src/.dual-build/**/*","src/options/**/*","src/toolx/**/*"],
-  "exclude": ["node_modules"]
-
+  }
 }

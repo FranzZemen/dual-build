@@ -19,5 +19,5 @@ export function Command<T extends CommandOptions>(options: T) {
 export abstract class AbstractCommand {
   protected constructor() {
   }
-  abstract execute();
+  abstract execute(): void;
 }

@@ -8,6 +8,7 @@ import {mkdir} from 'node:fs/promises';
 import {join} from 'node:path';
 import {inspect} from 'node:util';
 import {ContainsDirectories, Directories, DirectoryPath, isDirectory} from '../../options/directories.js';
+import {processUnknownError} from '../../util/process-unknown-error-message.js';
 import {Action} from '../action.js';
 
 
@@ -16,24 +17,26 @@ export class CreateDirectories<T extends ContainsDirectories> extends Action<T, 
   constructor() {
     super();
   }
-  execute(payload: T): Promise<T> {
+  executeImpl(payload: T): Promise<T> {
     const directories: Directories = payload.directories;
     try {
       if(directories.root.directoryPath === 'NOT_DEFINED') {
-        const err = new Error('Undefined root folder');
-        console.error(err);
-        return Promise.reject(err);
+        const msg = 'Undefined root folder';
+        this.log.info(msg, 'error');
+        this.errorCondition = true;
+        return Promise.reject(new Error(msg));
       }
       if (existsSync(directories.root.directoryPath)) {
-        const err = new Error(`Project folder ${directories.root.directoryPath} already exists`);
-        console.error(err);
-        return Promise.reject(err);
+        const msg = `Project folder ${directories.root.directoryPath} already exists, not creating`;
+        this.log.info(msg, 'error');
+        this.errorCondition = true;
+        return Promise.reject(new Error(msg));
       }
       const result = mkdirSync(directories.root.directoryPath, {recursive: true});
-      console.log(`makeDirSync: ${result}`)
     } catch (err) {
-      console.log(err);
-      return Promise.reject(err);
+      const error = processUnknownError(err);
+      this.log.error(error);
+      return Promise.reject(error);
     }
     const paths: string[] = [];
     const promises: Promise<undefined | string>[] = [];
@@ -58,7 +61,7 @@ export class CreateDirectories<T extends ContainsDirectories> extends Action<T, 
           }
         })
         if (failed.length > 0) {
-          console.warn(`Failed to create: ${inspect(failed, false, 10, true)}`);
+          this.log.warn(`Failed to create: ${inspect(failed, false, 10, true)}`);
           return Promise.reject(new Error(`Failed to create: ${inspect(failed, false, 10, true)}`));
         } else {
           return payload;
