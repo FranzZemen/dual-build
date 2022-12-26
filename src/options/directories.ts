@@ -206,6 +206,10 @@ export type ContainsDirectories = {
   directories: Directories;
 }
 
+export type ContainsRoot = {
+  'root': Directory;
+}
+
 
 export function isDirectory (dir: any | Directory): dir is Directory {
   return 'directoryPath' in dir && 'folder' in dir && 'transient' in dir;

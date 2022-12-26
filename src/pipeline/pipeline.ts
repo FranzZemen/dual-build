@@ -3,12 +3,11 @@ Created by Franz Zemen 12/15/2022
 License Type: 
 */
 
-import {performance} from 'node:perf_hooks';
-import {inspect} from 'node:util';
-import {Action} from '../action/action.js';
+import {v4 as uuidV4} from 'uuid';
+import {Action, ActionConstructor} from '../action/action.js';
 import {NestedLog} from '../log/nested-log.js';
-import {processUnknownError, processUnknownErrorMessage} from '../util/process-unknown-error-message.js';
-import {clearTiming, endTiming, isTimingNotFound, startTiming} from '../util/timing.js';
+import {processUnknownError} from '../util/process-unknown-error-message.js';
+import {clearTiming, endTiming, startTiming} from '../util/timing.js';
 import {ActionPipe, ActionPipeExecutionResult, ActionType} from './action-pipe.js';
 import {ParallelPipe, ParallelType} from './parallel-pipe.js';
 import {SeriesPipe, SeriesType} from './series-pipe.js';
@@ -36,59 +35,110 @@ export function isSettledRejected(settled: Settled<'fulfilled'> | Settled<'rejec
   return settled.status === 'rejected';
 }
 
-type Pipe = ActionPipe<any, any> | SeriesPipe<any, any, any, any> | ParallelPipe<any, any, any, any>;
+export type Pipe = ActionPipe<any, any> | SeriesPipe<any, any> | ParallelPipe<any, any>;
 
+export type PipelineOptions = {
+  name: string;
+  logDepth: number;
+}
+
+export function defaultPipelineOptions(): PipelineOptions {
+  return {
+    name: `Pipeline-${uuidV4()}`,
+    logDepth: 0
+  };
+}
+
+
+
+/**
+ * PIPELINE_IN = The payload starting the pipeline
+ * PIPELINE_OUT = The payload coming out of the pipeline
+ */
 export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
   protected _pipes: Pipe[] = [];
   protected static index = 1;
   log: NestedLog;
+  name: string;
+  logDepth: number;
 
-  private constructor(protected name?: string, protected logDepth: number = 0) {
-    if (!this.name) {
-      this.name = Pipeline.name + Pipeline.index++;
-    }
-    this.log = new NestedLog(logDepth);
+  private constructor(options: PipelineOptions) {
+    this.name = options.name;
+    this.logDepth = options.logDepth;
+    this.log = new NestedLog(options.logDepth);
   }
 
-  static action<ACTION_OUT, PIPELINE_IN, PIPELINE_OUT>(action: Action<PIPELINE_IN, ACTION_OUT>, pipelineName?: string, logDepth = 0): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
-    const pipeline = new Pipeline<PIPELINE_IN, PIPELINE_OUT>(pipelineName, logDepth);
-    action.logDepth = logDepth + 1;
-    pipeline._pipes.push(ActionPipe.action<PIPELINE_IN, ACTION_OUT>(action));
+  /**
+   * If this is not called, the defaultOptions function will be use.
+   *
+   * @param options
+   */
+  static options<PIPELINE_IN, PIPELINE_OUT>(options: PipelineOptions) {
+    return new Pipeline<PIPELINE_IN, PIPELINE_OUT>(options);
+  }
+
+  /**
+   * Start the pipeline with an action
+   * ACTION_CLASS extends Action = Action class (constructor)
+   * Payload is ACTION_IN = PIPELINE_IN by definition since it is the start of the pipeline
+   * In general, action payload out != pipeline payload out
+   *
+   */
+  static action<ACTION_CLASS extends Action<PAYLOAD_IN, PAYLOAD_OUT>,  PAYLOAD_IN, PAYLOAD_OUT, PIPELINE_OUT>
+  (actionClass: ActionConstructor<ACTION_CLASS, PAYLOAD_IN, PAYLOAD_OUT>): Pipeline<PAYLOAD_IN, PIPELINE_OUT> {
+    // ----- Declaration separator ----- //
+    const options = defaultPipelineOptions();
+    const pipeline = new Pipeline<PAYLOAD_IN, PIPELINE_OUT>(options);
+    pipeline._pipes.push(ActionPipe.action<ACTION_CLASS, PAYLOAD_IN, PAYLOAD_OUT>(actionClass, pipeline));
     return pipeline;
   };
 
-  static startSeries<ACTION_OUT, SERIES_OUT, PIPELINE_IN, PIPELINE_OUT>(action: Action<PIPELINE_IN, ACTION_OUT>, pipelineName?: string, logDepth = 0): SeriesPipe<PIPELINE_IN, SERIES_OUT, PIPELINE_IN, PIPELINE_OUT> {
-    const pipeline = new Pipeline<PIPELINE_IN, PIPELINE_OUT>(pipelineName, logDepth);
-    action.logDepth = logDepth + 1;
-    const seriesPipe = SeriesPipe.start<ACTION_OUT, PIPELINE_IN, SERIES_OUT, PIPELINE_IN, PIPELINE_OUT>(action, pipeline);
+  /**
+   * Start the pipeline with a series
+   * ACTION_CLASS extends Action = Action class (constructor)
+   * Payload is ACTION_IN = SERIES_IN = PIPELINE_IN by definition since it is the start of the pipeline
+   * In general, action payload out != series out != pipeline payload out
+   *
+   */
+  static startSeries<ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>, ACTION_IN, ACTION_OUT, SERIES_OUT, PIPELINE_OUT>
+  (actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, ACTION_OUT>): SeriesPipe<ACTION_IN, SERIES_OUT> {
+    // ----- Declaration separator ----- //
+    const options = defaultPipelineOptions();
+    const pipeline = new Pipeline<ACTION_IN, PIPELINE_OUT>(options);
+    const seriesPipe = SeriesPipe.start<ACTION_CLASS, ACTION_IN, ACTION_OUT, SERIES_OUT>(actionClass, pipeline);
     pipeline._pipes.push(seriesPipe);
     return seriesPipe;
   };
 
-  static startParallel<ACTION_OUT, PARALLEL_OUT, PIPELINE_IN, PIPELINE_OUT>(action: Action<PIPELINE_IN, ACTION_OUT>, pipelineName?: string, logDepth = 0): ParallelPipe<PIPELINE_IN, PARALLEL_OUT, PIPELINE_IN, PIPELINE_OUT> {
-    const pipeline = new Pipeline<PIPELINE_IN, PIPELINE_OUT>(pipelineName, logDepth);
-    action.logDepth = logDepth + 1;
-    const parallelPipe = ParallelPipe.start<ACTION_OUT, PIPELINE_IN, PARALLEL_OUT, PIPELINE_IN, PIPELINE_OUT>(action, pipeline);
+  static startParallel<ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>, ACTION_IN, ACTION_OUT, PARALLEL_OUT, PIPELINE_OUT>
+  (actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, ACTION_OUT>): ParallelPipe<ACTION_IN, PARALLEL_OUT> {
+    // ----- Declaration separator ----- //
+    const options = defaultPipelineOptions();
+    const pipeline = new Pipeline<ACTION_IN, PIPELINE_OUT>(options);
+    const parallelPipe = ParallelPipe.start<ACTION_CLASS, ACTION_IN, ACTION_OUT, PARALLEL_OUT>(actionClass, pipeline);
     pipeline._pipes.push(parallelPipe);
     return parallelPipe;
   };
 
-  action<ACTION_IN, ACTION_OUT>(action: Action<ACTION_IN, ACTION_OUT>): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
-    action.logDepth = this.logDepth + 1;
-    this._pipes.push(ActionPipe.action<ACTION_IN, ACTION_OUT>(action));
+  action<ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>, ACTION_IN, ACTION_OUT>
+  (actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, ACTION_OUT>): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
+    // ----- Declaration separator ----- //
+    this._pipes.push(ActionPipe.action<ACTION_CLASS,ACTION_IN, ACTION_OUT>(actionClass, this));
     return this;
   };
 
-  startSeries<ACTION_OUT, SERIES_IN, SERIES_OUT>(action: Action<SERIES_IN, ACTION_OUT>): SeriesPipe<SERIES_IN, SERIES_OUT, PIPELINE_IN, PIPELINE_OUT> {
-    action.logDepth = this.logDepth + 1;
-    const seriesPipe = SeriesPipe.start<ACTION_OUT, SERIES_IN, SERIES_OUT, PIPELINE_IN, PIPELINE_OUT>(action, this);
+  startSeries<ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>, ACTION_IN, ACTION_OUT, SERIES_OUT>
+  (actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, ACTION_OUT>): SeriesPipe<ACTION_IN, SERIES_OUT> {
+    // ----- Declaration separator ----- //
+    const seriesPipe = SeriesPipe.start<ACTION_CLASS, ACTION_IN, ACTION_OUT, SERIES_OUT>(actionClass, this);
     this._pipes.push(seriesPipe);
     return seriesPipe;
   };
 
-  startParallel<ACTION_OUT, PARALELL_IN, PAYLOAD_OUT>(action: Action<PARALELL_IN, ACTION_OUT>): ParallelPipe<PARALELL_IN, PAYLOAD_OUT, PIPELINE_IN, PIPELINE_OUT> {
-    action.logDepth = this.logDepth + 1;
-    const parallelPipe = ParallelPipe.start<ACTION_OUT, PARALELL_IN, PAYLOAD_OUT, PIPELINE_IN, PIPELINE_OUT>(action, this);
+  startParallel<ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>, ACTION_IN, ACTION_OUT, PARALLEL_OUT>
+  (actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, ACTION_OUT>): ParallelPipe<ACTION_IN, PARALLEL_OUT> {
+    // ----- Declaration separator ----- //
+    const parallelPipe = ParallelPipe.start<ACTION_CLASS, ACTION_IN, ACTION_OUT, PARALLEL_OUT>(actionClass, this);
     this._pipes.push(parallelPipe);
     return parallelPipe;
   };
@@ -111,34 +161,28 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
         inputPayload = result.output;
         outputPayload = result.output;
       }
-
-      this.log.info(`...pipeline ${this.name} completed ${startTimingSuccessful ? endTiming(timingMark, this.log) : ''}`);
-
+      this.log.info(`...pipeline ${this.name} completed ${startTimingSuccessful ? endTiming(timingMark,this.log):''}`);
       return outputPayload;
     } catch (err) {
       this.log.info(`...pipeline ${this.name} failed`, 'error');
-      if(isExecutionResult(err)) {
-        if(isSettledRejected(err.settled)) {
-          if(Array.isArray(err.settled.reason)) {
+      if (isExecutionResult(err)) {
+        if (isSettledRejected(err.settled)) {
+          if (Array.isArray(err.settled.reason)) {
             err.settled.reason.forEach(reason => {
               this.log.error(reason);
             });
           } else {
             this.log.error(err.settled.reason);
           }
-          throw new Error ('handled');
+          throw new Error('handled');
         } else {
-          throw new Error ('Unreachable code');
+          throw new Error('Unreachable code');
         }
       } else {
         const error = processUnknownError(err);
         this.log.error(error);
         throw error;
       }
-      //this.log.error(processUnknownError(err));
-      //this.log.info({error: processUnknownErrorMessage(err), results: inspect(results, false, 10, true)}, 'error');
-
-      //return Promise.reject(new Error(e));
     } finally {
       clearTiming(timingMark);
     }

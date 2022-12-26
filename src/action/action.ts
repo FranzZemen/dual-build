@@ -8,6 +8,9 @@ import {NestedLog} from '../log/nested-log.js';
 import {endTiming, startTiming} from '../util/timing.js';
 import {processUnknownError} from '../util/process-unknown-error-message.js'
 
+export type ActionConstructor<CLASS,IN, OUT> = new <IN,OUT>(logDepth?: number) => CLASS;
+
+
 export abstract class Action<IN, OUT> {
   protected log: NestedLog;
   protected errorCondition = false;

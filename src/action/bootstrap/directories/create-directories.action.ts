@@ -7,17 +7,19 @@ import {existsSync, mkdirSync} from 'node:fs';
 import {mkdir} from 'node:fs/promises';
 import {join} from 'node:path';
 import {inspect} from 'node:util';
-import {ContainsDirectories, Directories, DirectoryPath, isDirectory} from '../../options/directories.js';
-import {processUnknownError} from '../../util/process-unknown-error-message.js';
-import {Action} from '../action.js';
+import {ContainsDirectories, Directories, DirectoryPath, isDirectory} from '../../../options/directories.js';
+import {processUnknownError} from '../../../util/process-unknown-error-message.js';
+import {Action} from '../../action.js';
 
 
-
-export class CreateDirectories<T extends ContainsDirectories> extends Action<T, T> {
-  constructor() {
-    super();
+export class CreateDirectories<ACTION_IN extends ContainsDirectories> extends Action<ACTION_IN, ACTION_IN> {
+  constructor(logDepth = 1) {
+    super(logDepth);
   }
-  executeImpl(payload: T): Promise<T> {
+  executeImpl(payload: ACTION_IN): Promise<ACTION_IN> {
+   // wait Pipeline
+     // .action<Directories,Directories,Directories>(new CreateRootDirectory<Directories>(), 'root-directory', this.logDepth + 1)
+
     const directories: Directories = payload.directories;
     try {
       if(directories.root.directoryPath === 'NOT_DEFINED') {
@@ -67,5 +69,7 @@ export class CreateDirectories<T extends ContainsDirectories> extends Action<T, 
           return payload;
         }
       });
+
+
   }
 }

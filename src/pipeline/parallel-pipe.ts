@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {Action} from '../action/action.js';
+import {Action, ActionConstructor} from '../action/action.js';
 import {ActionPipeExecutionResult} from './action-pipe.js';
 import {
   ExecutionResult,
@@ -17,35 +17,38 @@ export type ParallelPipeExecutionResults<PAYLOAD_IN, PAYLOAD_OUT, S extends Sett
 export type MergeFunction<T> = (parallelPayloads: any[]) => Promise<T>;
 export type MergeType = 'asAttributes' | 'asMerged';
 
-export class ParallelPipe<PAYLOAD_IN, PAYLOAD_OUT, PIPELINE_IN, PIPELINE_OUT> {
+export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
   protected _pipe: Action<any, any>[] = [];
-  protected _mergeStrategy: MergeType | MergeFunction<PAYLOAD_OUT> = 'asAttributes';
+  protected _mergeStrategy: MergeType | MergeFunction<PARALLEL_OUT> = 'asAttributes';
 
-  protected constructor(protected _pipeline: Pipeline<PIPELINE_IN, PIPELINE_OUT>) {
+  protected constructor(protected _pipeline: Pipeline<any, any>) {
   }
 
-  static start<ACTION_OUT, PARALLEL_IN, PARALLEL_OUT, PIPELINE_IN, PIPELINE_OUT>(action: Action<PARALLEL_IN, ACTION_OUT>, pipeline: Pipeline<PIPELINE_IN, PIPELINE_OUT>): ParallelPipe<PARALLEL_IN, PARALLEL_OUT, PIPELINE_IN, PIPELINE_OUT> {
-    const pipe = new ParallelPipe<PARALLEL_IN, PARALLEL_OUT, PIPELINE_IN, PIPELINE_OUT>(pipeline);
-    return pipe.parallel(action);
+  static start<ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>, ACTION_IN, ACTION_OUT, PARALLEL_OUT>
+  (actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, ACTION_OUT>, pipeline: Pipeline<any, any>): ParallelPipe<ACTION_IN, PARALLEL_OUT> {
+    // ----- Declaration separator ----- //
+    const pipe = new ParallelPipe<ACTION_IN, PARALLEL_OUT>(pipeline);
+    return pipe.parallel<ACTION_CLASS, ACTION_OUT>(actionClass);
   }
 
-  parallel<ACTION_OUT>(action: Action<PAYLOAD_IN, ACTION_OUT>): ParallelPipe<PAYLOAD_IN, PAYLOAD_OUT, PIPELINE_IN, PIPELINE_OUT> {
-    this._pipe.push(action);
+  parallel<ACTION_CLASS extends Action<PARALLEL_IN, ACTION_OUT>, ACTION_OUT>
+  (actionClass: ActionConstructor<ACTION_CLASS, PARALLEL_IN, ACTION_OUT>): ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
+    // ----- Declaration separator ----- //
+    this._pipe.push(new actionClass(this._pipeline.logDepth + 1));
     return this;
   }
 
-  endParallel<ACTION_OUT>(action?: Action<PAYLOAD_IN, ACTION_OUT>, mergeStrategy: MergeType | MergeFunction<PAYLOAD_OUT> = 'asAttributes'): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
-    if (action) {
-      this._pipe.push(action);
-    }
+  endParallel<ACTION_CLASS extends Action<PARALLEL_IN, ACTION_OUT>, ACTION_OUT>
+  (actionClass: ActionConstructor<ACTION_CLASS, PARALLEL_IN, ACTION_OUT>, mergeStrategy: MergeType | MergeFunction<PARALLEL_OUT> = 'asAttributes'): Pipeline<any, any> {
+    this._pipe.push(new actionClass(this._pipeline.logDepth + 1));
     this._mergeStrategy = mergeStrategy;
     return this._pipeline;
   }
 
-  async execute(payload: PAYLOAD_IN): Promise<ParallelPipeExecutionResults<PAYLOAD_IN, PAYLOAD_OUT, SettledStatus>> {
+  async execute(payload: PARALLEL_IN): Promise<ParallelPipeExecutionResults<PARALLEL_IN, PARALLEL_OUT, SettledStatus>> {
     const actionResults: ActionPipeExecutionResult<any, any, SettledStatus>[] = [];
     const actionPromises: Promise<any>[] = [];
-    let parallelOutput: Partial<PAYLOAD_OUT> = {};
+    let parallelOutput: Partial<PARALLEL_OUT> = {};
     let parallelActionName = '';
     try {
       for (let i = 0; i < this._pipe.length; i++) {
@@ -98,10 +101,10 @@ export class ParallelPipe<PAYLOAD_IN, PAYLOAD_OUT, PIPELINE_IN, PIPELINE_OUT> {
         })
       } else {
         if (this._mergeStrategy === 'asAttributes') {
-          let output: PAYLOAD_OUT | Partial<PAYLOAD_OUT> = {};
+          let output: PARALLEL_OUT | Partial<PARALLEL_OUT> = {};
           actionResults.forEach(result => {
             if (result.actionName !== undefined) {
-              output[result.actionName as keyof PAYLOAD_OUT] = result.output;
+              output[result.actionName as keyof PARALLEL_OUT] = result.output;
             }
           });
           console.error(new Error('Unreachable code'));
@@ -111,9 +114,9 @@ export class ParallelPipe<PAYLOAD_IN, PAYLOAD_OUT, PIPELINE_IN, PIPELINE_OUT> {
             previousValue.push(currentValue.output);
             return previousValue;
           }, initialValue);
-          parallelOutput = _.merge({}, outputs) as unknown as PAYLOAD_OUT;
+          parallelOutput = _.merge({}, outputs) as unknown as PARALLEL_OUT;
         } else if (typeof this._mergeStrategy === 'function') {
-          const mergeFunction: MergeFunction<PAYLOAD_OUT> = this._mergeStrategy;
+          const mergeFunction: MergeFunction<PARALLEL_OUT> = this._mergeStrategy;
           const initialValue: any[] = [];
           const outputs = actionResults.reduce((previousValue, currentValue) => {
             previousValue.push(currentValue.output);
@@ -121,7 +124,7 @@ export class ParallelPipe<PAYLOAD_IN, PAYLOAD_OUT, PIPELINE_IN, PIPELINE_OUT> {
           }, initialValue);
           parallelOutput = await mergeFunction(outputs);
         } else {
-          parallelOutput = {'Unreachable Code': 'Unreachable Code'} as unknown as PAYLOAD_OUT;
+          parallelOutput = {'Unreachable Code': 'Unreachable Code'} as unknown as PARALLEL_OUT;
         }
         return Promise.resolve({
           scope: 'parallel',
@@ -130,7 +133,7 @@ export class ParallelPipe<PAYLOAD_IN, PAYLOAD_OUT, PIPELINE_IN, PIPELINE_OUT> {
           input: payload,
           output: parallelOutput,
           settled: {status: 'fulfilled'}
-        } as ParallelPipeExecutionResults<PAYLOAD_IN, PAYLOAD_OUT, FulfilledStatus>);
+        } as ParallelPipeExecutionResults<PARALLEL_IN, PARALLEL_OUT, FulfilledStatus>);
       }
     } catch (err) {
       return Promise.reject({
@@ -140,7 +143,7 @@ export class ParallelPipe<PAYLOAD_IN, PAYLOAD_OUT, PIPELINE_IN, PIPELINE_OUT> {
         input: payload,
         output: parallelOutput,
         settled: {status: 'rejected', reason: err}
-      });// as ParallelPipeExecutionResults<PAYLOAD_IN, PAYLOAD_OUT, RejectedStatus>);
+      });// as ParallelPipeExecutionResults<ACTION_IN, ACTION_OUT, RejectedStatus>);
     }
   }
 }

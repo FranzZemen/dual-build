@@ -2,7 +2,7 @@
 import {getValidator} from '../util/validator.cjs';
 
 import {ValidationSchema, ValidationError, SyncCheckFunction, AsyncCheckFunction} from 'fastest-validator';
-import {Directories, directories, directoriesWrappedSchema} from './directories.js';
+import {Directories, directories, directoriesWrappedSchema, Directory} from './directories.js';
 import {gitignore, gitOptions, GitOptions} from './git-options.js';
 import {packageOptions, PackageOptions} from './package-options.js';
 import {Sources, sources} from './sources.js';
@@ -43,9 +43,8 @@ export const bootstrapOptions: BootstrapOptions = {
   directories,
   sources,
   'build options': {buildEsm: true, buildCommonJS: true},
-  '.gitignore': gitignore
+  '.gitignore': gitignore,
 }
-
 
 const bootstrapSchema: ValidationSchema = {
   directories: directoriesWrappedSchema
