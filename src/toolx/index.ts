@@ -15,6 +15,7 @@ import {Log} from '../log/log.js';
 // import {SetupGit} from '../action/bootstrap/setup-git.js';
 import {BootstrapOptions, bootstrapOptions} from '../options/bootstrap-options.js';
 import {Directories} from '../options/index.js';
+import {DefaultPayload} from '../pipeline/pipeline-aliases.js';
 import {Pipeline} from '../pipeline/pipeline.js';
 import {processUnknownError} from '../util/process-unknown-error-message.js';
 
@@ -30,11 +31,16 @@ if(argv.length === 3 && argv[2].trim().length > 0) {
   exit(1);
 }
 
+
+
+
+
 const logDepth =0;
 try {
   await Pipeline
-    .startSeries(CreateDirectories)
-    .endSeries(InstallGitignore)
+    .options<BootstrapOptions>({name: 'bootstrap', logDepth:0})
+    .startSeries<CreateDirectories<BootstrapOptions>>(CreateDirectories)
+    .endSeries<InstallGitignore<BootstrapOptions>, BootstrapOptions>(InstallGitignore)
     .execute(options);
 
     /*

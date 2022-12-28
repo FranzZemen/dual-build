@@ -1,5 +1,6 @@
 import {Action, ActionConstructor} from '../action/action.js';
-import {ExecutionResult, FulfilledStatus, Pipeline, RejectedStatus, Settled, SettledStatus} from './pipeline.js';
+import {ExecutionResult, FulfilledStatus, RejectedStatus, Settled, SettledStatus} from './pipeline-aliases.js';
+import {Pipeline} from './pipeline.js';
 
 export type ActionType = 'action';
 export type ActionPipeExecutionResult<PAYLOAD_IN, PAYLOAD_OUT, S extends SettledStatus> = ExecutionResult<PAYLOAD_IN, PAYLOAD_OUT, ActionType, S>;

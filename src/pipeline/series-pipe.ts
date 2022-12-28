@@ -1,39 +1,42 @@
 import {Action, ActionConstructor} from '../action/action.js';
-import {BootstrapOptions} from '../options/index.js';
 import {processUnknownError} from '../util/process-unknown-error-message.js';
 import {ActionPipeExecutionResult} from './action-pipe.js';
-import {ExecutionResult, FulfilledStatus, Pipeline, RejectedStatus, Settled, SettledStatus} from './pipeline.js';
+import {DefaultPayload, FulfilledStatus, RejectedStatus, SeriesPipeExecutionResults, Settled, SettledStatus} from './pipeline-aliases.js';
+import {Pipeline} from './pipeline.js';
 
-export type SeriesType = 'series';
-export type SeriesPipeExecutionResults<PAYLOAD_IN, PAYLOAD_OUT, S extends SettledStatus> = ExecutionResult<PAYLOAD_IN, PAYLOAD_OUT, SeriesType, S>;
-
-
-
-export class SeriesPipe<SERIES_IN, SERIES_OUT> {
+export class SeriesPipe<PIPELINE_IN, PIPELINE_OUT, SERIES_IN, SERIES_OUT> {
   protected _pipe: Action<any, any>[] = [];
 
-  protected constructor(protected _pipeline: Pipeline<any, any>) {
+  private constructor(protected _pipeline: Pipeline<PIPELINE_IN, PIPELINE_OUT>) {
   }
-
   /**
    * Start a series, which can start anywhere in the pipeline
    * ACTION_CLASS extends Action = Action class (constructor)
-   * Payload is ACTION_IN = SERIES_IN != PIPELINE_IN by definition (except if first series, we have to think of general case when pipe creates
+   * Payload is ACTION_IN_AND_OUT = SERIES_IN != PIPELINE_IN by definition (except if first series, we have to think of general case when pipe creates
    * series in middle of pipeline
    * In general, action payload out != series out != pipeline payload out
    *
    */
-  static start<ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>, ACTION_IN, ACTION_OUT,SERIES_OUT>
-  (actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, ACTION_OUT>, pipeline: Pipeline<any, any>)
-    : SeriesPipe<ACTION_IN, SERIES_OUT> {
-    // ----- Declaration separator ----- //
-    const pipe = new SeriesPipe<ACTION_IN, SERIES_OUT>(pipeline);
-    return pipe.series<ACTION_CLASS, ACTION_IN, ACTION_OUT>(actionClass);
+  static start<
+    ACTION_CLASS extends Action<SERIES_IN, ACTION_OUT>,
+    PIPELINE_IN,
+    PIPELINE_OUT,
+    SERIES_IN,
+    SERIES_OUT,
+    ACTION_OUT>(actionClass: ActionConstructor<ACTION_CLASS, SERIES_IN, ACTION_OUT>, pipeline: Pipeline<PIPELINE_IN, PIPELINE_OUT>)
+    : SeriesPipe<PIPELINE_IN, PIPELINE_OUT, SERIES_IN, SERIES_OUT> {
+    // ----- Multiline Declaration Separator ----- //
+
+    const pipe = new SeriesPipe<PIPELINE_IN, PIPELINE_OUT, SERIES_IN, SERIES_OUT>(pipeline);
+    return pipe.series<ACTION_CLASS, SERIES_IN, ACTION_OUT>(actionClass);
   }
 
-  series<ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>, ACTION_IN, ACTION_OUT>
-  (actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, ACTION_OUT>): SeriesPipe<SERIES_IN, SERIES_OUT> {
-    // ----- Declaration separator ----- //
+  series<
+    ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>,
+    ACTION_IN,
+    ACTION_OUT>(actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, ACTION_OUT>)
+    : SeriesPipe<PIPELINE_IN,PIPELINE_OUT,SERIES_IN, SERIES_OUT> {
+    // ----- Multiline Declaration Separator ----- //
     this._pipe.push(new actionClass(this._pipeline.logDepth + 1));
     return this;
   }
@@ -43,8 +46,9 @@ export class SeriesPipe<SERIES_IN, SERIES_OUT> {
    * ACTION_OUT = SERIES OUT, which is defined on the class
    *
    */
-  endSeries<ACTION_CLASS extends Action<ACTION_IN, SERIES_OUT>, ACTION_IN>
-  (actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, SERIES_OUT>): Pipeline<any, any> {
+  endSeries<
+    ACTION_CLASS extends Action<ACTION_IN, SERIES_OUT>,
+    ACTION_IN>(actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, SERIES_OUT>): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     this._pipe.push(new actionClass(this._pipeline.logDepth + 1));
     return this._pipeline;
   }
@@ -65,56 +69,65 @@ export class SeriesPipe<SERIES_IN, SERIES_OUT> {
         try {
           const output = await action.execute(input);
           actionResults.push({
-            scope: 'action',
-            actionName,
-            log: 'this',
-            input,
-            output,
-            settled: {status: 'fulfilled'} as Settled<FulfilledStatus>
-          });
+                               scope: 'action',
+                               actionName,
+                               log: 'this',
+                               input,
+                               output,
+                               settled: {status: 'fulfilled'} as Settled<FulfilledStatus>
+                             });
           partialSeriesOutput = output;
           input = output;
         } catch (err) {
           actionError = processUnknownError(err);
           actionResults.push({
-            scope: 'action',
-            actionName,
-            log: 'this',
-            input,
-            output: {error: 'error'},
-            settled: {status: 'rejected', reason: actionError} as Settled<RejectedStatus>
-          });
+                               scope: 'action',
+                               actionName,
+                               log: 'this',
+                               input,
+                               output: {error: 'error'},
+                               settled: {
+                                 status: 'rejected',
+                                 reason: actionError
+                               } as Settled<RejectedStatus>
+                             });
           break;
         }
       }
       if (actionError) {
         return Promise.reject({
-          scope: 'series',
-          actionName: seriesActionName,
-          log: actionResults,
-          input: payload,
-          output: {error: 'error'},
-          settled: {status: 'rejected', reason: actionError}
-        });
+                                scope: 'series',
+                                actionName: seriesActionName,
+                                log: actionResults,
+                                input: payload,
+                                output: {error: 'error'},
+                                settled: {
+                                  status: 'rejected',
+                                  reason: actionError
+                                }
+                              });
       } else {
         return Promise.resolve({
-          scope: 'series',
-          actionName: seriesActionName,
-          log: actionResults,
-          input: payload,
-          output: partialSeriesOutput as SERIES_OUT,
-          settled: {status: 'fulfilled'}
-        } as SeriesPipeExecutionResults<SERIES_IN, SERIES_OUT, FulfilledStatus>);
+                                 scope: 'series',
+                                 actionName: seriesActionName,
+                                 log: actionResults,
+                                 input: payload,
+                                 output: partialSeriesOutput as SERIES_OUT,
+                                 settled: {status: 'fulfilled'}
+                               } as SeriesPipeExecutionResults<SERIES_IN, SERIES_OUT, FulfilledStatus>);
       }
     } catch (err) {
       return Promise.reject({
-        scope: 'series',
-        actionName: seriesActionName,
-        log: actionResults,
-        input: payload,
-        output: partialSeriesOutput,
-        settled: {status: 'rejected', reason: err}
-      } as SeriesPipeExecutionResults<SERIES_IN, SERIES_OUT, RejectedStatus>);
+                              scope: 'series',
+                              actionName: seriesActionName,
+                              log: actionResults,
+                              input: payload,
+                              output: partialSeriesOutput,
+                              settled: {
+                                status: 'rejected',
+                                reason: err
+                              }
+                            } as SeriesPipeExecutionResults<SERIES_IN, SERIES_OUT, RejectedStatus>);
     }
   }
 }

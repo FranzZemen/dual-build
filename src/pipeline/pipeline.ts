@@ -8,39 +8,11 @@ import {Action, ActionConstructor} from '../action/action.js';
 import {NestedLog} from '../log/nested-log.js';
 import {processUnknownError} from '../util/process-unknown-error-message.js';
 import {clearTiming, endTiming, startTiming} from '../util/timing.js';
-import {ActionPipe, ActionPipeExecutionResult, ActionType} from './action-pipe.js';
-import {ParallelPipe, ParallelType} from './parallel-pipe.js';
-import {SeriesPipe, SeriesType} from './series-pipe.js';
+import {ActionPipe} from './action-pipe.js';
+import {ParallelPipe} from './parallel-pipe.js';
+import {DefaultPayload, ExecutionResult, isExecutionResult, isSettledRejected, Pipe, PipelineOptions} from './pipeline-aliases.js';
+import {SeriesPipe} from './series-pipe.js';
 
-export type FulfilledStatus = 'fulfilled';
-export type RejectedStatus = 'rejected';
-export type SettledStatus = FulfilledStatus | RejectedStatus;
-
-export type Settled<T extends SettledStatus> = {
-  status: T;
-} & (T extends FulfilledStatus ? {} : T extends RejectedStatus ? { reason: any } : never);
-
-
-export type PipeType = ActionType | SeriesType | ParallelType;
-
-export type NarrowedPipeType<T extends PipeType> = T extends ActionType ? ActionType : T extends SeriesType ? SeriesType : T extends ParallelType ? ParallelType : never;
-export type NarrowedLog<PAYLOAD_IN, PAYLOAD_OUT, T extends PipeType, S extends SettledStatus> = T extends ActionType ? 'this' : T extends SeriesType ? ActionPipeExecutionResult<PAYLOAD_IN, PAYLOAD_OUT, S>[] : T extends ParallelType ? ActionPipeExecutionResult<PAYLOAD_IN, PAYLOAD_OUT, S>[] : never;
-export type ExecutionResult<PAYLOAD_IN, PAYLOAD_OUT, T extends PipeType, S extends SettledStatus> = { scope: NarrowedPipeType<T>, actionName: string, log: NarrowedLog<PAYLOAD_IN, PAYLOAD_OUT, T, S>, input: PAYLOAD_IN, output: PAYLOAD_OUT, settled: Settled<S> };
-
-export function isExecutionResult(result: any | ExecutionResult<any, any, any, any>): result is ExecutionResult<any, any, any, any> {
-  return 'scope' in result;
-}
-
-export function isSettledRejected(settled: Settled<'fulfilled'> | Settled<'rejected'>): settled is Settled<'rejected'> {
-  return settled.status === 'rejected';
-}
-
-export type Pipe = ActionPipe<any, any> | SeriesPipe<any, any> | ParallelPipe<any, any>;
-
-export type PipelineOptions = {
-  name: string;
-  logDepth: number;
-}
 
 export function defaultPipelineOptions(): PipelineOptions {
   return {
@@ -49,18 +21,16 @@ export function defaultPipelineOptions(): PipelineOptions {
   };
 }
 
-
-
 /**
  * PIPELINE_IN = The payload starting the pipeline
  * PIPELINE_OUT = The payload coming out of the pipeline
  */
 export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
-  protected _pipes: Pipe[] = [];
   protected static index = 1;
   log: NestedLog;
   name: string;
   logDepth: number;
+  protected _pipes: Pipe[] = [];
 
   private constructor(options: PipelineOptions) {
     this.name = options.name;
@@ -73,72 +43,99 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
    *
    * @param options
    */
-  static options<PIPELINE_IN, PIPELINE_OUT>(options: PipelineOptions) {
+  static options<PIPELINE_IN = DefaultPayload, PIPELINE_OUT = PIPELINE_IN>(options: PipelineOptions<PIPELINE_IN>) {
     return new Pipeline<PIPELINE_IN, PIPELINE_OUT>(options);
   }
 
   /**
    * Start the pipeline with an action
    * ACTION_CLASS extends Action = Action class (constructor)
-   * Payload is ACTION_IN = PIPELINE_IN by definition since it is the start of the pipeline
+   * Payload is ACTION_IN_AND_OUT = PIPELINE_IN by definition since it is the start of the pipeline
    * In general, action payload out != pipeline payload out
    *
    */
-  static action<ACTION_CLASS extends Action<PAYLOAD_IN, PAYLOAD_OUT>,  PAYLOAD_IN, PAYLOAD_OUT, PIPELINE_OUT>
-  (actionClass: ActionConstructor<ACTION_CLASS, PAYLOAD_IN, PAYLOAD_OUT>): Pipeline<PAYLOAD_IN, PIPELINE_OUT> {
+  static action<
+    ACTION_CLASS extends Action<PIPELINE_IN, ACTION_OUT>,
+    PIPELINE_IN = DefaultPayload,
+    PIPELINE_OUT = PIPELINE_IN,
+    ACTION_OUT = PIPELINE_IN>(
+    actionClass: ActionConstructor<ACTION_CLASS, PIPELINE_IN, ACTION_OUT>)
+    : Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     // ----- Declaration separator ----- //
     const options = defaultPipelineOptions();
-    const pipeline = new Pipeline<PAYLOAD_IN, PIPELINE_OUT>(options);
-    pipeline._pipes.push(ActionPipe.action<ACTION_CLASS, PAYLOAD_IN, PAYLOAD_OUT>(actionClass, pipeline));
+    const pipeline = new Pipeline<PIPELINE_IN, PIPELINE_OUT>(options);
+    pipeline._pipes.push(ActionPipe.action<ACTION_CLASS, PIPELINE_IN, ACTION_OUT>(actionClass, pipeline));
     return pipeline;
   };
 
   /**
    * Start the pipeline with a series
    * ACTION_CLASS extends Action = Action class (constructor)
-   * Payload is ACTION_IN = SERIES_IN = PIPELINE_IN by definition since it is the start of the pipeline
+   * Payload is ACTION_IN_AND_OUT = SERIES_IN = PIPELINE_IN by definition since it is the start of the pipeline
    * In general, action payload out != series out != pipeline payload out
    *
    */
-  static startSeries<ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>, ACTION_IN, ACTION_OUT, SERIES_OUT, PIPELINE_OUT>
-  (actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, ACTION_OUT>): SeriesPipe<ACTION_IN, SERIES_OUT> {
+  static startSeries<
+    ACTION_CLASS extends Action<PIPELINE_IN, ACTION_OUT>,
+    PIPELINE_IN = DefaultPayload,
+    PIPELINE_OUT = PIPELINE_IN,
+    SERIES_OUT = PIPELINE_IN,
+    ACTION_OUT = PIPELINE_IN>(
+    actionClass: ActionConstructor<ACTION_CLASS, PIPELINE_IN, ACTION_OUT>): SeriesPipe<PIPELINE_IN, PIPELINE_OUT, PIPELINE_IN, SERIES_OUT> {
     // ----- Declaration separator ----- //
     const options = defaultPipelineOptions();
-    const pipeline = new Pipeline<ACTION_IN, PIPELINE_OUT>(options);
-    const seriesPipe = SeriesPipe.start<ACTION_CLASS, ACTION_IN, ACTION_OUT, SERIES_OUT>(actionClass, pipeline);
+    const pipeline = new Pipeline<PIPELINE_IN, PIPELINE_OUT>(options);
+    const seriesPipe = SeriesPipe.start<ACTION_CLASS, PIPELINE_IN, PIPELINE_OUT, PIPELINE_IN, SERIES_OUT, ACTION_OUT>(actionClass, pipeline);
     pipeline._pipes.push(seriesPipe);
     return seriesPipe;
   };
 
-  static startParallel<ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>, ACTION_IN, ACTION_OUT, PARALLEL_OUT, PIPELINE_OUT>
-  (actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, ACTION_OUT>): ParallelPipe<ACTION_IN, PARALLEL_OUT> {
+  static startParallel<
+    ACTION_CLASS extends Action<PIPELINE_IN, ACTION_OUT>,
+    PIPELINE_IN = DefaultPayload,
+    PIPELINE_OUT = PIPELINE_IN,
+    PARALLEL_OUT = PIPELINE_IN,
+    ACTION_OUT = PIPELINE_IN>(
+    actionClass: ActionConstructor<ACTION_CLASS, PIPELINE_IN, ACTION_OUT>)
+    : ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PIPELINE_IN, PARALLEL_OUT> {
     // ----- Declaration separator ----- //
     const options = defaultPipelineOptions();
-    const pipeline = new Pipeline<ACTION_IN, PIPELINE_OUT>(options);
-    const parallelPipe = ParallelPipe.start<ACTION_CLASS, ACTION_IN, ACTION_OUT, PARALLEL_OUT>(actionClass, pipeline);
+    const pipeline = new Pipeline<PIPELINE_IN, PIPELINE_OUT>(options);
+    const parallelPipe = ParallelPipe.start<ACTION_CLASS, PIPELINE_IN, PIPELINE_OUT, PIPELINE_IN, PARALLEL_OUT, ACTION_OUT>(actionClass, pipeline);
     pipeline._pipes.push(parallelPipe);
     return parallelPipe;
   };
 
-  action<ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>, ACTION_IN, ACTION_OUT>
+  action<
+    ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>,
+    ACTION_IN = PIPELINE_IN,
+    ACTION_OUT = PIPELINE_OUT>
   (actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, ACTION_OUT>): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     // ----- Declaration separator ----- //
-    this._pipes.push(ActionPipe.action<ACTION_CLASS,ACTION_IN, ACTION_OUT>(actionClass, this));
+    this._pipes.push(ActionPipe.action<ACTION_CLASS, ACTION_IN, ACTION_OUT>(actionClass, this));
     return this;
   };
 
-  startSeries<ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>, ACTION_IN, ACTION_OUT, SERIES_OUT>
-  (actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, ACTION_OUT>): SeriesPipe<ACTION_IN, SERIES_OUT> {
+  startSeries<
+    ACTION_CLASS extends Action<SERIES_IN, ACTION_OUT>,
+    SERIES_IN = PIPELINE_IN,
+    SERIES_OUT = PIPELINE_OUT,
+    ACTION_OUT = SERIES_IN>(
+    actionClass: ActionConstructor<ACTION_CLASS, SERIES_IN, ACTION_OUT>): SeriesPipe<PIPELINE_IN, PIPELINE_OUT, SERIES_IN, SERIES_OUT> {
     // ----- Declaration separator ----- //
-    const seriesPipe = SeriesPipe.start<ACTION_CLASS, ACTION_IN, ACTION_OUT, SERIES_OUT>(actionClass, this);
+    const seriesPipe = SeriesPipe.start<ACTION_CLASS, PIPELINE_IN, PIPELINE_OUT, SERIES_IN, SERIES_OUT, ACTION_OUT>(actionClass, this);
     this._pipes.push(seriesPipe);
     return seriesPipe;
   };
 
-  startParallel<ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>, ACTION_IN, ACTION_OUT, PARALLEL_OUT>
-  (actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, ACTION_OUT>): ParallelPipe<ACTION_IN, PARALLEL_OUT> {
+  startParallel<
+    ACTION_CLASS extends Action<PARALELL_IN, ACTION_OUT>,
+    PARALELL_IN = PIPELINE_IN,
+    PARALLEL_OUT = PIPELINE_OUT,
+    ACTION_OUT = PARALELL_IN>
+  (actionClass: ActionConstructor<ACTION_CLASS, PARALELL_IN, ACTION_OUT>): ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALELL_IN, PARALLEL_OUT> {
     // ----- Declaration separator ----- //
-    const parallelPipe = ParallelPipe.start<ACTION_CLASS, ACTION_IN, ACTION_OUT, PARALLEL_OUT>(actionClass, this);
+    const parallelPipe = ParallelPipe.start<ACTION_CLASS, PIPELINE_IN, PIPELINE_OUT, PARALELL_IN, PARALLEL_OUT, ACTION_OUT>(actionClass, this);
     this._pipes.push(parallelPipe);
     return parallelPipe;
   };
@@ -161,7 +158,7 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
         inputPayload = result.output;
         outputPayload = result.output;
       }
-      this.log.info(`...pipeline ${this.name} completed ${startTimingSuccessful ? endTiming(timingMark,this.log):''}`);
+      this.log.info(`...pipeline ${this.name} completed ${startTimingSuccessful ? endTiming(timingMark, this.log) : ''}`);
       return outputPayload;
     } catch (err) {
       this.log.info(`...pipeline ${this.name} failed`, 'error');

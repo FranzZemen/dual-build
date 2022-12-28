@@ -1,45 +1,44 @@
 import _ from 'lodash';
 import {Action, ActionConstructor} from '../action/action.js';
 import {ActionPipeExecutionResult} from './action-pipe.js';
-import {
-  ExecutionResult,
-  FulfilledStatus,
-  isSettledRejected,
-  Pipeline,
-  RejectedStatus,
-  Settled,
-  SettledStatus
-} from './pipeline.js';
+import {FulfilledStatus, ParallelPipeExecutionResults, RejectedStatus, Settled, SettledStatus} from './pipeline-aliases.js';
+import {Pipeline} from './pipeline.js';
 
-export type ParallelType = 'parallel';
-export type ParallelPipeExecutionResults<PAYLOAD_IN, PAYLOAD_OUT, S extends SettledStatus> = ExecutionResult<PAYLOAD_IN, PAYLOAD_OUT, ParallelType, S>;
 
 export type MergeFunction<T> = (parallelPayloads: any[]) => Promise<T>;
 export type MergeType = 'asAttributes' | 'asMerged';
 
-export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
+export class ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> {
   protected _pipe: Action<any, any>[] = [];
   protected _mergeStrategy: MergeType | MergeFunction<PARALLEL_OUT> = 'asAttributes';
 
   protected constructor(protected _pipeline: Pipeline<any, any>) {
   }
 
-  static start<ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>, ACTION_IN, ACTION_OUT, PARALLEL_OUT>
-  (actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, ACTION_OUT>, pipeline: Pipeline<any, any>): ParallelPipe<ACTION_IN, PARALLEL_OUT> {
-    // ----- Declaration separator ----- //
-    const pipe = new ParallelPipe<ACTION_IN, PARALLEL_OUT>(pipeline);
+  static start<
+    ACTION_CLASS extends Action<PARALLEL_IN, ACTION_OUT>,
+    PIPELINE_IN,
+    PIPELINE_OUT,
+    PARALLEL_IN,
+    PARALLEL_OUT,
+    ACTION_OUT>(actionClass: ActionConstructor<ACTION_CLASS, PARALLEL_IN, ACTION_OUT>, pipeline: Pipeline<any, any>)
+    : ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> {
+    // ----- Multiline Declaration Separator ----- //
+    const pipe = new ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT>(pipeline);
     return pipe.parallel<ACTION_CLASS, ACTION_OUT>(actionClass);
   }
 
-  parallel<ACTION_CLASS extends Action<PARALLEL_IN, ACTION_OUT>, ACTION_OUT>
-  (actionClass: ActionConstructor<ACTION_CLASS, PARALLEL_IN, ACTION_OUT>): ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
-    // ----- Declaration separator ----- //
+  parallel<ACTION_CLASS extends Action<PARALLEL_IN, ACTION_OUT>, ACTION_OUT>(
+    actionClass: ActionConstructor<ACTION_CLASS, PARALLEL_IN, ACTION_OUT>): ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> {
+    // ----- Multiline Declaration Separator ----- //
     this._pipe.push(new actionClass(this._pipeline.logDepth + 1));
     return this;
   }
 
-  endParallel<ACTION_CLASS extends Action<PARALLEL_IN, ACTION_OUT>, ACTION_OUT>
-  (actionClass: ActionConstructor<ACTION_CLASS, PARALLEL_IN, ACTION_OUT>, mergeStrategy: MergeType | MergeFunction<PARALLEL_OUT> = 'asAttributes'): Pipeline<any, any> {
+  endParallel<ACTION_CLASS extends Action<PARALLEL_IN, ACTION_OUT>, ACTION_OUT>(
+    actionClass: ActionConstructor<ACTION_CLASS, PARALLEL_IN, ACTION_OUT>,
+    mergeStrategy: MergeType | MergeFunction<PARALLEL_OUT> = 'asAttributes'): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
+    // ----- Multiline Declaration Separator ----- //
     this._pipe.push(new actionClass(this._pipeline.logDepth + 1));
     this._mergeStrategy = mergeStrategy;
     return this._pipeline;
@@ -79,26 +78,32 @@ export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
           actionResults[ndx] = {
             ...actionResults[ndx], ...{
               output: 'error',
-              settled: {status: 'rejected', reason: settled.reason} as Settled<RejectedStatus>
+              settled: {
+                status: 'rejected',
+                reason: settled.reason
+              } as Settled<RejectedStatus>
             }
           };
         }
       });
-      if(someErrors) {
+      if (someErrors) {
         const errors: any[] = [];
         actionResults.forEach(result => {
-          if(result.settled.status === 'rejected') {
+          if (result.settled.status === 'rejected') {
             errors.push((result.settled as Settled<RejectedStatus>).reason);
           }
-        })
+        });
         return Promise.reject({
-          scope: 'parallel',
-          actionName: parallelActionName,
-          log: actionResults,
-          input: payload,
-          output: parallelOutput,
-          settled: {status: 'rejected', reason: [errors]}
-        })
+                                scope: 'parallel',
+                                actionName: parallelActionName,
+                                log: actionResults,
+                                input: payload,
+                                output: parallelOutput,
+                                settled: {
+                                  status: 'rejected',
+                                  reason: [errors]
+                                }
+                              });
       } else {
         if (this._mergeStrategy === 'asAttributes') {
           let output: PARALLEL_OUT | Partial<PARALLEL_OUT> = {};
@@ -127,23 +132,26 @@ export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
           parallelOutput = {'Unreachable Code': 'Unreachable Code'} as unknown as PARALLEL_OUT;
         }
         return Promise.resolve({
-          scope: 'parallel',
-          actionName: parallelActionName,
-          log: actionResults as ActionPipeExecutionResult<any, any, any>[],
-          input: payload,
-          output: parallelOutput,
-          settled: {status: 'fulfilled'}
-        } as ParallelPipeExecutionResults<PARALLEL_IN, PARALLEL_OUT, FulfilledStatus>);
+                                 scope: 'parallel',
+                                 actionName: parallelActionName,
+                                 log: actionResults as ActionPipeExecutionResult<any, any, any>[],
+                                 input: payload,
+                                 output: parallelOutput,
+                                 settled: {status: 'fulfilled'}
+                               } as ParallelPipeExecutionResults<PARALLEL_IN, PARALLEL_OUT, FulfilledStatus>);
       }
     } catch (err) {
       return Promise.reject({
-        scope: 'parallel',
-        actionName: parallelActionName,
-        log: actionResults,
-        input: payload,
-        output: parallelOutput,
-        settled: {status: 'rejected', reason: err}
-      });// as ParallelPipeExecutionResults<ACTION_IN, ACTION_OUT, RejectedStatus>);
+                              scope: 'parallel',
+                              actionName: parallelActionName,
+                              log: actionResults,
+                              input: payload,
+                              output: parallelOutput,
+                              settled: {
+                                status: 'rejected',
+                                reason: err
+                              }
+                            });// as ParallelPipeExecutionResults<ACTION_IN_AND_OUT, ACTION_OUT, RejectedStatus>);
     }
   }
 }

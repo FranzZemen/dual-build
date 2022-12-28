@@ -12,11 +12,11 @@ import {processUnknownError} from '../../../util/process-unknown-error-message.j
 import {Action} from '../../action.js';
 
 
-export class CreateDirectories<ACTION_IN extends ContainsDirectories> extends Action<ACTION_IN, ACTION_IN> {
+export class CreateDirectories<ACTION_IN_AND_OUT extends ContainsDirectories> extends Action<ACTION_IN_AND_OUT, ACTION_IN_AND_OUT> {
   constructor(logDepth = 1) {
     super(logDepth);
   }
-  executeImpl(payload: ACTION_IN): Promise<ACTION_IN> {
+  executeImpl(payload: ACTION_IN_AND_OUT): Promise<ACTION_IN_AND_OUT> {
    // wait Pipeline
      // .action<Directories,Directories,Directories>(new CreateRootDirectory<Directories>(), 'root-directory', this.logDepth + 1)
 
