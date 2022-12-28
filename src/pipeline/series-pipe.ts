@@ -1,11 +1,19 @@
 import {Action, ActionConstructor} from '../action/action.js';
 import {processUnknownError} from '../util/process-unknown-error-message.js';
 import {ActionPipeExecutionResult} from './action-pipe.js';
-import {DefaultPayload, FulfilledStatus, RejectedStatus, SeriesPipeExecutionResults, Settled, SettledStatus} from './pipeline-aliases.js';
+import {
+  DefaultPayload,
+  FulfilledStatus,
+  RejectedStatus,
+  SeriesPipeExecutionResults,
+  Settled,
+  SettledStatus,
+  TransformFunction
+} from './pipeline-aliases.js';
 import {Pipeline} from './pipeline.js';
 
 export class SeriesPipe<PIPELINE_IN, PIPELINE_OUT, SERIES_IN, SERIES_OUT> {
-  protected _pipe: Action<any, any>[] = [];
+  protected _pipe: (Action<any, any> | TransformFunction<any, any>)[] = [];
 
   private constructor(protected _pipeline: Pipeline<PIPELINE_IN, PIPELINE_OUT>) {
   }
@@ -41,6 +49,11 @@ export class SeriesPipe<PIPELINE_IN, PIPELINE_OUT, SERIES_IN, SERIES_OUT> {
     return this;
   }
 
+  transform<TRANSFORM_IN, TRANSFORM_OUT>(transform: TransformFunction<TRANSFORM_IN, TRANSFORM_OUT>): SeriesPipe<PIPELINE_IN,PIPELINE_OUT,SERIES_IN, SERIES_OUT>{
+    this._pipes.push(transform);
+    return this;
+  }
+
   /**
    * End of the series
    * ACTION_OUT = SERIES OUT, which is defined on the class
@@ -62,6 +75,11 @@ export class SeriesPipe<PIPELINE_IN, PIPELINE_OUT, SERIES_IN, SERIES_OUT> {
       let actionName: string = '';
       let actionError: Error | undefined;
       for (let i = 0; i < this._pipe.length; i++) {
+        const actionOrTransformFunction = this._pipe[i];
+        if(! (actionOrTransformFunction instanceof Action)) {
+          const transform: TransformFunction<any, any> = actionOrTransformFunction;
+          continue;
+        }
         actionName = '';
         const action = this._pipe[i];
         actionName = action.constructor.name;

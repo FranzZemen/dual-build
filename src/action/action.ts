@@ -14,7 +14,7 @@ export type ActionConstructor<CLASS extends Action<IN, OUT>, IN, OUT> = new <IN,
 export abstract class Action<IN, OUT> {
   protected log: NestedLog;
   protected errorCondition = false;
-  protected constructor(depth = 1) {
+  protected constructor(depth = 1, protected payload?: IN) {
     this.log = new NestedLog(depth);
   }
   set logDepth(depth: number) {

@@ -10,7 +10,7 @@ import {processUnknownError} from '../util/process-unknown-error-message.js';
 import {clearTiming, endTiming, startTiming} from '../util/timing.js';
 import {ActionPipe} from './action-pipe.js';
 import {ParallelPipe} from './parallel-pipe.js';
-import {DefaultPayload, ExecutionResult, isExecutionResult, isSettledRejected, Pipe, PipelineOptions} from './pipeline-aliases.js';
+import {DefaultPayload, ExecutionResult, isExecutionResult, isSettledRejected, Pipe, PipelineOptions, TransformFunction} from './pipeline-aliases.js';
 import {SeriesPipe} from './series-pipe.js';
 
 
@@ -20,6 +20,8 @@ export function defaultPipelineOptions(): PipelineOptions {
     logDepth: 0
   };
 }
+
+
 
 /**
  * PIPELINE_IN = The payload starting the pipeline
@@ -139,6 +141,11 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     this._pipes.push(parallelPipe);
     return parallelPipe;
   };
+
+  transform<TRANSFORM_IN, TRANSFORM_OUT>(transform: TransformFunction<TRANSFORM_IN, TRANSFORM_OUT>): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
+    this._pipes.push(transform);
+    return this;
+  }
 
   async execute(payload: PIPELINE_IN): Promise<PIPELINE_OUT> {
     this.log.info(`starting pipeline ${this.name}...`);

@@ -45,7 +45,10 @@ export function isSettledRejected(settled: Settled<'fulfilled'> | Settled<'rejec
   return settled.status === 'rejected';
 }
 
-export type Pipe = ActionPipe<any, any> | SeriesPipe<any, any, any, any> | ParallelPipe<any, any, any, any>;
+export type TransformFunction<TRANSFORM_IN, TRANSFORM_OUT> = (transformIn: TRANSFORM_IN ) => TRANSFORM_OUT;
+
+
+export type Pipe = ActionPipe<any, any> | SeriesPipe<any, any, any, any> | ParallelPipe<any, any, any, any> | TransformFunction<any, any>;
 
 export type PipelineOptions<PIPELINE_IN = any> = {
   name: string;

@@ -17,11 +17,11 @@ import {Action} from '../../action.js';
 /**
  * Passing a 2nd parameter because instantiating code cannot distinguish between one or 2 parameters.
  */
-export class CreateRootDirectory<ACTION_IN extends ContainsRoot> extends Action<ACTION_IN, ACTION_IN> {
+export class CreateRootDirectory<ACTION_IN extends ContainsRoot> extends Action<ACTION_IN, undefined> {
   constructor() {
     super();
   }
-  executeImpl(payload: ACTION_IN): Promise<ACTION_IN> {
+  executeImpl(payload: ACTION_IN): Promise<undefined> {
     const rootDirectory: Directory = payload.root;
     try {
       if(rootDirectory.directoryPath === 'NOT_DEFINED') {
@@ -37,11 +37,11 @@ export class CreateRootDirectory<ACTION_IN extends ContainsRoot> extends Action<
         return Promise.reject(new Error(msg));
       }
       const result = mkdirSync(rootDirectory.directoryPath, {recursive: true});
-      return Promise.resolve(payload);
+      return Promise.resolve(undefined);
     } catch (err) {
       const error = processUnknownError(err);
       this.log.error(error);
-      return Promise.reject(error);
+      throw error;
     }
   }
 }

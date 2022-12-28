@@ -44,14 +44,23 @@ export class ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> 
     return this._pipeline;
   }
 
-  async execute(payload: PARALLEL_IN): Promise<ParallelPipeExecutionResults<PARALLEL_IN, PARALLEL_OUT, SettledStatus>> {
+  async execute(payload: PARALLEL_IN): Promise<PARALLEL_OUT> {
+    /*
     const actionResults: ActionPipeExecutionResult<any, any, SettledStatus>[] = [];
+
+     */
     const actionPromises: Promise<any>[] = [];
+    /*
     let parallelOutput: Partial<PARALLEL_OUT> = {};
     let parallelActionName = '';
+
+     */
+    const actionNames: string[] = [];
     try {
       for (let i = 0; i < this._pipe.length; i++) {
         const action = this._pipe[i];
+        actionNames.push(action.constructor.name);
+        /*
         const actionName = action.constructor.name;
         const actionResult: Partial<ActionPipeExecutionResult<any, any, SettledStatus>> = {
           scope: 'action',
@@ -59,12 +68,22 @@ export class ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> 
           log: 'this',
           input: payload
         };
+
+
+
         parallelActionName = `${i === 0 ? actionName : parallelActionName + '||' + actionName}`;
         actionResults.push(actionResult as ActionPipeExecutionResult<any, any, any>);
+
+         */
         actionPromises.push(action.execute(payload));
       }
       const settlement = await Promise.allSettled(actionPromises);
-      let someErrors = false;
+      let filteredErrors = settlement.filter(settled => settled.status === 'rejected');
+      if(filteredErrors.length) {
+        dd
+      } else {
+        
+      }
       settlement.forEach((settled, ndx) => {
         if (settled.status === 'fulfilled') {
           actionResults[ndx] = {

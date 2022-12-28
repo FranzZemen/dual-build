@@ -23,30 +23,12 @@ export class ActionPipe<ACTION_IN, ACTION_OUT> {
     }
   }
 
-  async execute(payload: ACTION_IN): Promise<ActionPipeExecutionResult<ACTION_IN, ACTION_OUT, SettledStatus>> {
+  async execute(payload: ACTION_IN): Promise<ACTION_OUT> {
     const actionName = this.actionName;
     try {
-      return Promise.resolve({
-        scope: 'action',
-        actionName,
-        input: payload,
-        log: 'this',
-        output: await this._action.execute(payload),
-        settled: {status: 'fulfilled'} as Settled<FulfilledStatus>
-      });
+      return await this._action.execute(payload);
     } catch (err) {
-      console.error(err);
-      return Promise.reject({
-        scope: 'action',
-        actionName,
-        input: payload,
-        log: 'this',
-        output: 'error',
-        settled: {
-          status: 'rejected',
-          reason: err
-        } as Settled<RejectedStatus>
-      });
+      return Promise.reject(err);
     }
   }
 }
