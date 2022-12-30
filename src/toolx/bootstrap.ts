@@ -2,6 +2,8 @@
 Created by Franz Zemen 12/01/2022
 License Type: 
 */
+
+
 import process from 'node:process';
 import {stdout} from 'node:process'
 import {Readable} from 'node:stream';
@@ -47,7 +49,7 @@ type CommandCliOptions<CommandArguments> = {
   yargsCommand?: { command: string, description: string, demandString: string }
   yargsConflicts?: { [key: string]: string[] }
 }
-
+/*
 function cli<CommandArguments>(cliOptions: CommandCliOptions<CommandArguments>): Arguments<CommandArguments> {
   let interim = yargs(hideBin(process.argv));
   if (cliOptions.yargsOptions) {
@@ -110,8 +112,8 @@ const bootstrapCliOptions: CommandCliOptions<BootstrapArguments> = {
 
   },
   */
-  yargsCommand: {command: '<path_to_project>', description: 'Path to .dual-build', demandString: 'Enter path_to_project'}
-};
+  //yargsCommand: {command: '<path_to_project>', description: 'Path to ..dual-build', demandString: 'Enter path_to_project'}
+//};
 // console.log(cli<BootstrapArguments>(bootstrapCliOptions));
 
 
@@ -122,7 +124,7 @@ class SideStream extends Duplex {
   }
 }
 
-
+/*
 class Bootstrap extends Readable {
   constructor() {
     super({objectMode: false});

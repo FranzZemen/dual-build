@@ -227,7 +227,7 @@ Errors      n/a
 import {
   BootstrapOptions,
   deleteUserBootstrapOptions
-} from '.dual-build';
+} from '..dual-build';
 
 let success: 'success';
 success = deleteUserBootstrapOptions();
@@ -394,7 +394,7 @@ bootstrap.ts({});
 bootstrap.ts({'logger path': './path/to/my/logger/my-logger.js'});
 bootstrap.ts({logger: new MyLogger()});
 bootstrap.ts({prompt: true});
-bootstrap.ts({'project path': './my-.dual-build'});
+bootstrap.ts({'project path': './my-..dual-build'});
 bootstrap.ts({'bootstrap.ts-options.json': './my-bootstrap.ts-options.json'});
 const bootstrapJSON = loadSomehow(...somhhow);
 bootstrap.ts(bootstrapJSON);

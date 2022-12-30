@@ -46,23 +46,14 @@ export class NestedLog {
   }
 
   info(data: NeverError<any>, scheme?: keyof LogLevel | string) {
-    if(!scheme) {
-      scheme = this.infoScheme;
-    }
-    let message: string;
-    if (typeof data === 'string') {
-      message = `${this.prefix}${data}`;
-    } else {
-      message = `${this.prefix}${inspect(data, false, NestedLog.InspectDepth, true)}`;
-    }
-    if(scheme && scheme !== 'info') {
-      this.logger.log(message, 'info', scheme);
-    } else {
-      this.logger.info(message);
-    }
+    this.#write(data, scheme, 'info');
   }
 
   debug(data: NeverError<any>, scheme?: keyof LogLevel | string) {
+    this.#write(data, scheme, 'debug');
+  }
+
+  #write(data: NeverError<any>, scheme?: keyof LogLevel | string, method: 'info' | 'debug' = 'info') {
     if(!scheme) {
       scheme = this.infoScheme;
     }
@@ -72,10 +63,10 @@ export class NestedLog {
     } else {
       message = `${this.prefix}${inspect(data, false, NestedLog.InspectDepth, true)}`;
     }
-    if(scheme && scheme !== 'debug') {
-      this.logger.log(message, 'debug', scheme);
+    if(scheme && scheme !== method) {
+      this.logger.log(message, method, scheme);
     } else {
-      this.logger.debug(message);
+      this.logger[method](message);
     }
   }
 }

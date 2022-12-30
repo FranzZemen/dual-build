@@ -6,9 +6,23 @@
     "#commands/*": "./publish/bin/*"
   },
   "scripts": {
-    "clean-toolx": "rm -rf ./toolx.publish && rm -rf ./dual-build",
-    "build-toolx": "npm run clean-toolx && npx tsc -p toolx.tsconfig.json && cp ./toolx.package.json ./toolx.publish/package.json",
-    "publish-toolx": "npm run build-toolx && npm publish ./toolx.publish"
+    "test": "mocha transient/test/**/*.test.js",
+    "clean-test": "rm -rf ./transient/test",
+    "clean-toolx": "rm -rf ./transient/toolx",
+    "clean": "rm -rf ./transient",
+    "build": "tsc -b tsconfig.json",
+    "build-toolx deprecated": "npm run clean-toolx && npx tsc -p toolx.tsconfig.json && cp ./toolx.package.json ./toolx.publish/package.json",
+    "publish-toolx deprecated ": "npm run build-toolx && npm publish ./toolx.publish"
+  },
+  "nodemonConfig": {
+    "exec": "npx mocha ./transient/test/**/*.js",
+    "watch": [
+      "./transient/**/*"
+    ],
+    "delay": 100,
+    "env": {
+      "NODE_ENV": "test"
+    }
   },
   "dependencies": {
     "fast-glob": "^3.2.12",
@@ -16,16 +30,20 @@
     "is-stream": "^3.0.0",
     "lodash": "^4.17.21",
     "simple-git": "^3.15.1",
-    "toolx": "file:toolx.publish",
     "tsconfig.d.ts": "^0.1.14",
     "uuid": "^9.0.0",
     "yargs": "^17.6.2"
   },
   "devDependencies": {
+    "@types/chai": "^4.3.4",
     "@types/lodash": "^4.14.191",
+    "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.17",
     "@types/uuid": "^9.0.0",
     "@types/yargs": "^17.0.17",
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "nodemon": "^2.0.20",
     "typescript": "^4.9.4"
   }
 }

@@ -9,7 +9,7 @@ import {Pipeline} from '../../../pipeline/pipeline.js';
 import {Action} from '../../action.js';
 import {CreateRootDirectory} from './create-root-directory.task.js';
 
-
+/*
 export class CreateDirectories<ACTION_IN_AND_OUT extends ContainsDirectories> extends Action<ACTION_IN_AND_OUT, ACTION_IN_AND_OUT> {
   constructor(logDepth = 1) {
     super(logDepth);
@@ -25,6 +25,8 @@ export class CreateDirectories<ACTION_IN_AND_OUT extends ContainsDirectories> ex
       .action<CreateRootDirectory, ContainsRoot<CreateRootDirectory
 
   }
+
+ */
 
   /*
   const directories: Directories = payload.directories;
@@ -80,5 +82,7 @@ export class CreateDirectories<ACTION_IN_AND_OUT extends ContainsDirectories> ex
 
 }
 
-   */
+
 }
+
+*/

@@ -10,8 +10,11 @@ import {processUnknownError} from '../util/process-unknown-error-message.js';
 import {clearTiming, endTiming, startTiming} from '../util/timing.js';
 import {ActionPipe} from './action-pipe.js';
 import {ParallelPipe} from './parallel-pipe.js';
-import {DefaultPayload, ExecutionResult, isExecutionResult, isSettledRejected, Pipe, PipelineOptions, TransformFunction} from './pipeline-aliases.js';
+import {DefaultPayload, PipelineOptions} from './pipeline-aliases.js';
 import {SeriesPipe} from './series-pipe.js';
+
+
+export type Pipe = ActionPipe<any, any> | SeriesPipe<any, any, any, any> | ParallelPipe<any, any, any, any>; // | TransformFunction<any, any>;
 
 
 export function defaultPipelineOptions(): PipelineOptions {
@@ -20,7 +23,6 @@ export function defaultPipelineOptions(): PipelineOptions {
     logDepth: 0
   };
 }
-
 
 
 /**
@@ -142,10 +144,6 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     return parallelPipe;
   };
 
-  transform<TRANSFORM_IN, TRANSFORM_OUT>(transform: TransformFunction<TRANSFORM_IN, TRANSFORM_OUT>): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
-    this._pipes.push(transform);
-    return this;
-  }
 
   async execute(payload: PIPELINE_IN): Promise<PIPELINE_OUT> {
     this.log.info(`starting pipeline ${this.name}...`);
@@ -154,39 +152,22 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     const startTimingSuccessful = startTiming(timingMark, this.log);
 
     let inputPayload = payload;
-    let outputPayload = undefined;
-    const results: ExecutionResult<any, any, any, any> [] = [];
+    let outputPayload: PIPELINE_OUT | undefined;
+    // const results: ExecutionResult<any, any, any, any> [] = [];
     try {
       for (let i = 0; i < this._pipes.length; i++) {
         const pipe: Pipe = this._pipes[i];
-        let result: ExecutionResult<any, any, any, any>;
-        result = await pipe.execute(payload);
-        results.push(result);
-        inputPayload = result.output;
-        outputPayload = result.output;
+        let result = await pipe.execute(inputPayload);
+        inputPayload = result;
+        outputPayload = result;
       }
       this.log.info(`...pipeline ${this.name} completed ${startTimingSuccessful ? endTiming(timingMark, this.log) : ''}`);
-      return outputPayload;
+      return (outputPayload ? outputPayload : 'Unreachable Code') as unknown as PIPELINE_OUT;
     } catch (err) {
       this.log.info(`...pipeline ${this.name} failed`, 'error');
-      if (isExecutionResult(err)) {
-        if (isSettledRejected(err.settled)) {
-          if (Array.isArray(err.settled.reason)) {
-            err.settled.reason.forEach(reason => {
-              this.log.error(reason);
-            });
-          } else {
-            this.log.error(err.settled.reason);
-          }
-          throw new Error('handled');
-        } else {
-          throw new Error('Unreachable code');
-        }
-      } else {
-        const error = processUnknownError(err);
-        this.log.error(error);
-        throw error;
-      }
+      const error = processUnknownError(err);
+      this.log.error(error);
+      throw error;
     } finally {
       clearTiming(timingMark);
     }

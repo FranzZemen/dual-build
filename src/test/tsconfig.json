@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../../transient/test"
+  },
+  "watchOptions": {
+    "watchFile": "useFsEvents",
+    "watchDirectory": "useFsEvents",
+    "fallbackPolling": "fixedInterval",
+    "synchronousWatchDirectory": false,
+    "excludeDirectories": ["**/node_modules"]
+  },
+  "include": ["**/*"],
+  "references": [{"path": "../toolx"}]
+}
