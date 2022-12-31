@@ -9,18 +9,28 @@ import {join} from 'node:path';
 import {Directory} from '../../../options/index.js';
 import {Action} from '../../action.js';
 
-export type CreateProjectDirectoryPayload = {
-  root: string;
-  directory: Directory
-}
 
-export class CreateProjectDirectory extends Action<CreateProjectDirectoryPayload, string | undefined> {
-  constructor() {
-    super();
+export type CreateProjectDirectoryPayload = {
+  root: Directory;
+  directory: Directory
+} | undefined;
+
+export class CreateProjectDirectory extends Action<CreateProjectDirectoryPayload, CreateProjectDirectoryPayload, void> {
+  constructor(logDepth: number) {
+    super(logDepth);
   }
 
-  public executeImpl(payload: CreateProjectDirectoryPayload, bypass: undefined): Promise<string | undefined> {
-    const path = join(payload.root, payload.directory.directoryPath);
-    return mkdir(path, {recursive: true});
+  public executeImpl(payload: CreateProjectDirectoryPayload): Promise<void> {
+    if (payload) {
+      const path = join(payload.root.directoryPath, payload.directory.directoryPath);
+      return mkdir(path, {recursive: true})
+        .then(() => undefined);
+    } else {
+      throw new Error('Undefined payload');
+    }
+  }
+
+  public actionContext(payload: CreateProjectDirectoryPayload): string {
+    return payload ? payload.directory.directoryPath : '';
   }
 }

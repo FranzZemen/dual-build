@@ -6,3 +6,5 @@ node_modules
 /.dual-build.old/
 /toolx.publish/
 /testRoot/
+/transient/
+/test-scaffolding/

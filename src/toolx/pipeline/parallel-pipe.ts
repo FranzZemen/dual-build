@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import {Action, ActionConstructor} from '../action/action.js';
 import {processUnknownError} from '../util/process-unknown-error-message.js';
+import {DefaultPayload} from './pipeline-aliases.js';
 import {Pipeline} from './pipeline.js';
 
 
@@ -8,37 +9,50 @@ export type MergeFunction<T> = (parallelPayloads: any[]) => Promise<T>;
 export type MergeType = 'asAttributes' | 'asMerged';
 
 export class ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> {
-  protected _pipe: Action<any, any>[] = [];
+  protected _pipe: [action: Action<any, any, any>, payloadOverride: any][] = [];
   protected _mergeStrategy: MergeType | MergeFunction<PARALLEL_OUT> = 'asAttributes';
 
   protected constructor(protected _pipeline: Pipeline<any, any>) {
   }
 
   static start<
-    ACTION_CLASS extends Action<PARALLEL_IN, ACTION_OUT>,
-    PIPELINE_IN,
-    PIPELINE_OUT,
-    PARALLEL_IN,
-    PARALLEL_OUT,
-    ACTION_OUT>(actionClass: ActionConstructor<ACTION_CLASS, PARALLEL_IN, ACTION_OUT>, pipeline: Pipeline<any, any>)
-    : ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> {
+    ACTION_CLASS extends Action<PAYLOAD, ACTION_IN, ACTION_OUT>,
+    PAYLOAD = DefaultPayload,
+    PIPELINE_IN = undefined,
+    PIPELINE_OUT = void,
+    PARALLEL_IN = undefined,
+    PARALLEL_OUT = void,
+    ACTION_IN = undefined,
+    ACTION_OUT = void>(actionClass: ActionConstructor<ACTION_CLASS, PAYLOAD, ACTION_IN, ACTION_OUT>,
+                       pipeline: Pipeline<any, any>,
+                       payloadOverride?: PAYLOAD): ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> {
+
     // ----- Multiline Declaration Separator ----- //
     const pipe = new ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT>(pipeline);
-    return pipe.parallel<ACTION_CLASS, ACTION_OUT>(actionClass);
+    return pipe.parallel<ACTION_CLASS, PAYLOAD, ACTION_IN, ACTION_OUT>(actionClass, payloadOverride);
   }
 
-  parallel<ACTION_CLASS extends Action<PARALLEL_IN, ACTION_OUT>, ACTION_OUT>(
-    actionClass: ActionConstructor<ACTION_CLASS, PARALLEL_IN, ACTION_OUT>): ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> {
+  parallel<
+    ACTION_CLASS extends Action<PAYLOAD, ACTION_IN, ACTION_OUT>,
+    PAYLOAD = DefaultPayload,
+    ACTION_IN = undefined,
+    ACTION_OUT = void>(
+    actionClass: ActionConstructor<ACTION_CLASS, PAYLOAD, ACTION_IN, ACTION_OUT>,
+    payloadOverride?: PAYLOAD): ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> {
     // ----- Multiline Declaration Separator ----- //
-    this._pipe.push(new actionClass(this._pipeline.logDepth + 1));
+    this._pipe.push([new actionClass(this._pipeline.logDepth + 1), payloadOverride]);
     return this;
   }
 
-  endParallel<ACTION_CLASS extends Action<PARALLEL_IN, ACTION_OUT>, ACTION_OUT>(
-    actionClass: ActionConstructor<ACTION_CLASS, PARALLEL_IN, ACTION_OUT>,
-    mergeStrategy: MergeType | MergeFunction<PARALLEL_OUT> = 'asAttributes'): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
+  endParallel<
+    ACTION_CLASS extends Action<PAYLOAD, ACTION_IN, ACTION_OUT>,
+    PAYLOAD = DefaultPayload,
+    ACTION_IN = undefined,
+    ACTION_OUT = void>(actionClass: ActionConstructor<ACTION_CLASS, PAYLOAD, ACTION_IN, ACTION_OUT>,
+                       mergeStrategy: MergeType | MergeFunction<PARALLEL_OUT> = 'asAttributes',
+                       payloadOverride?: any): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     // ----- Multiline Declaration Separator ----- //
-    this._pipe.push(new actionClass(this._pipeline.logDepth + 1));
+    this._pipe.push([new actionClass(this._pipeline.logDepth + 1), payloadOverride]);
     this._mergeStrategy = mergeStrategy;
     return this._pipeline;
   }
@@ -47,9 +61,8 @@ export class ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> 
     const actionPromises: Promise<any>[] = [];
     try {
       for (let i = 0; i < this._pipe.length; i++) {
-        const action = this._pipe[i];
-        //actionNames.push(action.constructor.name);
-        actionPromises.push(action.execute(payload));
+        const [action, payloadOverride] = this._pipe[i];
+        actionPromises.push(action.execute(payload, payloadOverride));
       }
       const settlement = await Promise.allSettled(actionPromises);
       let filteredErrors = settlement.filter(settled => settled.status === 'rejected');

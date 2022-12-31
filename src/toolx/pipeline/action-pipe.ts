@@ -1,14 +1,20 @@
 import {Action, ActionConstructor} from '../action/action.js';
 import {Pipeline} from './pipeline.js';
 
-export class ActionPipe<ACTION_IN, ACTION_OUT> {
-  protected constructor(protected _action: Action<ACTION_IN, ACTION_OUT>, protected _pipeline: Pipeline<any, any>) {
+export class ActionPipe<PAYLOAD, ACTION_IN, ACTION_OUT> {
+  protected payloadOverride: PAYLOAD | undefined;
+  protected constructor(protected _action: Action<PAYLOAD, ACTION_IN, ACTION_OUT>, payloadOverride?: PAYLOAD) {
+    this.payloadOverride = payloadOverride;
   }
 
-  static action<ACTION_CLASS extends Action<ACTION_IN, ACTION_OUT>, ACTION_IN, ACTION_OUT>
-  (actionClass: ActionConstructor<ACTION_CLASS, ACTION_IN, ACTION_OUT>, pipeline: Pipeline<any, any>): ActionPipe<ACTION_IN, ACTION_OUT> {
+  static action<
+    ACTION_CLASS extends Action<PAYLOAD, ACTION_IN, ACTION_OUT>,
+    PAYLOAD,
+    ACTION_IN = undefined,
+    ACTION_OUT = void>
+  (actionClass: ActionConstructor<ACTION_CLASS, PAYLOAD, ACTION_IN, ACTION_OUT>, pipeline: Pipeline<any,any>, payloadOverride?: PAYLOAD): ActionPipe<PAYLOAD, ACTION_IN, ACTION_OUT> {
     // ----- Declaration separator ----- //
-    return new ActionPipe<ACTION_IN, ACTION_OUT>(new actionClass(pipeline.logDepth + 1), pipeline);
+    return new ActionPipe<PAYLOAD, ACTION_IN, ACTION_OUT>(new actionClass(pipeline.logDepth + 1), payloadOverride);
   }
 
   get actionName(): string {
@@ -22,7 +28,7 @@ export class ActionPipe<ACTION_IN, ACTION_OUT> {
   async execute(payload: ACTION_IN): Promise<ACTION_OUT> {
     const actionName = this.actionName;
     try {
-      return await this._action.execute(payload);
+      return await this._action.execute(payload, this.payloadOverride);
     } catch (err) {
       return Promise.reject(err);
     }
