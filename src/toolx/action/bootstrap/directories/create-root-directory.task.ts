@@ -9,6 +9,8 @@ License Type: MIT
 */
 
 import {existsSync, mkdirSync} from 'node:fs';
+import {join} from 'node:path';
+import {cwd} from 'node:process';
 import {ContainsRoot, Directory} from '../../../options/directories.js';
 import {processUnknownError} from '../../../util/process-unknown-error-message.js';
 import {Action} from '../../action.js';
@@ -33,12 +35,14 @@ export class CreateRootDirectory extends Action<ContainsRoot, ContainsRoot, void
           return Promise.reject(new Error(msg));
         }
         if (existsSync(rootDirectory.directoryPath)) {
-          const msg = `Project folder ${rootDirectory.directoryPath} already exists, not creating`;
+          const msg = `project root folder ${rootDirectory.directoryPath} already exists, not creating`;
           this.log.info(msg, 'error');
           this.errorCondition = true;
           return Promise.reject(new Error(msg));
         }
-        mkdirSync(rootDirectory.directoryPath, {recursive: true});
+        const path = join(cwd(), rootDirectory.directoryPath);
+        mkdirSync(path, {recursive: true});
+        this.log.info(`created ${path}`, 'task-internal');
         return Promise.resolve(undefined);
       } catch (err) {
         const error = processUnknownError(err);

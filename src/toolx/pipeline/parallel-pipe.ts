@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import {Action, ActionConstructor} from '../action/action.js';
+import {Log} from '../log/log.js';
 import {processUnknownError} from '../util/process-unknown-error-message.js';
 import {DefaultPayload} from './pipeline-aliases.js';
 import {Pipeline} from './pipeline.js';
@@ -11,8 +12,10 @@ export type MergeType = 'asAttributes' | 'asMerged';
 export class ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> {
   protected _pipe: [action: Action<any, any, any>, payloadOverride: any][] = [];
   protected _mergeStrategy: MergeType | MergeFunction<PARALLEL_OUT> = 'asAttributes';
+  log:Log
 
-  protected constructor(protected _pipeline: Pipeline<any, any>) {
+  protected constructor(protected _pipeline: Pipeline<any, any>, depth: number) {
+    this.log = new Log(depth);
   }
 
   static start<
@@ -28,7 +31,7 @@ export class ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> 
                        payloadOverride?: PAYLOAD): ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> {
 
     // ----- Multiline Declaration Separator ----- //
-    const pipe = new ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT>(pipeline);
+    const pipe = new ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT>(pipeline, pipeline.log.depth + 1);
     return pipe.parallel<ACTION_CLASS, PAYLOAD, ACTION_IN, ACTION_OUT>(actionClass, payloadOverride);
   }
 
@@ -40,7 +43,7 @@ export class ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> 
     actionClass: ActionConstructor<ACTION_CLASS, PAYLOAD, ACTION_IN, ACTION_OUT>,
     payloadOverride?: PAYLOAD): ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> {
     // ----- Multiline Declaration Separator ----- //
-    this._pipe.push([new actionClass(this._pipeline.logDepth + 1), payloadOverride]);
+    this._pipe.push([new actionClass(this.log.depth + 1), payloadOverride]);
     return this;
   }
 
@@ -52,12 +55,14 @@ export class ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> 
                        mergeStrategy: MergeType | MergeFunction<PARALLEL_OUT> = 'asAttributes',
                        payloadOverride?: any): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     // ----- Multiline Declaration Separator ----- //
-    this._pipe.push([new actionClass(this._pipeline.logDepth + 1), payloadOverride]);
+    this._pipe.push([new actionClass(this.log.depth + 1), payloadOverride]);
     this._mergeStrategy = mergeStrategy;
     return this._pipeline;
   }
 
   async execute(payload: PARALLEL_IN): Promise<PARALLEL_OUT> {
+    this.log.info('starting parallel pipe...', 'pipeline');
+
     const actionPromises: Promise<any>[] = [];
     try {
       for (let i = 0; i < this._pipe.length; i++) {
@@ -90,6 +95,9 @@ export class ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> 
       }
     } catch (err) {
       return Promise.reject(processUnknownError(err));
+    }
+    finally {
+       this.log.info('...completing paralell pipe', 'pipeline');
     }
   }
 }

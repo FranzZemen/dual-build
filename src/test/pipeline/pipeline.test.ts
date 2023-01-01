@@ -8,11 +8,12 @@ License Type: MIT
 */
 
 import * as chai from 'chai';
-import {rmSync} from 'fs';
 import _ from 'lodash';
 import 'mocha';
-import {existsSync} from 'node:fs';
-import {basename} from 'node:path';
+import {existsSync, rmSync} from 'node:fs';
+import {basename, sep, join} from 'node:path';
+import {chdir, cwd} from 'node:process';
+import {ChangeWorkingDirectory, ChangeWorkingDirectoryPayload} from '../../toolx/action/bootstrap/change-working-directory.js';
 import {CreateDirectories} from '../../toolx/action/bootstrap/directories/create-directories.action.js';
 import {Log} from '../../toolx/log/log.js';
 import {bootstrapOptions} from '../../toolx/options/bootstrap-options.js';
@@ -29,21 +30,28 @@ describe('dual-build tests', () => {
     describe('Pipeline Integration', () => {
       it('should instantiate and execute action', async function () {
 
+        const projectDirectoryPath = './test-scaffolding';
+
         const options = _.merge({}, bootstrapOptions);
         const log = new Log();
-        options.directories.root.directoryPath = './test-scaffolding';
+        options.directories.root.directoryPath = projectDirectoryPath;
         options.directories.root.folder = basename(options.directories.root.directoryPath);
         try {
+          const oldCwd = cwd();
           await Pipeline.options<void, void>({name: 'test-scaffolding', logDepth: 0})
                         .action<CreateDirectories, ContainsDirectories>(CreateDirectories, options)
+                        .action<ChangeWorkingDirectory, ChangeWorkingDirectoryPayload>(ChangeWorkingDirectory,
+                                                                                       {rootPath: options.directories.root.directoryPath})
                         .execute();
+          cwd().should.contain(join(`dual-build${sep}${projectDirectoryPath}`));
+          chdir(oldCwd);
 
-          existsSync('./test-scaffolding').should.be.true;
+          existsSync(projectDirectoryPath).should.be.true;
         } catch (err) {
           log.error(processUnknownError(err));
           unreachableCode.should.be.true;
         } finally {
-          rmSync('./test-scaffolding', {recursive: true, force: true});
+          rmSync(projectDirectoryPath, {recursive: true, force: true});
         }
       });
     });

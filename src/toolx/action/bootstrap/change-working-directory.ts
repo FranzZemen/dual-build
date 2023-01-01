@@ -10,18 +10,23 @@ import {processUnknownError} from '../../util/process-unknown-error-message.js';
 import {Action} from '../action.js';
 
 
-export class ChangeWorkingDirectory extends Action<ContainsDirectories, ContainsDirectories, void> {
-  constructor(logDepth: number, protected directoryPath: DirectoryPath | 'root') {
+export type ChangeWorkingDirectoryPayload = {
+  rootPath: string
+}
+
+export class ChangeWorkingDirectory extends Action<ChangeWorkingDirectoryPayload, undefined, void> {
+  constructor(logDepth: number) {
     super(logDepth);
   }
 
-  executeImpl(payload: ContainsDirectories): Promise<void> {
+  executeImpl(payload: ChangeWorkingDirectoryPayload): Promise<void> {
     if (payload) {
       try {
-        const newCwd = payload.directories[this.directoryPath];
-        const newCwdPath = resolve(cwd(), newCwd.directoryPath);
+        const newCwd = payload.rootPath;
+        this.log.info(`current working directory is ${cwd()}`, 'task-internal')
+        const newCwdPath = resolve(cwd(), newCwd);
         chdir(newCwdPath);
-        payload.directories[this.directoryPath].directoryPath = cwd();
+        this.log.info(`new working directory is ${cwd()}`, 'warn');
         return Promise.resolve();
       } catch (err) {
         const error = processUnknownError(err);
@@ -33,7 +38,7 @@ export class ChangeWorkingDirectory extends Action<ContainsDirectories, Contains
     }
   }
 
-  public actionContext(payload: ContainsDirectories): string {
-    return '';
+  public actionContext(payload: ChangeWorkingDirectoryPayload): string {
+    return payload ? payload.rootPath : '';
   }
 }
