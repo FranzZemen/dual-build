@@ -1,2 +1,2 @@
 // export * from './bin-command/external-index.js'
-export {Action} from './action/action.js';
+export {Transform} from './transform/transform.js';

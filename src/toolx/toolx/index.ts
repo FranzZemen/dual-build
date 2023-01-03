@@ -7,12 +7,12 @@ License Type:
 import {basename} from 'node:path';
 import {argv,exit} from 'node:process';
 import _ from 'lodash';
-import {ChangeWorkingDirectory} from '../action/bootstrap/change-working-directory.js';
-//import {CreateDirectories} from '../action/bootstrap/directories/create-directories.action.js';
-import {CreateRootDirectory} from '../action/bootstrap/directories/create-root-directory.task.js';
-import {InstallGitignore} from '../action/bootstrap/install-gitignore.js';
+import {ChangeWorkingDirectory} from '../transform/bootstrap/change-working-directory.transform.js';
+//import {CreateDirectories} from '../transform/bootstrap/directories/create-directories.transform.js';
+import {CreateRootDirectory} from '../transform/bootstrap/directories/create-root-directory.transform.js';
+import {InstallGitignore} from '../transform/bootstrap/install-gitignore.transform.js';
 import {Log} from '../log/log.js';
-// import {SetupGit} from '../action/bootstrap/setup-git.js';
+// import {SetupGit} from '../transform/bootstrap/setup-git.js';
 import {BootstrapOptions, bootstrapOptions} from '../options/bootstrap-options.js';
 import {Directories} from '../options/index.js';
 import {DefaultPayload} from '../pipeline/pipeline-aliases.js';
@@ -39,15 +39,15 @@ const logDepth =0;
 try {
   /*
   await Pipeline
-    .options<BootstrapOptions>({name: 'bootstrap', logDepth:0})
+    .gitOptions<BootstrapOptions>({name: 'bootstrap', logDepth:0})
     .startSeries<CreateDirectories<BootstrapOptions>>(CreateDirectories)
     .endSeries<InstallGitignore<BootstrapOptions>, BootstrapOptions>(InstallGitignore)
-    .execute(options);
+    .execute(gitOptions);
 
     .startSeries<CreateDirectories<BootstrapOptions>, BootstrapOptions,BootstrapOptions,BootstrapOptions,BootstrapOptions>(new CreateDirectories<BootstrapOptions>(), 'toolx', logDepth)
     .series<BootstrapOptions, BootstrapOptions>(new ChangeWorkingDirectory<BootstrapOptions>('root'))
     .endSeries<BootstrapOptions>(new InstallGitignore<BootstrapOptions>())*/
-    //.execute(options)
+    //.execute(gitOptions)
 
 } catch (err) {
   log.error(processUnknownError(err));

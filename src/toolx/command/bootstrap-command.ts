@@ -6,7 +6,7 @@ License Type: MIT
 import {AbstractCommand, CommandOptions} from './command.js';
 
 export class BootstrapCommand extends AbstractCommand {
-  // options: CommandOptions;
+  // gitOptions: CommandOptions;
   constructor() {
     super();
   }

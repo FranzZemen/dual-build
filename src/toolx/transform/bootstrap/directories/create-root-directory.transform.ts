@@ -13,20 +13,21 @@ import {join} from 'node:path';
 import {cwd} from 'node:process';
 import {ContainsRoot, Directory} from '../../../options/directories.js';
 import {processUnknownError} from '../../../util/process-unknown-error-message.js';
-import {Action} from '../../action.js';
-import {CreateProjectDirectoryPayload} from './create-project-directory.js';
+import {Transform} from '../../transform.js';
 
 
 /**
  * Passing a 2nd parameter because instantiating code cannot distinguish between one or 2 parameters.
  */
-export class CreateRootDirectory extends Action<ContainsRoot, ContainsRoot, void> {
+export class CreateRootDirectory extends Transform<Directory | undefined, Directory | undefined, Directory> {
   constructor(logDepth: number) {
     super(logDepth);
   }
-  executeImpl(payload: ContainsRoot): Promise<undefined> {
-    if(payload) {
-      const rootDirectory: Directory = payload.root;
+  executeImpl(rootDirectory: Directory | undefined, override?: Directory | undefined): Promise<Directory> {
+    if(rootDirectory === undefined && override) {
+      rootDirectory = override;
+    }
+    if(rootDirectory) {
       try {
         if (rootDirectory.directoryPath === 'NOT_DEFINED') {
           const msg = 'Undefined root folder';
@@ -43,7 +44,7 @@ export class CreateRootDirectory extends Action<ContainsRoot, ContainsRoot, void
         const path = join(cwd(), rootDirectory.directoryPath);
         mkdirSync(path, {recursive: true});
         this.log.info(`created ${path}`, 'task-internal');
-        return Promise.resolve(undefined);
+        return Promise.resolve(rootDirectory);
       } catch (err) {
         const error = processUnknownError(err);
         this.log.error(error);
@@ -53,7 +54,7 @@ export class CreateRootDirectory extends Action<ContainsRoot, ContainsRoot, void
       throw new Error ('Undefined payload');
     }
   }
-  public actionContext(payload: ContainsRoot): string {
-    return payload ? payload.root.directoryPath : '';
+  public transformContext(rootDirectory: Directory): string {
+    return rootDirectory ? rootDirectory.directoryPath : '';
   }
 }

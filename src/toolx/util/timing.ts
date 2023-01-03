@@ -4,13 +4,13 @@ License Type: MIT
 */
 
 import {performance} from 'node:perf_hooks';
-import {NestedLog} from '../log/nested-log.js';
+import {Log} from '../log/log.js';
 
 export type TimingUnit = 'µs' | 'ms' | 's';
 
 const keys: string[] = [];
 
-export function startTiming(key: string, log: NestedLog): boolean {
+export function startTiming(key: string, log: Log): boolean {
   if(keys.includes(key)) {
     log.info(`timing key ${key} already used`, 'error');
     return false;
@@ -20,12 +20,12 @@ export function startTiming(key: string, log: NestedLog): boolean {
   return true;
 }
 
-export function endTiming(key: string, log: NestedLog): `in ${number} ${TimingUnit}` | '' {
+export function endTiming(key: string, log: Log): `in ${number} ${TimingUnit}` | '' {
   if(keys.includes(key)) {
     const measure = performance.measure(key, key);
     let units:TimingUnit = 'ms';
     let value = Math.ceil(measure.duration);
-    if (measure.duration < 0) {
+    if (measure.duration < 1) {
       units = 'µs'
       value = Math.ceil(measure.duration * 1000);
     } else if (measure.duration > 1000) {

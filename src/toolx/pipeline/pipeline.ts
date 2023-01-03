@@ -4,17 +4,15 @@ License Type:
 */
 
 import {v4 as uuidV4} from 'uuid';
-import {Action, ActionConstructor} from '../action/action.js';
 import {Log} from '../log/log.js';
+import {Transform, TransformConstructor} from '../transform/transform.js';
 import {processUnknownError} from '../util/process-unknown-error-message.js';
 import {clearTiming, endTiming, startTiming} from '../util/timing.js';
-import {ActionPipe} from './action-pipe.js';
 import {MergeFunction, MergeType, ParallelPipe} from './parallel-pipe.js';
-import {DefaultPayload, PipelineOptions} from './pipeline-aliases.js';
+import {DefaultPayload, Pipe, PipelineOptions} from './pipeline-aliases.js';
 import {SeriesPipe} from './series-pipe.js';
+import {TransformPipe} from './transform-pipe.js';
 
-
-export type Pipe = ActionPipe<any, any, any> | SeriesPipe<any, any, any, any> | ParallelPipe<any, any, any, any>; // | TransformFunction<any, any>;
 
 export type ArrayTwoOrMore<T> = [T, T, ...T[]];
 
@@ -34,12 +32,12 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
   protected static index = 1;
   log: Log;
   name: string;
-  logDepth: number;
+  //logDepth: number;
   protected _pipes: Pipe[] = [];
 
   private constructor(options: PipelineOptions) {
     this.name = options.name;
-    this.logDepth = options.logDepth;
+    //this.logDepth = gitOptions.logDepth;
     this.log = new Log(options.logDepth);
   }
 
@@ -56,70 +54,70 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
   }
 
   /**
-   * Start the pipeline with an action
-   * ACTION_CLASS extends Action = Action class (constructor)
+   * Start the pipeline with an transform
+   * TRANSFORM_CLASS extends Transform = Transform class (constructor)
    * Payload is DIRECTORIES = PIPELINE_IN by definition since it is the start of the pipeline
-   * In general, action payload out != pipeline payload out
+   * In general, transform payload out != pipeline payload out
    *
    */
-  static action<
-    ACTION_CLASS extends Action<PAYLOAD, ACTION_IN, ACTION_OUT>,
+  static transform<
+    CLASS extends Transform<PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
     PAYLOAD = DefaultPayload,
     PIPELINE_IN = undefined,
     PIPELINE_OUT = void,
-    ACTION_IN = undefined,
-    ACTION_OUT = void>(
-    actionClass: ActionConstructor<ACTION_CLASS, PAYLOAD, ACTION_IN, ACTION_OUT>,
+    TRANSFORM_IN = undefined,
+    TRANSFORM_OUT = void>(
+    transformClass: TransformConstructor<CLASS, PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
     payloadOverride?: PAYLOAD): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
 
     // ----- Declaration separator ----- //
     const options = defaultPipelineOptions();
     const pipeline = Pipeline.options<PIPELINE_IN, PIPELINE_OUT>(options);
-    pipeline._pipes.push(ActionPipe.action<ACTION_CLASS, PAYLOAD, ACTION_IN, ACTION_OUT>(actionClass, pipeline, payloadOverride));
+    pipeline._pipes.push(TransformPipe.transform<CLASS, PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>(transformClass, pipeline, payloadOverride));
     return pipeline;
   };
 
-  static actions<
+  static transforms<
     PIPELINE_IN = undefined,
-    PIPELINE_OUT = void>(actionClasses: ActionConstructor<any> | ActionConstructor<any>[],
+    PIPELINE_OUT = void>(transformClasses: TransformConstructor<any> | TransformConstructor<any>[],
                          payloadOverrides?: any | any [],
                          options?: PipelineOptions): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     // ----- Declaration separator ----- //
 
     const pipeline = Pipeline.options<PIPELINE_IN, PIPELINE_OUT>(options);
-    return pipeline.actions(actionClasses, payloadOverrides);
+    return pipeline.transforms(transformClasses, payloadOverrides);
   }
 
 
   /**
    * Start the pipeline with a series
-   * ACTION_CLASS extends Action = Action class (constructor)
+   * TRANSFORM_CLASS extends Transform = Transform class (constructor)
    * Payload is DIRECTORIES = SERIES_IN = PIPELINE_IN by definition since it is the start of the pipeline
-   * In general, action payload out != series out != pipeline payload out
+   * In general, transform payload out != series out != pipeline payload out
    *
    */
   static startSeries<
-    ACTION_CLASS extends Action<PAYLOAD, ACTION_IN, ACTION_OUT>,
+    TRANSFORM_CLASS extends Transform<PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
     PAYLOAD = DefaultPayload,
     PIPELINE_IN = undefined,
     PIPELINE_OUT = void,
     SERIES_IN = undefined,
     SERIES_OUT = void,
-    ACTION_IN = undefined,
-    ACTION_OUT = void>(actionClass: ActionConstructor<ACTION_CLASS, PAYLOAD, ACTION_IN, ACTION_OUT>,
+    TRANSFORM_IN = undefined,
+    TRANSFORM_OUT = void>(transformClass: TransformConstructor<TRANSFORM_CLASS, PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
                        payloadOverride?: PAYLOAD): SeriesPipe<PIPELINE_IN, PIPELINE_OUT, SERIES_IN, SERIES_OUT> {
     // ----- Declaration separator ----- //
     const options = defaultPipelineOptions();
     const pipeline = Pipeline.options<PIPELINE_IN, PIPELINE_OUT>(options);
     const seriesPipe = SeriesPipe.start<
-      ACTION_CLASS,
+      TRANSFORM_CLASS,
       PAYLOAD,
       PIPELINE_IN,
       PIPELINE_OUT,
       SERIES_IN,
       SERIES_OUT,
-      ACTION_IN,
-      ACTION_OUT>(actionClass, pipeline, payloadOverride);
+      TRANSFORM_IN,
+      TRANSFORM_OUT>(transformClass, pipeline, payloadOverride);
     pipeline._pipes.push(seriesPipe);
     return seriesPipe;
   };
@@ -128,35 +126,35 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     PIPELINE_IN = undefined,
     PIPELINE_OUT = void,
     SERIES_IN = undefined,
-    SERIES_OUT = void>(actionClasses: ActionConstructor<any>[],
+    SERIES_OUT = void>(transformClasses: TransformConstructor<any>[],
                        payloadOverrides: ArrayTwoOrMore<any | undefined> [],
                        options?: PipelineOptions): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     const pipeline = Pipeline.options<PIPELINE_IN, PIPELINE_OUT>(options);
-    return pipeline.series<SERIES_IN, SERIES_OUT>(actionClasses, payloadOverrides);
+    return pipeline.series<SERIES_IN, SERIES_OUT>(transformClasses, payloadOverrides);
   }
 
   static startParallel<
-    ACTION_CLASS extends Action<PAYLOAD, ACTION_IN, ACTION_OUT>,
+    TRANSFORM_CLASS extends Transform<PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
     PAYLOAD = DefaultPayload,
     PIPELINE_IN = undefined,
     PIPELINE_OUT = void,
     PARALLEL_IN = undefined,
     PARALLEL_OUT = void,
-    ACTION_IN = undefined,
-    ACTION_OUT = void, >(actionClass: ActionConstructor<ACTION_CLASS, PAYLOAD, ACTION_IN, ACTION_OUT>,
+    TRANSFORM_IN = undefined,
+    TRANSFORM_OUT = void, >(transformClass: TransformConstructor<TRANSFORM_CLASS, PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
                          payloadOverride?: PAYLOAD): ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT> {
     // ----- Declaration separator ----- //
     const options = defaultPipelineOptions();
     const pipeline = Pipeline.options<PIPELINE_IN, PIPELINE_OUT>(options);
     const parallelPipe = ParallelPipe.start<
-      ACTION_CLASS,
+      TRANSFORM_CLASS,
       PAYLOAD,
       PIPELINE_IN,
       PIPELINE_OUT,
       PARALLEL_IN,
       PARALLEL_OUT,
-      ACTION_IN,
-      ACTION_OUT>(actionClass, pipeline, payloadOverride);
+      TRANSFORM_IN,
+      TRANSFORM_OUT>(transformClass, pipeline, payloadOverride);
     pipeline._pipes.push(parallelPipe);
     return parallelPipe;
   };
@@ -165,85 +163,85 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     PIPELINE_IN = undefined,
     PIPELINE_OUT = void,
     PARALLEL_IN = undefined,
-    PARALLEL_OUT = void>(actionClasses: ActionConstructor<any>[],
-                         mergeStrategy: MergeType | MergeFunction<PARALLEL_OUT> = 'asAttributes',
+    PARALLEL_OUT = void>(transformClasses: TransformConstructor<any>[],
+                         mergeStrategy: [mergeType: MergeType, mergeFunction?:MergeFunction<PARALLEL_OUT>] = ['asAttributes'],
                          payloadOverrides: ArrayTwoOrMore<any | undefined> [],
                          options?: PipelineOptions): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     const pipeline = Pipeline.options<PIPELINE_IN, PIPELINE_OUT>(options);
-    return pipeline.parallels<PARALLEL_IN, PARALLEL_OUT>(actionClasses, mergeStrategy, payloadOverrides);
+    return pipeline.parallels<PARALLEL_IN, PARALLEL_OUT>(transformClasses, mergeStrategy, payloadOverrides);
   }
 
-  action<
-    ACTION_CLASS extends Action<PAYLOAD, ACTION_IN, ACTION_OUT>,
+  transform<
+    TRANSFORM_CLASS extends Transform<PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
     PAYLOAD = DefaultPayload,
-    ACTION_IN = undefined,
-    ACTION_OUT = void>(actionClass: ActionConstructor<ACTION_CLASS, PAYLOAD, ACTION_IN, ACTION_OUT>,
+    TRANSFORM_IN = undefined,
+    TRANSFORM_OUT = void>(transformClass: TransformConstructor<TRANSFORM_CLASS, PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
                        payloadOverride?: PAYLOAD): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
 
     // ----- Declaration separator ----- //
-    this._pipes.push(ActionPipe.action<ACTION_CLASS, PAYLOAD, ACTION_IN, ACTION_OUT>(actionClass, this, payloadOverride));
+    this._pipes.push(TransformPipe.transform<TRANSFORM_CLASS, PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>(transformClass, this, payloadOverride));
     return this;
   };
 
-  actions(actionClasses: ActionConstructor<any> | ActionConstructor<any>[],
-          payloadOverrides?: any | any []): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
-    if (Array.isArray(actionClasses)) {
+  transforms(transformClasses: TransformConstructor<any> | TransformConstructor<any>[],
+             payloadOverrides?: any | any []): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
+    if (Array.isArray(transformClasses)) {
       if (payloadOverrides) {
         if (Array.isArray(payloadOverrides)) {
           // Size of arrays must match, we are still 1:1 not mxn.
-          if (actionClasses.length === payloadOverrides.length) {
-            return actionClasses.reduce((previousValue: Pipeline<any, any>, currentValue: ActionConstructor<any>, currentIndex) => {
-              return previousValue.action<any, any>(currentValue, payloadOverrides[currentIndex]);
+          if (transformClasses.length === payloadOverrides.length) {
+            return transformClasses.reduce((previousValue: Pipeline<any, any>, currentValue: TransformConstructor<any>, currentIndex) => {
+              return previousValue.transform<any, any>(currentValue, payloadOverrides[currentIndex]);
 
             }, this);
           } else {
-            throw new Error('actions:  action classes array and payload array do not match');
+            throw new Error('transforms:  transform classes array and payload array do not match');
           }
         } else {
-          return actionClasses.reduce((previousValue: Pipeline<any, any>, currentValue: ActionConstructor<any>) => {
-            return previousValue.action<any, any>(currentValue, payloadOverrides);
+          return transformClasses.reduce((previousValue: Pipeline<any, any>, currentValue: TransformConstructor<any>) => {
+            return previousValue.transform<any, any>(currentValue, payloadOverrides);
           }, this);
         }
       } else {
-        return actionClasses.reduce((previousValue: Pipeline<any, any>, currentValue: ActionConstructor<any>) => {
-          return previousValue.action<any, undefined>(currentValue);
+        return transformClasses.reduce((previousValue: Pipeline<any, any>, currentValue: TransformConstructor<any>) => {
+          return previousValue.transform<any, undefined>(currentValue);
         }, this);
       }
     } else {
       if (payloadOverrides) {
         if (Array.isArray(payloadOverrides)) {
           return payloadOverrides.reduce((previousValue: Pipeline<PIPELINE_IN, PIPELINE_OUT>, currentValue: any) => {
-            return previousValue.action<any, any>(actionClasses, currentValue);
+            return previousValue.transform<any, any>(transformClasses, currentValue);
           }, this);
         } else {
-          return this.action<any, any>(actionClasses, payloadOverrides);
+          return this.transform<any, any>(transformClasses, payloadOverrides);
         }
       } else {
-        return this.action<any, undefined>(actionClasses);
+        return this.transform<any, undefined>(transformClasses);
       }
     }
   }
 
 
   startSeries<
-    ACTION_CLASS extends Action<PAYLOAD, ACTION_IN, ACTION_OUT>,
+    TRANSFORM_CLASS extends Transform<PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
     PAYLOAD = DefaultPayload,
     SERIES_IN = undefined,
     SERIES_OUT = void,
-    ACTION_IN = undefined,
-    ACTION_OUT = void>(actionClass: ActionConstructor<ACTION_CLASS, PAYLOAD, ACTION_IN, ACTION_OUT>,
+    TRANSFORM_IN = undefined,
+    TRANSFORM_OUT = void>(transformClass: TransformConstructor<TRANSFORM_CLASS, PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
                        payloadOverride?: PAYLOAD): SeriesPipe<PIPELINE_IN, PIPELINE_OUT, SERIES_IN, SERIES_OUT> {
 
     // ----- Declaration separator ----- //
     const seriesPipe = SeriesPipe.start<
-      ACTION_CLASS,
+      TRANSFORM_CLASS,
       PAYLOAD,
       PIPELINE_IN,
       PIPELINE_OUT,
       SERIES_IN,
       SERIES_OUT,
-      ACTION_IN,
-      ACTION_OUT>(actionClass,
+      TRANSFORM_IN,
+      TRANSFORM_OUT>(transformClass,
                   this,
                   payloadOverride);
     this._pipes.push(seriesPipe);
@@ -252,12 +250,12 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
 
   series<
     SERIES_IN = undefined,
-    SERIES_OUT = void>(actionClasses: ActionConstructor<any>[],
+    SERIES_OUT = void>(transformClasses: TransformConstructor<any>[],
                        payloadOverrides: ArrayTwoOrMore<any | undefined> []): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
-    return actionClasses.reduce((previousValue: any, currentValue, currentIndex) => {
+    return transformClasses.reduce((previousValue: any, currentValue, currentIndex) => {
       // Even though ArrayTwoOrMore guards minimum length from a type perspective, let's put in a run time check.  We have to match lengths between
       // Arrays anyway
-      if (actionClasses.length != payloadOverrides.length) {
+      if (transformClasses.length != payloadOverrides.length) {
         throw new Error('Array lengths do not match');
       } else if (payloadOverrides.length < 2) {
         throw new Error('Minimum array length is 2 for a series');
@@ -276,39 +274,39 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
 
 
   startParallel<
-    ACTION_CLASS extends Action<PAYLOAD, ACTION_IN, ACTION_OUT>,
+    TRANSFORM_CLASS extends Transform<PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
     PAYLOAD = DefaultPayload,
     PARALELL_IN = undefined,
     PARALLEL_OUT = void,
-    ACTION_IN = undefined,
-    ACTION_OUT = void>(actionClass: ActionConstructor<ACTION_CLASS, PAYLOAD, ACTION_IN, ACTION_OUT>,
+    TRANSFORM_IN = undefined,
+    TRANSFORM_OUT = void>(transformClass: TransformConstructor<TRANSFORM_CLASS, PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
                        payloadOverride?: PAYLOAD): ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALELL_IN, PARALLEL_OUT> {
     // ----- Declaration separator ----- //
     const parallelPipe = ParallelPipe.start<
-      ACTION_CLASS,
+      TRANSFORM_CLASS,
       PAYLOAD,
       PIPELINE_IN,
       PIPELINE_OUT,
       PARALELL_IN,
       PARALLEL_OUT,
-      ACTION_IN,
-      ACTION_OUT>(actionClass, this, payloadOverride);
+      TRANSFORM_IN,
+      TRANSFORM_OUT>(transformClass, this, payloadOverride);
     this._pipes.push(parallelPipe);
     return parallelPipe;
   };
 
-  parallels<PARALLEL_IN, PARALLEL_OUT>(actionClasses: ActionConstructor<any>[],
-                                       mergeStrategy: MergeType | MergeFunction<PARALLEL_OUT> = 'asAttributes',
+  parallels<PARALLEL_IN, PARALLEL_OUT>(transformClasses: TransformConstructor<any>[],
+                                       mergeStrategy: [type: MergeType, mergeFunction?: MergeFunction<PARALLEL_OUT>] = ['asAttributes'],
                                        payloadOverrides: ArrayTwoOrMore<any | undefined> []): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
-    return actionClasses.reduce((previousValue: any, currentValue, currentIndex) => {
-      if (actionClasses.length != payloadOverrides.length) {
+    return transformClasses.reduce((previousValue: any, currentValue, currentIndex) => {
+      if (transformClasses.length != payloadOverrides.length) {
         throw new Error('Array lengths do not match');
       } else if (payloadOverrides.length < 2) {
         throw new Error('Minimum array length is 2 for a parallel');
       }
       if (previousValue === undefined) {
         return this.startParallel<any, any, PARALLEL_IN, PARALLEL_OUT, any, any>(currentValue, payloadOverrides[currentIndex]);
-      } else if (currentIndex === actionClasses.length - 1) {
+      } else if (currentIndex === transformClasses.length - 1) {
         return (previousValue as ParallelPipe<PIPELINE_IN, PIPELINE_OUT, PARALLEL_IN, PARALLEL_OUT>).endParallel<any, any, any, any>(currentValue,
                                                                                                                                      mergeStrategy,
                                                                                                                                      payloadOverrides[currentIndex]);
@@ -319,8 +317,9 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     }, undefined);
   }
 
-  // Pipeline.options()
-  // .forEach(directories, predicate or predicate array [], will take the last of 'action', 'series' , 'parallel', in nothing defaults to aciton
+
+  // Pipeline.gitOptions()
+  // .forEach(directories, predicate or predicate array [], will take the last of 'transform', 'series' , 'parallel', in nothing defaults to aciton
 
   async execute(payload: PIPELINE_IN): Promise<PIPELINE_OUT> {
     this.log.info(`starting pipeline ${this.name}...`, 'pipeline');
@@ -339,7 +338,7 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
         outputPayload = result;
       }
       this.log.info(`...pipeline ${this.name} completed ${startTimingSuccessful ? endTiming(timingMark, this.log) : ''}`, 'pipeline');
-      return (outputPayload ? outputPayload : 'Unreachable Code') as unknown as PIPELINE_OUT;
+      return outputPayload as PIPELINE_OUT;
     } catch (err) {
       this.log.info(`...pipeline ${this.name} failed`, 'error');
       const error = processUnknownError(err);

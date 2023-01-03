@@ -9,7 +9,8 @@ import {mkdir} from 'node:fs/promises';
 import {join} from 'node:path';
 import {cwd} from 'node:process';
 import {Directory} from '../../../options/index.js';
-import {Action} from '../../action.js';
+import {TransformPayloadIn} from '../../transform-payload-in.js';
+import {Transform} from '../../transform.js';
 
 
 export type CreateProjectDirectoryPayload = {
@@ -17,14 +18,14 @@ export type CreateProjectDirectoryPayload = {
   directory: Directory
 } | undefined;
 
-export class CreateProjectDirectory extends Action<CreateProjectDirectoryPayload, CreateProjectDirectoryPayload, void> {
+export class CreateProjectDirectory extends TransformPayloadIn<Directory, Directory> {
   constructor(logDepth: number) {
     super(logDepth);
   }
 
-  public executeImpl(payload: CreateProjectDirectoryPayload): Promise<void> {
-    if (payload) {
-      const path = join(cwd(), join(payload.root.directoryPath, payload.directory.directoryPath));
+  public executeImpl(root: Directory, directory?: Directory): Promise<void> {
+    if (root && directory) {
+      const path = join(cwd(), join(root.directoryPath, directory.directoryPath));
       if (existsSync(path)) {
         const msg = `Project folder ${path} already exists, skipping`;
         this.log.warn(msg);
@@ -41,7 +42,7 @@ export class CreateProjectDirectory extends Action<CreateProjectDirectoryPayload
     }
   }
 
-  public actionContext(payload: CreateProjectDirectoryPayload): string {
-    return payload ? payload.directory.directoryPath : '';
+  public transformContext(payload: Directory, override: Directory): string {
+    return override ? override.directoryPath : '';
   }
 }

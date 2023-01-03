@@ -6,12 +6,12 @@ License Type: MIT
 import '../pid.test.js'
 import * as chai from 'chai';
 import 'mocha';
-import {Action} from '../../toolx/index.js';
+import {Transform} from '../../toolx/index.js';
 import {EmittingConsole, Log} from '../../toolx/log/log.js';
 
 const should = chai.should();
 
-class TestAction extends Action<number, number, string> {
+class TestTransform extends Transform<number, number, string> {
   constructor() {
     super(3);
   }
@@ -20,7 +20,7 @@ class TestAction extends Action<number, number, string> {
     return Promise.resolve(payload.toString(10));
   }
 
-  public actionContext(): string {
+  public transformContext(): string {
     return '';
   }
 
@@ -30,9 +30,9 @@ class TestAction extends Action<number, number, string> {
 
 
 describe('dual-build tests', () => {
-  describe('action.test', () => {
-    describe('Action', () => {
-      it('should instantiate and execute action', function () {
+  describe('transform.test', () => {
+    describe('Transform', () => {
+      it('should instantiate and execute transform', function () {
         const emittingConsole: EmittingConsole = new EmittingConsole();
         const stdout: string[] = [];
         const stderr: string[] = [];
@@ -44,8 +44,8 @@ describe('dual-build tests', () => {
           stderr.push(value);
         })
         Log.setConsole(emittingConsole.console);
-        const action = new TestAction();
-        return action.execute(5)
+        const transform = new TestTransform();
+        return transform.execute(5)
                      .then(output => {
                        output.should.equal('5');
                      })
@@ -53,7 +53,7 @@ describe('dual-build tests', () => {
                        stderr.length.should.equal(0);
                        stdout.length.should.equal(2);
                        stdout[0].should.contain('starting...');
-                       stdout[1].should.contain('...action');
+                       stdout[1].should.contain('...transform');
                        emittingConsole.removeAllListeners();
                        Log.resetConsole();
                      });

@@ -161,8 +161,8 @@ From code:
 ```typescript
 options = await defaultBootstrapOptions();
 options = await defaultBootstrapOptions({console: true});
-options = await defaultBootstrapOptions({path: 'bootstrap.ts-options.json'});
-options = await defaultBootstrapOptions({path: 'bootstrap.ts-options.json', force: true});
+options = await defaultBootstrapOptions({path: 'bootstrap.ts-gitOptions.json'});
+options = await defaultBootstrapOptions({path: 'bootstrap.ts-gitOptions.json', force: true});
 ```
 
 ### Get bootstrap.ts-options.json from user configuration
@@ -198,8 +198,8 @@ API
 ```typescript
 options = await userBootstrapOptions();
 options = await userBootstrapOptions({console: true});
-options = await userBootstrapOptions({path: 'bootstrap.ts-options.json'});
-options = await userBootstrapOptions({path: 'bootstrap.ts-options.json', force: true});
+options = await userBootstrapOptions({path: 'bootstrap.ts-gitOptions.json'});
+options = await userBootstrapOptions({path: 'bootstrap.ts-gitOptions.json', force: true});
 ```
 
 ### Delete bootstrap.ts-options from user configuration
@@ -395,7 +395,7 @@ bootstrap.ts({'logger path': './path/to/my/logger/my-logger.js'});
 bootstrap.ts({logger: new MyLogger()});
 bootstrap.ts({prompt: true});
 bootstrap.ts({'project path': './my-..dual-build'});
-bootstrap.ts({'bootstrap.ts-options.json': './my-bootstrap.ts-options.json'});
+bootstrap.ts({'bootstrap.ts-options.json': './my-bootstrap.ts-gitOptions.json'});
 const bootstrapJSON = loadSomehow(...somhhow);
 bootstrap.ts(bootstrapJSON);
 ```

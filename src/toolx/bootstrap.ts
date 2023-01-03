@@ -53,7 +53,7 @@ type CommandCliOptions<CommandArguments> = {
 function cli<CommandArguments>(cliOptions: CommandCliOptions<CommandArguments>): Arguments<CommandArguments> {
   let interim = yargs(hideBin(process.argv));
   if (cliOptions.yargsOptions) {
-    interim = interim.options(cliOptions.yargsOptions);
+    interim = interim.gitOptions(cliOptions.yargsOptions);
   }
   if (cliOptions.yargsConflicts) {
     interim = interim.conflicts(cliOptions.yargsConflicts);
@@ -73,17 +73,17 @@ function cli<CommandArguments>(cliOptions: CommandCliOptions<CommandArguments>):
 }
 
 const bootstrapCliOptions: CommandCliOptions<BootstrapArguments> = {
-  yargsUsage: 'Usage: $0 <path_to_project> [options]',
+  yargsUsage: 'Usage: $0 <path_to_project> [gitOptions]',
   yargsOptions: {
     'prompt': {
       alias: 'p',
-      describe: 'Use prompts to verify/specify options',
+      describe: 'Use prompts to verify/specify gitOptions',
       type: 'boolean',
       demandOption: true
     },
-    'options': {
+    'gitOptions': {
       alias: 'o',
-      describe: 'Specify options file',
+      describe: 'Specify gitOptions file',
       type: 'string'
     },
     'verbose': {
@@ -97,14 +97,14 @@ const bootstrapCliOptions: CommandCliOptions<BootstrapArguments> = {
       type: 'string'
     }
   },
-  yargsConflicts: {'prompt': ['options']},
+  yargsConflicts: {'prompt': ['gitOptions']},
   yargsCheckFunction: undefined, /* {
-    function: (argv, options) => {
+    function: (argv, gitOptions) => {
 
       let errorStr = undefined;
 
       if (argv.o !== undefined && argv.p) {
-        return new Error('Only one of -p, --prompt and -o, --options may be specified');
+        return new Error('Only one of -p, --prompt and -o, --gitOptions may be specified');
       } else {
         return true;
       }
@@ -142,10 +142,10 @@ bootstrap.pipe(stdout);
 
 
 /*
-- Resolve options (focus v first on using default)
+- Resolve gitOptions (focus v first on using default)
 - Git Init
 - Create noon toolx_ directories hierarchy
-- Save options to options file
+- Save gitOptions to gitOptions file
 - Createxkages and tsconfigs from defaults
 - create sample source _tests from defaults
 - npm i

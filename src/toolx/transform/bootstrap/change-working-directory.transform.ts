@@ -5,24 +5,25 @@ License Type:
 
 import {resolve} from 'node:path';
 import {chdir, cwd} from 'node:process';
-import {ContainsDirectories, ContainsRoot, DirectoryPath} from '../../options/directories.js';
+import {Directory} from '../../options/index.js';
 import {processUnknownError} from '../../util/process-unknown-error-message.js';
-import {Action} from '../action.js';
+import {TransformIn} from '../transform-in.js';
+import {Transform} from '../transform.js';
 
 
 export type ChangeWorkingDirectoryPayload = {
   rootPath: string
 }
 
-export class ChangeWorkingDirectory extends Action<ChangeWorkingDirectoryPayload, undefined, void> {
+export class ChangeWorkingDirectory extends TransformIn<Directory> {
   constructor(logDepth: number) {
     super(logDepth);
   }
 
-  executeImpl(payload: ChangeWorkingDirectoryPayload): Promise<void> {
-    if (payload) {
+  executeImpl(rootDirectory: Directory): Promise<void> {
+    if (rootDirectory) {
       try {
-        const newCwd = payload.rootPath;
+        const newCwd = rootDirectory.directoryPath;
         this.log.info(`current working directory is ${cwd()}`, 'task-internal')
         const newCwdPath = resolve(cwd(), newCwd);
         chdir(newCwdPath);
@@ -38,7 +39,7 @@ export class ChangeWorkingDirectory extends Action<ChangeWorkingDirectoryPayload
     }
   }
 
-  public actionContext(payload: ChangeWorkingDirectoryPayload): string {
-    return payload ? payload.rootPath : '';
+  public transformContext(rootDirectory: Directory): string {
+    return rootDirectory ? rootDirectory.directoryPath : '';
   }
 }
