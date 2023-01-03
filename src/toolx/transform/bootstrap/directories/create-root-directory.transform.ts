@@ -19,14 +19,11 @@ import {Transform} from '../../transform.js';
 /**
  * Passing a 2nd parameter because instantiating code cannot distinguish between one or 2 parameters.
  */
-export class CreateRootDirectory extends Transform<Directory | undefined, Directory | undefined, Directory> {
+export class CreateRootDirectory extends Transform<undefined, Directory, Directory> {
   constructor(logDepth: number) {
     super(logDepth);
   }
-  executeImpl(rootDirectory: Directory | undefined, override?: Directory | undefined): Promise<Directory> {
-    if(rootDirectory === undefined && override) {
-      rootDirectory = override;
-    }
+  executeImpl(rootDirectory: Directory): Promise<Directory> {
     if(rootDirectory) {
       try {
         if (rootDirectory.directoryPath === 'NOT_DEFINED') {

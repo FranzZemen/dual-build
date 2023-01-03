@@ -43,8 +43,8 @@ describe('dual-build tests', () => {
           const oldCwd = cwd();
           await Pipeline.options<BootstrapOptions, void>({name: 'test-scaffolding', logDepth: 0})
                         .transform<CreateDirectories,undefined, BootstrapOptions, Directory>(CreateDirectories)
-                        .startSeries<ChangeWorkingDirectory, undefined, Directory, void, Directory, void>(ChangeWorkingDirectory)
-                        .series<InstallGitignore, string>(InstallGitignore, _bootstrapOptions.directories.root.directoryPath)
+                        .startSeries<ChangeWorkingDirectory, undefined, Directory, void>(ChangeWorkingDirectory)
+                        .series<InstallGitignore, undefined>(InstallGitignore)
                         .endSeries<SetupGit, GitOptions>(SetupGit, _bootstrapOptions['git options'])
                         .execute(_bootstrapOptions);
           cwd().should.contain(join(`dual-build${sep}${projectDirectoryPath}`));

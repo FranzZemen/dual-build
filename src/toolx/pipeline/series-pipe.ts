@@ -1,49 +1,41 @@
-import {Transform, TransformConstructor} from '../transform/transform.js';
 import {Log} from '../log/log.js';
+import {Transform, TransformConstructor} from '../transform/transform.js';
 import {processUnknownError} from '../util/process-unknown-error-message.js';
-import {DefaultPayload} from './pipeline-aliases.js';
 import {Pipeline} from './pipeline.js';
 
-export class SeriesPipe<PIPELINE_IN, PIPELINE_OUT, SERIES_IN, SERIES_OUT> {
-  protected _pipe: [transform: Transform<any, any, any>, payloadOverride: any | undefined][] = [];
+export class SeriesPipe<SERIES_IN, SERIES_OUT> {
   log: Log;
+  protected _pipe: [transform: Transform<any, any, any>, payloadOverride: any | undefined][] = [];
 
-  private constructor(protected _pipeline: Pipeline<PIPELINE_IN, PIPELINE_OUT>, depth: number) {
+  private constructor(protected _pipeline: Pipeline<any, any>, depth: number) {
     this.log = new Log(depth);
   }
 
   /**
    * Start a series, which can start anywhere in the pipeline
    * TRANSFORM_CLASS extends Transform = Transform class (constructor)
-   * Payload is DIRECTORIES = SERIES_IN != PIPELINE_IN by definition (except if first series, we have to think of general case when pipe creates
-   * series in middle of pipeline
-   * In general, transform payload out != series out != pipeline payload out
+   * Payload is DIRECTORIES = SERIES_AND_PIPE_IN != PIPELINE_SERIES_AND_PIPE_IN by definition (except if first series, we have to think of general
+   * case when pipe creates series in middle of pipeline In general, transform payload out != series out != pipeline payload out
    *
    */
   static start<
-    TRANSFORM_CLASS extends Transform<PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
-    PAYLOAD = DefaultPayload,
-    PIPELINE_IN = undefined,
-    PIPELINE_OUT = void,
-    SERIES_IN = undefined,
-    SERIES_OUT = void,
-    TRANSFORM_IN = undefined,
-    TRANSFORM_OUT = void>(transformClass: TransformConstructor<TRANSFORM_CLASS, PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
-                       pipeline: Pipeline<PIPELINE_IN, PIPELINE_OUT>,
-                       payloadOverride?: PAYLOAD): SeriesPipe<PIPELINE_IN, PIPELINE_OUT, SERIES_IN, SERIES_OUT> {
+    TRANSFORM_CLASS extends Transform<any, any, any>,
+    PASSED_IN,
+    SERIES_IN,
+    SERIES_OUT>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
+                pipeline: Pipeline<any, any>,
+                payloadOverride?: PASSED_IN): SeriesPipe<SERIES_IN, SERIES_OUT> {
 
     // ----- Multiline Declaration Separator ----- //
 
-    const pipe = new SeriesPipe<PIPELINE_IN, PIPELINE_OUT, SERIES_IN, SERIES_OUT>(pipeline, pipeline.log.depth +1);
-    return pipe.series<TRANSFORM_CLASS, PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>(transformClass, payloadOverride);
+    const pipe = new SeriesPipe<SERIES_IN, SERIES_OUT>(pipeline, pipeline.log.depth + 1);
+    return pipe.series<TRANSFORM_CLASS, PASSED_IN>(transformClass, payloadOverride);
   }
 
   series<
-    TRANSFORM_CLASS extends Transform<PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
-    PAYLOAD = DefaultPayload,
-    TRANSFORM_IN = undefined,
-    TRANSFORM_OUT = void>(transformClass: TransformConstructor<TRANSFORM_CLASS, PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
-                       payloadOverride?: PAYLOAD): SeriesPipe<PIPELINE_IN, PIPELINE_OUT, SERIES_IN, SERIES_OUT> {
+    TRANSFORM_CLASS extends Transform<any, any, any>,
+    PASSED_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
+               payloadOverride?: PASSED_IN): SeriesPipe<SERIES_IN, SERIES_OUT> {
     // ----- Multiline Declaration Separator ----- //
 
     this._pipe.push([new transformClass(this._pipeline.log.depth + 1), payloadOverride]);
@@ -52,15 +44,11 @@ export class SeriesPipe<PIPELINE_IN, PIPELINE_OUT, SERIES_IN, SERIES_OUT> {
 
   /**
    * End of the series
-   * TRANSFORM_OUT = SERIES OUT, which is defined on the class
+   * PIPE_OUT = SERIES PIPE_OUT, which is defined on the class
    *
    */
-  endSeries<
-    TRANSFORM_CLASS extends Transform<PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
-    PAYLOAD = DefaultPayload,
-    TRANSFORM_IN = undefined,
-    TRANSFORM_OUT = void>(transformClass: TransformConstructor<TRANSFORM_CLASS, PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
-                       payloadOverride?: PAYLOAD): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
+  endSeries<TRANSFORM_CLASS extends Transform<any, any, any>, PASSED_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
+                                                                                     payloadOverride?: PASSED_IN): Pipeline<any, any> {
     this._pipe.push([new transformClass(this._pipeline.log.depth + 1), payloadOverride]);
     return this._pipeline;
   }

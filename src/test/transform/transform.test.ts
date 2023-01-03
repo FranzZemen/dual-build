@@ -45,7 +45,7 @@ describe('dual-build tests', () => {
         })
         Log.setConsole(emittingConsole.console);
         const transform = new TestTransform();
-        return transform.execute(5)
+        return transform.execute(5, 3)
                      .then(output => {
                        output.should.equal('5');
                      })

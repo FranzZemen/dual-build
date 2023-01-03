@@ -3,7 +3,7 @@ Created by Franz Zemen 12/12/2022
 License Type: MI
 */
 import {simpleGit, SimpleGit} from 'simple-git';
-import {GitOptions} from '../../../options/git-options.js';
+import {GitOptions} from '../../../options/index.js';
 import {Pipeline} from '../../../pipeline/pipeline.js';
 import {processUnknownError} from '../../../util/process-unknown-error-message.js';
 import {TransformPayload} from '../../transform-payload.js';

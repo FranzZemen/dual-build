@@ -6,10 +6,8 @@ License Type: MIT
 import {ContainsDirectories, Directories, Directory, DirectoryPath} from '../../../options/directories.js';
 import {Pipeline} from '../../../pipeline/pipeline.js';
 import {TransformInOut} from '../../transform-in-out.js';
-import {TransformIn} from '../../transform-in.js';
-import {TransformPayload} from '../../transform-payload.js';
-import {Transform, TransformConstructor} from '../../transform.js';
-import {CreateProjectDirectory, CreateProjectDirectoryPayload} from './create-project-directory.transform.js';
+import {TransformConstructor} from '../../transform.js';
+import {CreateProjectDirectory} from './create-project-directory.transform.js';
 import {CreateRootDirectory} from './create-root-directory.transform.js';
 
 
@@ -18,11 +16,11 @@ export class CreateDirectories extends TransformInOut<ContainsDirectories, Direc
     super(logDepth);
   }
 
-  executeImpl(payload: ContainsDirectories): Promise<Directory> {
-    if (payload) {
-      const directories: Directories = payload.directories;
+  executeImpl(passedIn: ContainsDirectories): Promise<Directory> {
+    if (passedIn) {
+      const directories: Directories = passedIn.directories;
       const payloadOverrides: Directory[] = [];
-      let createProjectDirectories: TransformConstructor<any, any, any>[] = []
+      let createProjectDirectories: TransformConstructor<any>[] = []
       let key: DirectoryPath | 'root';
       for(key in directories) {
         if(key == 'root') continue;
@@ -34,10 +32,10 @@ export class CreateDirectories extends TransformInOut<ContainsDirectories, Direc
 
       return Pipeline
         .options<Directory, void>({name: 'create directories', logDepth: this.depth + 1})
-        .transform<CreateRootDirectory, Directory | undefined, Directory | undefined, Directory>(CreateRootDirectory)
+        .transform<CreateRootDirectory, undefined, Directory, Directory>(CreateRootDirectory)
         .parallels<Directory, void>(createProjectDirectories, ['void'], payloadOverrides as any [])
         .execute( directories.root)
-        .then(() => payload.directories.root);
+        .then(() => passedIn.directories.root);
     } else {
       throw new Error('Undefined payload');
     }

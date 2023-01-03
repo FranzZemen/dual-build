@@ -16,7 +16,7 @@ export abstract class TransformIndependent extends Transform<undefined, undefine
     super(depth);
   }
 
-  public async execute(payload:any, payloadOverride?: any): Promise<void> {
+  public async execute(pipeIn = undefined, passedIn = undefined): Promise<void> {
     return super.execute(undefined, undefined)
       .then(output => {return;});
   }

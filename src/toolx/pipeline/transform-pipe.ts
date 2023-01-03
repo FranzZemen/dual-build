@@ -1,20 +1,20 @@
 import {Transform, TransformConstructor} from '../transform/transform.js';
 import {Pipeline} from './pipeline.js';
 
-export class TransformPipe<PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT> {
-  protected payloadOverride: PAYLOAD | undefined;
-  protected constructor(protected _transform: Transform<PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>, payloadOverride?: PAYLOAD) {
-    this.payloadOverride = payloadOverride;
+export class TransformPipe<PASSED_IN, PIPE_IN, PIPE_OUT> {
+  protected payloadOverride: PASSED_IN | undefined;
+  protected constructor(protected _transform: Transform<PASSED_IN, PIPE_IN, PIPE_OUT>, passedIn?: PASSED_IN) {
+    this.payloadOverride = passedIn;
   }
 
   static transform<
-    TRANSFORM_CLASS extends Transform<PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>,
-    PAYLOAD,
-    TRANSFORM_IN = undefined,
-    TRANSFORM_OUT = void>
-  (transformClass: TransformConstructor<TRANSFORM_CLASS, PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>, pipeline: Pipeline<any,any>, payloadOverride?: PAYLOAD): TransformPipe<PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT> {
+    TRANSFORM_CLASS extends Transform<any, any, any>,
+    PASSED_IN,
+    PIPE_IN,
+    PIPE_OUT>
+  (transformClass: TransformConstructor<TRANSFORM_CLASS>, pipeline: Pipeline<any,any>, payloadOverride?: PASSED_IN): TransformPipe<PASSED_IN, PIPE_IN, PIPE_OUT> {
     // ----- Declaration separator ----- //
-    return new TransformPipe<PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT>(new transformClass(pipeline.log.depth + 1), payloadOverride);
+    return new TransformPipe<PASSED_IN, PIPE_IN, PIPE_OUT>(new transformClass(pipeline.log.depth + 1), payloadOverride);
   }
 
   get transformName(): string {
@@ -25,10 +25,10 @@ export class TransformPipe<PAYLOAD, TRANSFORM_IN, TRANSFORM_OUT> {
     }
   }
 
-  async execute(payload: TRANSFORM_IN): Promise<TRANSFORM_OUT> {
+  async execute(passedIn: PIPE_IN): Promise<PIPE_OUT> {
     const actionName = this.transformName;
     try {
-      return await this._transform.execute(payload, this.payloadOverride);
+      return await this._transform.execute(passedIn, this.payloadOverride);
     } catch (err) {
       return Promise.reject(err);
     }
