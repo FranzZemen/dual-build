@@ -43,9 +43,7 @@ export class CreateRootDirectory extends Transform<undefined, Directory, Directo
         this.log.info(`created ${path}`, 'task-internal');
         return Promise.resolve(rootDirectory);
       } catch (err) {
-        const error = processUnknownError(err);
-        this.log.error(error);
-        throw error;
+        throw processUnknownError(err);
       }
     } else {
       throw new Error ('Undefined payload');

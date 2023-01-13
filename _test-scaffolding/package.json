@@ -1,0 +1,9 @@
+{
+  "name": "test-scaffolding",
+  "version": "0.0.1",
+  "description": "",
+  "type": "module",
+  "exports": {
+    ".": "./project-1/dummy.js"
+  }
+}

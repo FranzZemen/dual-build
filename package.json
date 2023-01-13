@@ -30,7 +30,8 @@
     "is-stream": "^3.0.0",
     "lodash": "^4.17.21",
     "simple-git": "^3.15.1",
-    "tsconfig.d.ts": "^0.1.14",
+    "test-scaffolding": "file:_test-scaffolding/transient",
+    "tsconfig.d.ts": "^0.1.15",
     "uuid": "^9.0.0",
     "yargs": "^17.6.2"
   },

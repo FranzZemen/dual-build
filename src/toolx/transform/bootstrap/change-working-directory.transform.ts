@@ -30,9 +30,7 @@ export class ChangeWorkingDirectory extends TransformIn<Directory> {
         this.log.info(`new working directory is ${cwd()}`, 'warn');
         return Promise.resolve();
       } catch (err) {
-        const error = processUnknownError(err);
-        this.log.error(error);
-        return Promise.reject(error);
+        return Promise.reject(processUnknownError(err, this.log));
       }
     } else {
       throw new Error('Undefined payload');

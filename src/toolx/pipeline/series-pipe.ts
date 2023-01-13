@@ -38,7 +38,7 @@ export class SeriesPipe<SERIES_IN, SERIES_OUT> {
                payloadOverride?: PASSED_IN): SeriesPipe<SERIES_IN, SERIES_OUT> {
     // ----- Multiline Declaration Separator ----- //
 
-    this._pipe.push([new transformClass(this._pipeline.log.depth + 1), payloadOverride]);
+    this._pipe.push([new transformClass(this.log.depth + 1), payloadOverride]);
     return this;
   }
 
@@ -49,7 +49,7 @@ export class SeriesPipe<SERIES_IN, SERIES_OUT> {
    */
   endSeries<TRANSFORM_CLASS extends Transform<any, any, any>, PASSED_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
                                                                                      payloadOverride?: PASSED_IN): Pipeline<any, any> {
-    this._pipe.push([new transformClass(this._pipeline.log.depth + 1), payloadOverride]);
+    this._pipe.push([new transformClass(this.log.depth + 1), payloadOverride]);
     return this._pipeline;
   }
 

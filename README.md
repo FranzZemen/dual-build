@@ -341,11 +341,12 @@ base ─┬─ .git/
       ├─ src─┬─ package.json [transient] (Ref: Source Folder)
       │      ├─ tsconfig.json [transient]
       │      ├─ bin-command/─ (Any source we want built and later called from /bin and placed in package.json)
-      │      └─ (files hierarchy for all sources, ex: .ts, .js, .cts, .mts, .cjs, .mjs, non-doc .md, non-data .json)     
-      │
-      ├─ test/─┬─ package.json [transient] (Ref: Test Folder) 
-      │        ├─ tsconfig.json [transient]
-      │        └─ (test files hierarchy)  
+      │      ├─ (files hierarchy for all sources, ex: .ts, .js, .cts, .mts, .cjs, .mjs, non-doc .md, non-data .json)     
+      │      │
+      │      └─ test/
+      ├─ DEPRECATED test/─┬─ package.json [transient] (Ref: Test Folder) 
+      │                   ├─ tsconfig.json [transient]
+      │                   └─ (test files hierarchy)  
       │
       ├─ buildhooks/─
       │

@@ -1,0 +1,8 @@
+./node_modules
+./bin
+./transient
+./.dual-build/logs
+src\package.old.json
+test\package.old.json
+.zip
+.idea

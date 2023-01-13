@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "./transient/types",
+    "module": "esnext",
+    "target": "esnext",
+    "moduleResolution": "Node",
+    "sourceMap": true,
+    "outDir": "./transient/module",
+    "rootDir": "./src"
+  },
+  "include": ["./src/**/**.*"],
+  "exclude": [
+    "node_modules"
+  ]
+}

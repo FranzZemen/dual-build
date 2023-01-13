@@ -1,0 +1,1 @@
+{"version":3,"file":"dummy.js","sourceRoot":"","sources":["../../../src/project-1/dummy.ts"],"names":[],"mappings":";;;AAAA,yCAAiC;AAEjC,MAAa,KAAK;IAChB;IACA,CAAC;IACD,KAAK;QACH,MAAM,KAAK,GAAG,IAAI,gBAAK,EAAE,CAAC;QAC1B,OAAO,CAAC,GAAG,CAAC,KAAK,CAAC,KAAK,EAAE,CAAC,CAAC;IAC7B,CAAC;CACF;AAPD,sBAOC;AACD,OAAO,CAAC,GAAG,CAAC,cAAc,CAAC,CAAC"}

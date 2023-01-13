@@ -7,12 +7,14 @@ import {GitOptions} from '../../../options/index.js';
 import {Pipeline} from '../../../pipeline/pipeline.js';
 import {processUnknownError} from '../../../util/process-unknown-error-message.js';
 import {TransformPayload} from '../../transform-payload.js';
+import {GitAddOrigin} from './git-add-origin.transform.js';
 import {GitInitResult, InitGit} from './init-git.transform.js';
 
 
 export type SetupGitPipelinePayload = {
   git: SimpleGit,
-  gitOptions: GitOptions
+  gitOptions: GitOptions,
+  gitInitResult?: GitInitResult
 }
 
 export class SetupGit extends TransformPayload<GitOptions> {
@@ -29,17 +31,19 @@ export class SetupGit extends TransformPayload<GitOptions> {
           git,
           gitOptions
         };
-        const result = await Pipeline.options<undefined, GitInitResult>({name: 'git setup', logDepth: self.log.depth + 1})
-                                     .transform<InitGit, SetupGitPipelinePayload, undefined, GitInitResult>(InitGit, pipelinePayload)
-                                     .execute(undefined);
+        const result = await Pipeline.options<SetupGitPipelinePayload, SetupGitPipelinePayload>({name: 'git setup', logDepth: self.log.depth + 1})
+                                     .startSeries<InitGit, undefined, SetupGitPipelinePayload, void>(InitGit)
+                                     .endSeries<GitAddOrigin, undefined>(GitAddOrigin)
+                                     .execute(pipelinePayload);
       } catch (err) {
         const error = processUnknownError(err);
+        this.log.info('Error processing git setup - not fatal but you will need to setup git yourself', 'error');
         this.log.error(error);
-        throw error;
+        return;
       }
     } else {
       this.log.warn('git gitOptions not enabled, skipping');
-      return Promise.resolve();
+      return;
     }
   }
 

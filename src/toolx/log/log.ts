@@ -221,7 +221,7 @@ export class Log {
   protected foreground = ForegroundColor._8_ForegroundGreen;
   protected background = BackgroundColor._8_BackgroundBlack;
 
-  constructor(public depth = 0) {
+  constructor(public depth = 0, protected maxDigestSize = 1000) {
     this.logLevel = logConfig.level ?? 'info';
   }
 
@@ -232,6 +232,8 @@ export class Log {
   public static setConsole(console: Console) {Log.console = console;};
 
   public static resetConsole() {Log.console = console;};
+
+
 
   error(data: Error | string) { // Force that error is always an Error or a string
     if (data && this.logLevelValue <= logLevelValues.error) {

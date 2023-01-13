@@ -1,0 +1,16 @@
+{
+  "name": "test-scaffolding",
+  "version": "0.0.1",
+  "description": "",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./module/index.js",
+      "require": "./commonjs/index.js"
+    },
+    "./esnext.nodenext.nodenext": {
+      "types": "./types/index.d.ts",
+      "import": "./module/index.js"
+    }
+  }
+}

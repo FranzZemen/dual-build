@@ -1,4 +1,4 @@
-import {basename, join} from 'node:path/posix';
+import {basename, join} from 'node:path';
 import {cwd} from 'node:process';
 import {directories} from './directories.js';
 import {packageJson} from './package-options.js';
@@ -12,7 +12,7 @@ export enum GitProtocol  {
 export type GitOptions = {
   useGit: boolean;
   username?: string;
-  repository?: string;
+  repository: string | (() => string);
   protocol?: GitProtocol;
   'git init'?: boolean;
   'git remote add origin'?: boolean;
@@ -26,13 +26,14 @@ export type ContainsGitOptions = {
 
 export const gitOptions: GitOptions = {
   useGit: true,
-  repository: basename(cwd()),
+  repository: () => basename(cwd()),
   protocol: GitProtocol.https,
   'git init': true,
   'git remote add origin': true,
   'git push current branch on successful build': true,
   'git push current branch on successful publish': true
 };
+
 export const gitignore: string[] = [
   directories.node_modules.directoryPath,
   directories.bin.directoryPath,

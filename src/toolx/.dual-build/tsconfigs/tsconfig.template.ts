@@ -41,7 +41,7 @@ class CompilerOptionJSONReplacement extends JSONTemplateReplacement<CompileOptio
 }
 
 export type CompilerOptionsTemplate = CompilerOptionsOmitted & {
-  moduleResolution?:  ModuleResolution  | CompilerOptionJSONReplacement | undefined;
+  moduleResolution?:  moduleResolution  | CompilerOptionJSONReplacement | undefined;
   module?:            Module            | CompilerOptionJSONReplacement | undefined;
   target?:            Target            | CompilerOptionJSONReplacement | undefined;
   outDir?:            string            | CompilerOptionJSONReplacement | undefined;

@@ -312,9 +312,7 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
       return outputPayload as PIPELINE_OUT;
     } catch (err) {
       this.log.info(`...pipeline ${this.name} failed`, 'error');
-      const error = processUnknownError(err);
-      this.log.error(error);
-      throw error;
+      throw processUnknownError(err, this.log);
     } finally {
       clearTiming(timingMark);
     }

@@ -10,7 +10,7 @@ import _ from 'lodash';
 import {ChangeWorkingDirectory} from '../transform/bootstrap/change-working-directory.transform.js';
 //import {CreateDirectories} from '../transform/bootstrap/directories/create-directories.transform.js';
 import {CreateRootDirectory} from '../transform/bootstrap/directories/create-root-directory.transform.js';
-import {InstallGitignore} from '../transform/bootstrap/install-gitignore.transform.js';
+import {InstallGitignore} from '../transform/bootstrap/git/install-gitignore.transform.js';
 import {Log} from '../log/log.js';
 // import {SetupGit} from '../transform/bootstrap/setup-git.js';
 import {BootstrapOptions, bootstrapOptions} from '../options/bootstrap-options.js';
@@ -50,6 +50,6 @@ try {
     //.execute(gitOptions)
 
 } catch (err) {
-  log.error(processUnknownError(err));
+  processUnknownError(err, log);
 }
 
