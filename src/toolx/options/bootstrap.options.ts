@@ -1,13 +1,12 @@
-
-import {getValidator} from '../util/validator.cjs';
-
-import {ValidationSchema, ValidationError, SyncCheckFunction, AsyncCheckFunction} from 'fastest-validator';
-import {Directories, directories, directoriesWrappedSchema, Directory} from './directories.js';
-import {gitignore, gitOptions, GitOptions} from './git-options.js';
-import {packageOptions, PackageOptions} from './package-options.js';
-import {Sources, sources} from './sources.js';
+import {AsyncCheckFunction, SyncCheckFunction, ValidationError, ValidationSchema} from 'fastest-validator';
+import pkg from '../util/validator.cjs';
+const getValidator = pkg.getValidator;
+import {Directories, directories, directoriesWrappedSchema} from './directories.js';
+import {gitignore, gitOptions, GitOptions} from './git.options.js';
 import {Options} from './options.js';
-
+import {packageOptions, PackageOptions} from './package.options.js';
+import {Sources, sources} from './sources.js';
+import {es6, nodenext, TargetOptions} from './tsconfig.options.js';
 
 
 export type InstallModuleLoader = 'install esm' | 'install commonjs' | 'install both';
@@ -19,7 +18,6 @@ export type BuildOptions = {
   buildCommonJS: boolean
 }
 
-
 export type BootstrapOptions = Options & {
   'save profile': boolean;
   directories: Directories;
@@ -27,6 +25,7 @@ export type BootstrapOptions = Options & {
   'install module loader': InstallModuleLoader;
   'bin source': BinSource;
   'package options': PackageOptions;
+  'target options': TargetOptions;
   sources: Sources[];
   'build options': BuildOptions;
   '.gitignore': string[];
@@ -40,6 +39,11 @@ export const bootstrapOptions: BootstrapOptions = {
   'install module loader': 'install both',
   'bin source': 'esm/bin',
   'package options': packageOptions,
+  'target options': {
+    'primary commonjs': 'es6',
+    'primary esm': 'nodenext',
+    options: [es6, nodenext]
+  },
   directories,
   sources,
   'build options': {buildEsm: true, buildCommonJS: true},

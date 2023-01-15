@@ -5,7 +5,7 @@ License Type:
 
 import {writeFile} from 'node:fs/promises';
 import {EOL} from 'os';
-import {gitignore} from '../../../options/git-options.js';
+import {gitignore} from '../../../options/git.options.js';
 import {processUnknownError} from '../../../util/process-unknown-error-message.js';
 import {TransformIndependent} from '../../transform-independent.js';
 

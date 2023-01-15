@@ -15,7 +15,7 @@ import {basename, join, sep} from 'node:path';
 import {chdir, cwd} from 'node:process';
 import {simpleGit, SimpleGit} from 'simple-git';
 import {Log} from '../../toolx/log/log.js';
-import {BootstrapOptions, bootstrapOptions} from '../../toolx/options/bootstrap-options.js';
+import {BootstrapOptions, bootstrapOptions} from '../../toolx/options/bootstrap.options.js';
 import {Directory, GitOptions} from '../../toolx/options/index.js';
 import {Pipeline} from '../../toolx/pipeline/pipeline.js';
 import {ChangeWorkingDirectory} from '../../toolx/transform/bootstrap/change-working-directory.transform.js';
@@ -75,7 +75,7 @@ describe('dual-build tests', () => {
           chdir(oldCwd);
           log.info(`reverting working directory to ${oldCwd}`);
           existsSync(projectDirectoryPath).should.be.true;
-          // rmSync(projectDirectoryPath, {recursive: true, force: true});
+          rmSync(projectDirectoryPath, {recursive: true, force: true});
         }
       });
     });

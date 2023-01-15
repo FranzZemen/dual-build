@@ -7,3 +7,4 @@ export function enumToCollections (theEnum: any): [set: Set<string>, array: stri
   });
   return [set, array];
 }
+

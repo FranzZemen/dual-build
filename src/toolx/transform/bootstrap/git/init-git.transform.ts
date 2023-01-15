@@ -4,7 +4,7 @@ License Type: MIT
 */
 
 import {InitResult, SimpleGit} from 'simple-git';
-import {gitOptions} from '../../../options/git-options.js';
+import {gitOptions} from '../../../options/git.options.js';
 import {TransformInOut} from '../../transform-in-out.js';
 import {TransformPayloadOut} from '../../transform-payload-out.js';
 import {Transform} from '../../transform.js';

@@ -4,19 +4,13 @@ License Type:
 */
 
 
-import {basename} from 'node:path';
-import {argv,exit} from 'node:process';
 import _ from 'lodash';
-import {ChangeWorkingDirectory} from '../transform/bootstrap/change-working-directory.transform.js';
-//import {CreateDirectories} from '../transform/bootstrap/directories/create-directories.transform.js';
-import {CreateRootDirectory} from '../transform/bootstrap/directories/create-root-directory.transform.js';
-import {InstallGitignore} from '../transform/bootstrap/git/install-gitignore.transform.js';
+import {basename} from 'node:path';
+import {argv, exit} from 'node:process';
 import {Log} from '../log/log.js';
 // import {SetupGit} from '../transform/bootstrap/setup-git.js';
-import {BootstrapOptions, bootstrapOptions} from '../options/bootstrap-options.js';
-import {Directories} from '../options/index.js';
-import {DefaultPayload} from '../pipeline/pipeline-aliases.js';
-import {Pipeline} from '../pipeline/pipeline.js';
+import {bootstrapOptions} from '../options/bootstrap.options.js';
+//import {CreateDirectories} from '../transform/bootstrap/directories/create-directories.transform.js';
 import {processUnknownError} from '../util/process-unknown-error-message.js';
 
 const options = _.merge({}, bootstrapOptions);

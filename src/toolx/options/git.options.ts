@@ -1,7 +1,7 @@
 import {basename, join} from 'node:path';
 import {cwd} from 'node:process';
 import {directories} from './directories.js';
-import {packageJson} from './package-options.js';
+import {packageJson} from './package.options.js';
 
 export enum GitProtocol  {
   https = 'https://github.com/',
