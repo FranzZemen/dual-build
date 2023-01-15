@@ -24,7 +24,7 @@ export class InstallGitignore extends TransformIndependent {
       const path = './.gitignore';
       await writeFile(path, file, {encoding: 'utf-8'});
     } catch (err) {
-      throw processUnknownError(err);
+      throw processUnknownError(err, this.log);
     }
   }
 

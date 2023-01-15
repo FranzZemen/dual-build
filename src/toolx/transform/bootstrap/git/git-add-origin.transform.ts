@@ -23,7 +23,7 @@ export class GitAddOrigin extends TransformIn<SetupGitPipelinePayload> {
         return;
       }
     } catch (err) {
-      throw processUnknownError(err);
+      throw processUnknownError(err, this.log);
     }
   }
 

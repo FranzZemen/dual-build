@@ -19,7 +19,7 @@ export abstract class TransformInOut<PIPE_IN, PIPE_OUT> extends Transform<undefi
     super(depth);
   }
 
-  public async execute(payload: PIPE_IN, payloadOverride = undefined): Promise<PIPE_OUT> {
+  public async execute(payload: PIPE_IN, passedIn = undefined): Promise<PIPE_OUT> {
     return super.execute(payload, undefined);
   }
 }

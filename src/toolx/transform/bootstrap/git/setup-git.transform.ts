@@ -3,7 +3,7 @@ Created by Franz Zemen 12/12/2022
 License Type: MI
 */
 import {simpleGit, SimpleGit} from 'simple-git';
-import {GitOptions} from '../../../options/index.js';
+import {GitOptions} from 'dual-build';
 import {Pipeline} from '../../../pipeline/pipeline.js';
 import {processUnknownError} from '../../../util/process-unknown-error-message.js';
 import {TransformPayload} from '../../transform-payload.js';
@@ -36,7 +36,7 @@ export class SetupGit extends TransformPayload<GitOptions> {
                                      .endSeries<GitAddOrigin, undefined>(GitAddOrigin)
                                      .execute(pipelinePayload);
       } catch (err) {
-        const error = processUnknownError(err);
+        const error = processUnknownError(err, this.log);
         this.log.info('Error processing git setup - not fatal but you will need to setup git yourself', 'error');
         this.log.error(error);
         return;

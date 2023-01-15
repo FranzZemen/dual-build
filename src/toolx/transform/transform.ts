@@ -23,24 +23,41 @@ export abstract class Transform<PASSED_IN, PIPE_IN, PIPE_OUT> {
     this.log.depth = depth;
   }
 
+  get logDepth(): number {
+    return this.log.depth;
+  }
+
   get name(): string {
     return this.constructor.name;
   }
 
   async execute(pipe_in: PIPE_IN, passedIn?: PASSED_IN): Promise<PIPE_OUT> {
     const transformContext = this.transformContext(pipe_in, passedIn);
-    this.log.info(`transform ${this.name}${transformContext.length ? ' on ' + transformContext : ''} starting...`);
+    const maxLineLength = 100;
+    if(`transform ${this.name}${transformContext.length ? ' on ' + transformContext : ''} starting...`.length  > maxLineLength) {
+      this.log.info(`transform ${this.name}`);
+      this.log.info(`  on ${transformContext} starting...`);
+    } else {
+      this.log.info(`transform ${this.name}${transformContext.length ? ' on ' + transformContext : ''} starting...`);
+    }
     let startTimingSuccessful: boolean = true;
     const timingMark = `Timing ${Transform.name}:${transformContext}:${this.name}.execute`;
     try {
       startTimingSuccessful = startTiming(timingMark, this.log);
       return await this.executeImpl(pipe_in, passedIn);
     } catch (err) {
-      return Promise.reject(processUnknownError(err));
+      return Promise.reject(processUnknownError(err, this.log));
     } finally {
-      this.log.info(`...transform ${this.name}${transformContext.length ? ' on ' + transformContext : ''} ${this.errorCondition ? 'failed' : 'completed'} ${startTimingSuccessful ? endTiming(
-        timingMark,
-        this.log) : ''}`, this.errorCondition ? 'error' : 'task-done');
+      if(`...transform ${this.name}${transformContext.length ? ' on ' + transformContext : ''} ${this.errorCondition ? 'failed' : 'completed'}`.length  > maxLineLength) {
+        this.log.info(`...transform ${this.name}`, this.errorCondition ? 'error' : 'task-done');
+        this.log.info(`  on ${transformContext} ${this.errorCondition ? 'failed' : 'completed'}  ${startTimingSuccessful ? endTiming(
+          timingMark,
+          this.log) : ''}`, this.errorCondition ? 'error' : 'task-done');
+      } else {
+        this.log.info(`...transform ${this.name}${transformContext.length ? ' on ' + transformContext : ''} ${this.errorCondition ? 'failed' : 'completed'} ${startTimingSuccessful ? endTiming(
+          timingMark,
+          this.log) : ''}`, this.errorCondition ? 'error' : 'task-done');
+      }
     }
   }
 

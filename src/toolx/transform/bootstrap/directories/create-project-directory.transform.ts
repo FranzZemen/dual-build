@@ -8,7 +8,7 @@ import {existsSync} from 'node:fs';
 import {mkdir} from 'node:fs/promises';
 import {join} from 'node:path';
 import {cwd} from 'node:process';
-import {Directory} from '../../../options/index.js';
+import {Directory} from '../../../options/internal-index.js';
 import {TransformPayloadIn} from '../../transform-payload-in.js';
 import {Transform} from '../../transform.js';
 

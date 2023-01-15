@@ -5,6 +5,9 @@
   "imports": {
     "#commands/*": "./publish/bin/*"
   },
+  "exports": {
+    ".": "./transient/toolx/internal-index.js"
+  },
   "scripts": {
     "test": "mocha transient/test/**/*.test.js",
     "clean-test": "rm -rf ./transient/test",

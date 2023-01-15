@@ -3,18 +3,25 @@ Created by Franz Zemen 01/14/2023
 License Type: MIT
 */
 
+import * as os from 'node:os';
 import {
-  EmitCompilerOptions, ImportsNotUsedAsValues,
+  EmitCompilerOptions,
+  ImportsNotUsedAsValues,
   InteropConstraintsCompilerOptions,
   JavascriptSupportCompilerOptions,
   LanguageAndEnvironmentCompilerOptions,
-  Module, ModuleDetection,
+  Module,
+  ModuleDetection,
   ModuleResolution,
   ModulesCompilerOptions,
-  OutputFormattingCompilerOptions, PollingWatch,
+  NewLine,
+  OutputFormattingCompilerOptions,
+  PollingWatch,
   ProjectsCompilerOptions,
   Target,
-  TypeCheckingCompilerOptions, WatchDirectory, WatchFile,
+  TypeCheckingCompilerOptions,
+  WatchDirectory,
+  WatchFile,
   WatchOptions
 } from 'tsconfig.d.ts';
 
@@ -96,14 +103,14 @@ export const defaultBaseCompilerOptions: BaseCompilerOptions = {
   noEmitHelpers: false,
   noEmitOnError: false,
   preserveConstEnums: false,
-  preserveValueImports:false
+  preserveValueImports:false,
+  newLine: os.platform() === 'win32' ? NewLine.crlf : NewLine.lf
 };
 
 export const defaultTargetEnvironmentOptions: TargetEnvironmentCompilerOptions = {
 
   // ModuleCompiler Options
   allowUmdGlobalAccess: false,
-  baseUrl: './',
   module: Module.nodenext,  // Will be overwritten
   moduleResolution: ModuleResolution.nodenext, // Will be overwritten
   noResolve: false,
@@ -145,9 +152,10 @@ export const defaultWatchOptions: WatchOptions = {
   excludeDirectories: ['**/node_modules']
 };
 
+export type WellKnownTargetOptions = 'ide' | 'es3' | 'es5' | 'es6' | 'nodenext' | 'esm';
 
 export type TargetOption = {
-  nickName: string;
+  nickName: WellKnownTargetOptions | string;
   target: Target;
   module: Module;
   moduleResolution: ModuleResolution;
@@ -155,8 +163,8 @@ export type TargetOption = {
 
 export type TargetOptions = {
   options: TargetOption[],
-  'primary esm': string | undefined,
-  'primary commonjs': string | undefined
+  'primary esm': WellKnownTargetOptions | string | undefined,
+  'primary commonjs': WellKnownTargetOptions | string | undefined
 }
 
 export const es3: TargetOption = {
@@ -193,3 +201,16 @@ export const esm: TargetOption = {
   module: Module.esnext,
   moduleResolution: ModuleResolution.node
 };
+
+export const ide: TargetOption = {
+  nickName: 'ide',
+  target: Target.esnext,
+  module: Module.nodenext,
+  moduleResolution: ModuleResolution.nodenext
+}
+
+export const defaultTargetOptions: TargetOptions = {
+  options: [ide, nodenext,  es6],
+  'primary commonjs': 'es6',
+  'primary esm': 'nodenext'
+}

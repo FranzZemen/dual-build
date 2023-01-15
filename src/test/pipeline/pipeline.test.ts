@@ -8,6 +8,7 @@ License Type: MIT
 */
 
 import * as chai from 'chai';
+import {BootstrapOptions, bootstrapOptions, Directory, GitOptions} from 'dual-build';
 import _ from 'lodash';
 import 'mocha';
 import {existsSync, rmSync} from 'node:fs';
@@ -15,18 +16,20 @@ import {basename, join, sep} from 'node:path';
 import {chdir, cwd} from 'node:process';
 import {simpleGit, SimpleGit} from 'simple-git';
 import {Log} from '../../toolx/log/log.js';
-import {BootstrapOptions, bootstrapOptions} from '../../toolx/options/bootstrap.options.js';
-import {Directory, GitOptions} from '../../toolx/options/index.js';
+import {defaultTargetOptions} from '../../toolx/options/tsconfig.options.js';
 import {Pipeline} from '../../toolx/pipeline/pipeline.js';
 import {ChangeWorkingDirectory} from '../../toolx/transform/bootstrap/change-working-directory.transform.js';
 import {CreateDirectories} from '../../toolx/transform/bootstrap/directories/create-directories.transform.js';
-import {SetupGit} from '../../toolx/transform/bootstrap/git/setup-git.transform.js';
 import {InstallGitignore} from '../../toolx/transform/bootstrap/git/install-gitignore.transform.js';
+import {SetupGit} from '../../toolx/transform/bootstrap/git/setup-git.transform.js';
 import {SaveOptionsPayload, SaveOptionsTransform} from '../../toolx/transform/bootstrap/save-options.transform.js';
 import {
-  GenerateBaseTsConfigTransform,
-  GenerateBaseTsConfigTransformPayload
-} from '../../toolx/transform/bootstrap/tsconfig/generate-base-ts-config.transform.js';
+  BaseTsConfigTransform,
+  BaseTsConfigTransformPayload
+} from '../../toolx/transform/bootstrap/tsconfig/base-ts-config.transform.js';
+import {
+  TargetEnvTsConfigsTransform, GenerateTsConfigsPayload
+} from '../../toolx/transform/bootstrap/tsconfig/target-env-ts-configs.transform.js';
 import {processUnknownError} from '../../toolx/util/process-unknown-error-message.js';
 import '../transform/transform.test.js';
 
@@ -47,7 +50,7 @@ describe('dual-build tests', () => {
         _bootstrapOptions.directories.root.folder = basename(_bootstrapOptions.directories.root.directoryPath);
         const oldCwd = cwd();
 
-        const baseTsConfigPayload: GenerateBaseTsConfigTransformPayload = {
+        const baseTsConfigPayload: BaseTsConfigTransformPayload = {
           '.dual-build/tsconfigs': _bootstrapOptions.directories['.dual-build/tsconfigs'],
         }
 
@@ -57,8 +60,24 @@ describe('dual-build tests', () => {
                         .startSeries<ChangeWorkingDirectory, undefined, Directory, void>(ChangeWorkingDirectory)
                         .series<InstallGitignore, undefined>(InstallGitignore)
                         .series<SetupGit, GitOptions>(SetupGit, _bootstrapOptions['git options'])
-                        .endSeries<SaveOptionsTransform, SaveOptionsPayload>(SaveOptionsTransform, {directory: _bootstrapOptions.directories['.dual-build/options'], ..._bootstrapOptions})
-                        .transform<GenerateBaseTsConfigTransform, GenerateBaseTsConfigTransformPayload, undefined, undefined>(GenerateBaseTsConfigTransform, baseTsConfigPayload)
+                        .endSeries<SaveOptionsTransform, SaveOptionsPayload>(
+                          SaveOptionsTransform,
+                          {
+                            directory: _bootstrapOptions.directories['.dual-build/options'],
+                            ..._bootstrapOptions}
+                        )
+                        .startParallel<BaseTsConfigTransform, BaseTsConfigTransformPayload, undefined, undefined>(
+                          BaseTsConfigTransform,
+                          baseTsConfigPayload
+                        )
+                        .endParallel<TargetEnvTsConfigsTransform, GenerateTsConfigsPayload>(
+                          TargetEnvTsConfigsTransform,
+                          ['void'],
+                          {
+                            path: _bootstrapOptions.directories['.dual-build/tsconfigs'].directoryPath,
+                            targetOptions: defaultTargetOptions
+                            }
+                          )
                         .execute(_bootstrapOptions);
           cwd().should.contain(join(`dual-build${sep}${projectDirectoryPath}`));
 
@@ -69,7 +88,7 @@ describe('dual-build tests', () => {
           remotes.length.should.equal(1);
           remotes[0]['name'].should.equal('origin');
         } catch (err) {
-          log.error(processUnknownError(err));
+          processUnknownError(err, log);
           unreachableCode.should.be.true;
         } finally {
           chdir(oldCwd);

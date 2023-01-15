@@ -66,13 +66,13 @@ export class SeriesPipe<SERIES_IN, SERIES_OUT> {
           _payload = output;
         } catch (err) {
           errorCondition = true;
-          return Promise.reject(processUnknownError(err));
+          return Promise.reject(processUnknownError(err, this.log));
         }
       }
       return Promise.resolve(output);
     } catch (err) {
       errorCondition = true;
-      return Promise.reject(processUnknownError(err));
+      return Promise.reject(processUnknownError(err, this.log));
     } finally {
       if (errorCondition) {
         this.log.info('...series pipe failed', 'error');

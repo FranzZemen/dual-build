@@ -6,21 +6,21 @@ License Type:
 
 import {writeFile} from 'fs/promises';
 import {join} from 'node:path';
-import {Directory} from '../../../options/index.js';
+import {Directory} from '../../../options/internal-index.js';
 import {defaultBaseCompilerOptions} from '../../../options/tsconfig.options.js';
 import {TransformPayload} from '../../transform-payload.js';
 
 
-export type GenerateBaseTsConfigTransformPayload = {
+export type BaseTsConfigTransformPayload = {
   '.dual-build/tsconfigs': Directory
 }
 
-export class GenerateBaseTsConfigTransform extends TransformPayload<GenerateBaseTsConfigTransformPayload> {
+export class BaseTsConfigTransform extends TransformPayload<BaseTsConfigTransformPayload> {
   constructor(logDepth: number) {
     super(logDepth);
   }
 
-  public executeImpl(pipeIn: undefined, passedIn: GenerateBaseTsConfigTransformPayload | undefined): Promise<void> {
+  public executeImpl(pipeIn: undefined, passedIn: BaseTsConfigTransformPayload | undefined): Promise<void> {
     if(!passedIn) {
       return Promise.reject(new Error('Undefined Payload'));
     } else {
@@ -29,7 +29,7 @@ export class GenerateBaseTsConfigTransform extends TransformPayload<GenerateBase
     }
   }
 
-  public transformContext(pipedIn: undefined, passedIn: GenerateBaseTsConfigTransformPayload | undefined): string {
+  public transformContext(pipedIn: undefined, passedIn: BaseTsConfigTransformPayload | undefined): string {
     return '';
   }
 }

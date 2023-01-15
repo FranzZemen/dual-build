@@ -64,7 +64,7 @@ export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
       const settlement = await Promise.allSettled(transformPromises);
       let filteredErrors = settlement.filter(settled => settled.status === 'rejected');
       if (filteredErrors.length) {
-        return Promise.reject(processUnknownError(filteredErrors));
+        return Promise.reject(processUnknownError(filteredErrors, this.log));
       } else {
         switch (this._mergeStrategy[0]) {
           case 'asAttributes':
@@ -114,7 +114,7 @@ export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
         }
       }
     } catch (err) {
-      return Promise.reject(processUnknownError(err));
+      return Promise.reject(processUnknownError(err, this.log));
     } finally {
       this.log.info('...completing paralell pipe', 'pipeline');
     }
