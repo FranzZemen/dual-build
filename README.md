@@ -338,7 +338,15 @@ base ─┬─ .git/
       │                        ├─ ...
       │                        └─ [command].log4 
       │
-      ├─ src─┬─ package.json [transient] (Ref: Source Folder)
+      ├─ sources ─┬─ bin ─┬─ tsconfig.json
+      │           │       │
+      │           ├─ src
+      │           └─ test
+           
+           
+      
+      
+      package.json [transient] (Ref: Source Folder)
       │      ├─ tsconfig.json [transient]
       │      ├─ bin-command/─ (Any source we want built and later called from /bin and placed in package.json)
       │      ├─ (files hierarchy for all sources, ex: .ts, .js, .cts, .mts, .cjs, .mjs, non-doc .md, non-data .json)     

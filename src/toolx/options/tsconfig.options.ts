@@ -18,7 +18,7 @@ import {
   OutputFormattingCompilerOptions,
   PollingWatch,
   ProjectsCompilerOptions,
-  Target,
+  Target, TsConfig,
   TypeCheckingCompilerOptions,
   WatchDirectory,
   WatchFile,
@@ -54,7 +54,6 @@ export type TargetEnvironmentCompilerOptions =
   & ProjectsCompilerOptions
   & EnvEmitOptions
   & OutputFormattingCompilerOptions;
-
 
 export const defaultBaseCompilerOptions: BaseCompilerOptions = {
   // TypeCheckingCompilerOptions
@@ -152,6 +151,16 @@ export const defaultWatchOptions: WatchOptions = {
   excludeDirectories: ['**/node_modules']
 };
 
+export const projectTsConfig: TsConfig = {
+  compilerOptions: defaultBaseCompilerOptions,
+  watchOptions: defaultWatchOptions,
+  references: [
+    {"path": "./src/project"},
+    {"path": "./src/"}
+  ]
+}
+
+
 export type WellKnownTargetOptions = 'ide' | 'es3' | 'es5' | 'es6' | 'nodenext' | 'esm';
 
 export type TargetOption = {
@@ -202,7 +211,7 @@ export const esm: TargetOption = {
   moduleResolution: ModuleResolution.node
 };
 
-export const ide: TargetOption = {
+export const ideTsConfig: TargetOption = {
   nickName: 'ide',
   target: Target.esnext,
   module: Module.nodenext,
@@ -210,7 +219,7 @@ export const ide: TargetOption = {
 }
 
 export const defaultTargetOptions: TargetOptions = {
-  options: [ide, nodenext,  es6],
+  options: [ideTsConfig, nodenext, es6],
   'primary commonjs': 'es6',
   'primary esm': 'nodenext'
 }

@@ -4,7 +4,7 @@ const getValidator = pkg.getValidator;
 import {Directories, directories, directoriesWrappedSchema} from './directories.js';
 import {gitignore, gitOptions, GitOptions} from './git.options.js';
 import {Options} from './options.js';
-import {packageOptions, PackageOptions} from './package.options.js';
+import {defaultBootstrapPackageOptions, BootstrapPackageOptions} from './package.options.js';
 import {Sources, sources} from './sources.js';
 import {es6, nodenext, TargetOptions} from './tsconfig.options.js';
 
@@ -24,7 +24,7 @@ export type BootstrapOptions = Options & {
   'git options': GitOptions;
   'install module loader': InstallModuleLoader;
   'bin source': BinSource;
-  'package options': PackageOptions;
+  'package options': BootstrapPackageOptions;
   'target options': TargetOptions;
   sources: Sources[];
   'build options': BuildOptions;
@@ -38,7 +38,7 @@ export const bootstrapOptions: BootstrapOptions = {
   'git options': gitOptions,
   'install module loader': 'install both',
   'bin source': 'esm/bin',
-  'package options': packageOptions,
+  'package options': defaultBootstrapPackageOptions,
   'target options': {
     'primary commonjs': 'es6',
     'primary esm': 'nodenext',

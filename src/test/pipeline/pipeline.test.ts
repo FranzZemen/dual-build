@@ -79,8 +79,8 @@ describe('dual-build tests', () => {
                             }
                           )
                         .execute(_bootstrapOptions);
-          cwd().should.contain(join(`dual-build${sep}${projectDirectoryPath}`));
 
+          cwd().should.contain(join(`dual-build${sep}${projectDirectoryPath}`));
           const git: SimpleGit = simpleGit();
           const remotes = await git.getRemotes(true);
           ///log.info(inspect(remotes, false, 10, true));

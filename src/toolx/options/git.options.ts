@@ -1,7 +1,6 @@
-import {basename, join} from 'node:path';
+import {basename} from 'node:path';
 import {cwd} from 'node:process';
 import {directories} from './directories.js';
-import {packageJson} from './package.options.js';
 
 export enum GitProtocol  {
   https = 'https://github.com/',
@@ -39,8 +38,8 @@ export const gitignore: string[] = [
   directories.bin.directoryPath,
   directories.transient.directoryPath,
   directories['.dual-build/logs'].directoryPath,
-  join(directories.src.directoryPath, packageJson),
-  join(directories.test.directoryPath, packageJson),
+  // join(directories.src.directoryPath, packageJson),
+  // join(directories.test.directoryPath, packageJson),
   '.zip',
   '.idea'
 ];
