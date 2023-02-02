@@ -20,7 +20,7 @@ export class BaseTsConfigTransform extends TransformPayload<BaseTsConfigTransfor
     super(logDepth);
   }
 
-  public executeImpl(pipeIn: undefined, passedIn: BaseTsConfigTransformPayload | undefined): Promise<void> {
+  public executeImplPayload(passedIn: BaseTsConfigTransformPayload | undefined): Promise<void> {
     if(!passedIn) {
       return Promise.reject(new Error('Undefined Payload'));
     } else {

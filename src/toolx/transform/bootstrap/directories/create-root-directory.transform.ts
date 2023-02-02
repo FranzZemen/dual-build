@@ -1,12 +1,7 @@
 /*
 Created by Franz Zemen 12/25/2022
 License Type: MIT
-*/
-
-/*
-Created by Franz Zemen 12/10/2022
-License Type: MIT
-*/
+*/CRou
 
 import {existsSync, mkdirSync} from 'node:fs';
 import {join} from 'node:path';

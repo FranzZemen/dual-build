@@ -10,8 +10,14 @@ import {endTiming, startTiming} from '../util/timing.js';
 
 export type TransformConstructor<CLASS extends Transform<any, any, any>> = new (logDepth: number) => CLASS;
 
-
-export abstract class Transform<PASSED_IN, PIPE_IN, PIPE_OUT> {
+/**
+ * Abstract Transform class.  A Transform is a class that transforms data; data can be intrinsic (obtained by the class through internal means),
+ * piped in (provided to the class by the starting Pipeline payload or by the previous Transform, SeriesPipe, or ParallelPipe piped out data, or
+ * passed in directly when added to a Pipeline.
+ *
+ * The transform declares what kind of data it is sending down the Pipeline as output - this does not have to be the transformed data.
+ */
+export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
   protected log: Log;
   protected errorCondition = false;
 
@@ -31,7 +37,7 @@ export abstract class Transform<PASSED_IN, PIPE_IN, PIPE_OUT> {
     return this.constructor.name;
   }
 
-  async execute(pipe_in: PIPE_IN, passedIn?: PASSED_IN): Promise<PIPE_OUT> {
+  async execute(pipe_in: PIPED_IN, passedIn?: PASSED_IN): Promise<PIPE_OUT> {
     const transformContext = this.transformContext(pipe_in, passedIn);
     const maxLineLength = 100;
     if(`transform ${this.name}${transformContext.length ? ' on ' + transformContext : ''} starting...`.length  > maxLineLength) {
@@ -61,7 +67,7 @@ export abstract class Transform<PASSED_IN, PIPE_IN, PIPE_OUT> {
     }
   }
 
-  abstract executeImpl(pipeIn: PIPE_IN | PASSED_IN | undefined, passedIn?: PASSED_IN): Promise<PIPE_OUT>;
+  abstract executeImpl(pipeIn: PIPED_IN | undefined, passedIn?: PASSED_IN): Promise<PIPE_OUT>;
 
-  abstract transformContext(pipeIn: PIPE_IN | PASSED_IN| undefined, passedIn?: PASSED_IN): string;
+  abstract transformContext(pipeIn: PIPED_IN | undefined, passedIn?: PASSED_IN): string;
 }

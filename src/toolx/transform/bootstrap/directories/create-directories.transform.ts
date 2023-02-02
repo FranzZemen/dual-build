@@ -16,7 +16,7 @@ export class CreateDirectories extends TransformInOut<ContainsDirectories, Direc
     super(logDepth);
   }
 
-  executeImpl(passedIn: ContainsDirectories): Promise<Directory> {
+  executeImplInOut(passedIn: ContainsDirectories): Promise<Directory> {
     if (passedIn) {
       const directories: Directories = passedIn.directories;
       const passIns: Directory[] = [];

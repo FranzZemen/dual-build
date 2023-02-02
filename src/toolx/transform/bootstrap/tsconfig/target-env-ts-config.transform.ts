@@ -19,7 +19,7 @@ export class TargetEnvTsConfigTransform extends TransformPayload<GenerateTsConfi
     super(depth);
   }
 
-  public executeImpl(pipeIn: undefined, passedIn: GenerateTsConfigPayload | undefined): Promise<void> {
+  public executeImplPayload(passedIn: GenerateTsConfigPayload | undefined): Promise<void> {
     if(!passedIn) {
       throw new Error ('Undefined payload');
     } else {

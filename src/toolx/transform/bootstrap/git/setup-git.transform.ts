@@ -22,7 +22,7 @@ export class SetupGit extends TransformPayload<GitOptions> {
     super(depth);
   }
 
-  async executeImpl(payload: undefined, gitOptions?: GitOptions): Promise<void> {
+  async executeImplPayload(gitOptions?: GitOptions): Promise<void> {
     if (gitOptions && gitOptions.useGit && gitOptions['git init']) {
       try {
         const self = this;

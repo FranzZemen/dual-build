@@ -6,8 +6,6 @@ License Type: MIT
 import {InitResult, SimpleGit} from 'simple-git';
 import {gitOptions} from '../../../options/git.options.js';
 import {TransformInOut} from '../../transform-in-out.js';
-import {TransformPayloadOut} from '../../transform-payload-out.js';
-import {Transform} from '../../transform.js';
 import {SetupGitPipelinePayload} from './setup-git.transform.js';
 
 export type GitInitResult = Partial<InitResult> & {initialized: boolean;}
@@ -20,7 +18,7 @@ export class InitGit extends TransformInOut<SetupGitPipelinePayload, SetupGitPip
     return '';
   }
 
-  public async executeImpl(pipeIn: SetupGitPipelinePayload): Promise<SetupGitPipelinePayload> {
+  public async executeImplInOut(pipeIn: SetupGitPipelinePayload): Promise<SetupGitPipelinePayload> {
     if (pipeIn ) {
       if(gitOptions.useGit && gitOptions['git init']) {
         const git: SimpleGit = pipeIn.git;

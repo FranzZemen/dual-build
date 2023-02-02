@@ -12,7 +12,7 @@ export class GitAddOrigin extends TransformIn<SetupGitPipelinePayload> {
   constructor(depth: number) {
     super(depth);
   }
-  public async executeImpl(pipeIn: SetupGitPipelinePayload): Promise<void> {
+  public async executeImplIn(pipeIn: SetupGitPipelinePayload): Promise<void> {
     try {
       if (pipeIn.gitInitResult?.initialized) {
         const git = pipeIn.git;

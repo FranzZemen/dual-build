@@ -1,93 +1,117 @@
 # Source Scaffolding
 
-The scaffolding allows for several source scaffolding strategies, particularly with respect to the
-location of test files relative to the source files.
+Within the topic of folder scaffolding is the main concern of source scaffolding. By definition,
+this includes anything that is necessary to build or operate run time functionality, so typescript,
+javascript, json, configuration files, test files and so on. Depending on local preference and often
+framework specifications (for example Angular), it can make sense to create different roots for
+different types of source, or keep them collocated or even comingled.
 
-The scaffolding standard is to have the test files under the same root folder as the source 
-files, so that imports can point directly to the source files.  The build system knows to 
-exclude the test output from distribution.
+Within a project, there is often just one target feature/program/library being generated, and
+therefore just one set of source files. Sometimes however it is desired to generate separately
+managed but otherwise related distributions, requiring multiple sets of output distributions.  
+This is supported by dual-project as "subprojects". Moreover, subprojects can have their own
+transport and build rules, or share common ones.
 
-# Test File Locations and Build Strategy
+Also, a project can include two special kind of source subprojects. One is called `tool.x` which
+supports the creation of binary tools that are published with the project through the "bin"
+attribute of package.json. The second is called `tool.i`, which supports the creation of binary
+tools that exist within the project for the project developer, but not exposed through the
+distribution. They are also invoked through a "bin" package.json attribute, just not the one that is
+published.
 
-The build system supports several test file location strategies.  This section explains what 
-they are and, in the event the location needs to be change, how to accomplish that.
+Finally, there are various practices on where to put test source. Dual build supports several
+locational strategies and within that, several import strategies, i.e. how test source files resolve
+source files for transpilation, and how to ensure the transpiled source files are in the correct
+location at run time for tests to run without error. This is not limited to typescript
 
-## Test files commingled with source files 
+PS:  The scaffolding topic is somewhat related and driven by a) test file strategy, b) test import
+strategy and c) module loading/resolution strategy.
 
-This is a simple strategy for testing, because test files have adjacent access to source files 
-(import from current or relative path).  The distribution build process will exclude the test 
-files, as long as the test files hold to a pre-defined pattern.
+# Projects
 
-buildStrategy.json
-```json
-{
-  "testFileLocation": "commingled",
-  "testFilePattern": "**/*.test.*"
-}
-```
+As mentioned, there can be more than one subproject in a project. If there is only one subproject,
+then it can be located in the project root.
 
+If there is more than one subproject, excluding the `tool.x` and `tool.i` special subprojects,
+then the subprojects will require their own directories and an import strategy for each subproject 
+will need to be defined or all subprojects will use a common import strategy.
 
+The `tool.x` and `tool.i` subprojects are always named just that.
 
-## Test file folder under src folder
+Subprojects should not be nested in directory hierarchies.  Options include hanging them off the 
+root project directory './sub1', './sub2' etc. or within a subdirectory.
 
-Similar to comingled, but asssembled under a single directory
+## Location of source files
 
-buildStrategy.json
-```json
-{
-  "testFileLocation": "collocated",
-  "testFilePattern": "${SOURCE_FOLDER}/path-to-test-folder/**/*.test*"
-}
-```
+Non-test source files are expected to be under the same source directory for a given subproject, 
+whatever the type of source.  By default, the source directory is names './src'.  Thus, for a 
+single subproject (subproject = project), the default location is ./project-folder/src.  
 
-## Test file folded in its own folder 
+Source file path resolution, for example for imports (import, require, etc.) of other typescript 
+or javascript files is expected to be relative or absolute and identical pre-compilation or 
+post-compilation unless otherwise configured below.  Several tools exist to bypass this:
 
-buildStrategy.json
-```json
-{
-  "testFileLocation": "distinct",
-  "testFolder": "${SOURCE_FOLDER}",
-  "sourceReferenceOption": "self-reference | imports | dist | rootDirs"
-}
-```
-When keeping files in their own folder, the build system supports four options.
+- leveraging typescript configuration properties like rootDir, rootDirs, paths, typeRoots and types,
+- using custom symlinks or similar
+- leveraging reusable transforms like TransformLocation and customizing a pipeline
+- writing your own transform
+- at worst, writing your own custom code
 
-### self-reference
+Generally speaking, beyond the features provided by dual-code natively, leveraging these 
+directly would be the exception.
 
-This leverages Node's self reference setup, where a local file can refer to files in its own 
-package as if were a deployed module, if the package declares exports.  For this to work 
-moduleResolution and "module" need to be set to nodenext or node16.ok
+For dependent subprojects that do not leverage a published npm format (dependency is resolved 
+through an import)
 
-### imports
+Resolving paths for source files is normally the task of the
 
-This leverages Node's package.json imports clause.  Unfortunately, the typescript compiler does 
-not support this capability yet, so one as to leverage tsconfig paths to get this working at the 
-pre-compile time.  However regular javascript will work fine.  Given that typescript does not 
-support it, the moduleResolution and module are inconsequential, but a good idea is to set to 
-nodenext so that it automatically works without paths int he future.
-
-### dist
-
-This leverages the distribution files, which requires the distribution to build compiled prior 
-to the tests seeing the definitions.  Deleting the distribution files will cause errors in test 
-typescript files until they are rebuilt.
-
-### rootDirs
-
-This leverages rootDirs in tsconfig.  However, a build step is necessary (and supplied) to merge 
-source generated javascript with the test generated.  (typescript is fine with the rootDirs, but 
-javascript knows nothing of them).
+- a source directory, by default this is 'src'
+- the source the source subdirectory of the project where there is only 1 subproject (subproject = 
+  project)
+- or the source subdirectory of the subproject 
 
 
-### Options for source paths
+By default, source files will all be located under './src' from the subproject. So for just one 
+project that would be './src' under the root directory, and for multiples that would be .
+/some-subproject/src.
 
-- nodenext:  
+The default lumps all source files under ./src.  There may be a desire to break out different 
+types of source files under different folders, or different source folders.  Here the key 
+consideration is import mapping, both for transpilation and IDE support, and destination 
+reconciliation, so imports work at run time.  Except for test files (discussed further below), 
+it is expected that source file imports within a subproject be managed manually using tsconfig.
+josn or use 
+relative paths
 
 
-Option 1: test exits under src => distribution build will exclude src/path_to_test_dir
 
-Option 2: tests not under src, moduleResolution=nodenext tests leverage package.json imports to 
-get to src files(#...)
 
-Option 3: tests not under src, moduleResolution!=nodenext tests leverage rootDirs to get to src, 
-build step compbine root dirs to test output
+The are more specific, in that they are not expected to be dependent on other project source, and if
+needed are more limited the import options to make that happen.
+
+Source scaffolding include where any file considered as source(.ts, .cts, .mts, .js, .json, .html,
+.css etc) are located, as well as configuration files necessary to transpile, build or otherwise
+alter them for run time.
+
+This also includes test files and potentially assets (media, json) or data required for the system
+to run.
+
+The build system leverages both package.json and tsconfig.json to maximize the options as well as
+providing some transforms, or build steps, necessary to meet the scaffolding needs.
+
+Multiple source hierarchies building different functional capability are allowed. This is not to be
+confused with one functional capability generating multiple target distributions, for example ES5
+and esnext generated code. Typically aside (potentially) from tests, and project would have just one
+src root & hierarchy.
+
+# Target Distributions
+
+Several distribution types are allowed within a project. These are:
+
+- Distributions:  Software libraries intended for external (distributed) usage
+- Tests:  Various test suites to test both the intermediary and distributed software
+- Tools:  Tools used to manage the project. These include the tools provided by dual-build as well
+  as additional tools the project owner may wish to provide.
+
+
+

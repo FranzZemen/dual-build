@@ -17,7 +17,7 @@ export class InstallGitignore extends TransformIndependent {
     super(logDepth);
   }
 
-  async executeImpl(rootPath: undefined): Promise<void> {
+  async executeImplIndependent(): Promise<void> {
     try {
       let file = '';
       gitignore.forEach(ignore => file += ignore + EOL);

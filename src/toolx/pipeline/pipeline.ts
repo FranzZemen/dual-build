@@ -63,19 +63,19 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
 
   /*
   static transform<
-    CLASS extends Transform<PASSED_IN, PIPE_IN, PIPE_OUT>,
+    CLASS extends Transform<PASSED_IN, PIPED_IN, PIPED_OUT>,
     PASSED_IN = DefaultPayload,
     PIPELINE_IN = undefined,
     PIPELINE_OUT = void,
-    PIPE_IN = undefined,
-    PIPE_OUT = void>(
-    transformClass: TransformConstructor<CLASS, PASSED_IN, PIPE_IN, PIPE_OUT>,
+    PIPED_IN = undefined,
+    PIPED_OUT = void>(
+    transformClass: TransformConstructor<CLASS, PASSED_IN, PIPED_IN, PIPED_OUT>,
     passedIn?: PASSED_IN): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
 
     // ----- Declaration separator ----- //
     const options = defaultPipelineOptions();
     const pipeline = Pipeline.options<PIPELINE_IN, PIPELINE_OUT>(options);
-    pipeline._pipes.push(TransformPipe.transform<CLASS, PASSED_IN, PIPE_IN, PIPE_OUT>(transformClass, pipeline, passedIn));
+    pipeline._pipes.push(TransformPipe.transform<CLASS, PASSED_IN, PIPED_IN, PIPED_OUT>(transformClass, pipeline, passedIn));
     return pipeline;
   };
   
@@ -94,12 +94,12 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
 
 
   static startSeries<
-    TRANSFORM_CLASS extends Transform<PASSED_IN, PIPELINE_SERIES_AND_PIPE_IN, PIPE_OUT>,
+    TRANSFORM_CLASS extends Transform<PASSED_IN, PIPELINE_SERIES_AND_PIPE_IN, PIPED_OUT>,
     PASSED_IN = DefaultPayload,
     PIPELINE_SERIES_AND_PIPE_IN = undefined,
     PIPELINE_OUT = void,
     SERIES_OUT = void,
-    PIPE_OUT = void>(transformClass: TransformConstructor<TRANSFORM_CLASS, PASSED_IN, PIPELINE_SERIES_AND_PIPE_IN, PIPE_OUT>,
+    PIPED_OUT = void>(transformClass: TransformConstructor<TRANSFORM_CLASS, PASSED_IN, PIPELINE_SERIES_AND_PIPE_IN, PIPED_OUT>,
                      passedIn?: PASSED_IN): SeriesPipe<PIPELINE_SERIES_AND_PIPE_IN, SERIES_OUT> {
     // ----- Declaration separator ----- //
     const options = defaultPipelineOptions();
@@ -109,7 +109,7 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
       PASSED_IN,
       PIPELINE_SERIES_AND_PIPE_IN,
       SERIES_OUT,
-      PIPE_OUT>(transformClass, pipeline, passedIn);
+      PIPED_OUT>(transformClass, pipeline, passedIn);
     pipeline._pipes.push(seriesPipe);
     return seriesPipe;
   };
@@ -126,12 +126,12 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
 
 
   static startParallel<
-    TRANSFORM_CLASS extends Transform<PASSED_IN, PIPELINE_PARALLEL_AND_PIPE_IN, PIPE_OUT>,
+    TRANSFORM_CLASS extends Transform<PASSED_IN, PIPELINE_PARALLEL_AND_PIPE_IN, PIPED_OUT>,
     PASSED_IN,
     PIPELINE_PARALLEL_AND_PIPE_IN,
     PIPELINE_OUT = void,
     PARALLEL_OUT = void,
-    PIPE_OUT = void, >(transformClass: TransformConstructor<TRANSFORM_CLASS, PASSED_IN, PIPELINE_PARALLEL_AND_PIPE_IN, PIPE_OUT>,
+    PIPED_OUT = void, >(transformClass: TransformConstructor<TRANSFORM_CLASS, PASSED_IN, PIPELINE_PARALLEL_AND_PIPE_IN, PIPED_OUT>,
                        passedIn?: PASSED_IN): ParallelPipe<PIPELINE_PARALLEL_AND_PIPE_IN, PARALLEL_OUT> {
     // ----- Declaration separator ----- //
     const options = defaultPipelineOptions();
@@ -141,7 +141,7 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
       PASSED_IN,
       PIPELINE_PARALLEL_AND_PIPE_IN,
       PARALLEL_OUT,
-      PIPE_OUT>(transformClass, pipeline, passedIn);
+      PIPED_OUT>(transformClass, pipeline, passedIn);
     pipeline._pipes.push(parallelPipe);
     return parallelPipe;
   };

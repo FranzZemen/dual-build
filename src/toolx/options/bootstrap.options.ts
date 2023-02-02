@@ -6,6 +6,7 @@ import {gitignore, gitOptions, GitOptions} from './git.options.js';
 import {Options} from './options.js';
 import {defaultBootstrapPackageOptions, BootstrapPackageOptions} from './package.options.js';
 import {Sources, sources} from './sources.js';
+import {defaultTestStrategy, TestStrategy} from './test-strategy-options.js';
 import {es6, nodenext, TargetOptions} from './tsconfig.options.js';
 
 
@@ -13,7 +14,7 @@ export type InstallModuleLoader = 'install esm' | 'install commonjs' | 'install 
 
 export type BinSource = 'esm/bin' | 'commonjs/bin';
 
-export type BuildOptions = {
+export type ModuleOptions = {
   buildEsm: boolean;
   buildCommonJS: boolean
 }
@@ -27,7 +28,8 @@ export type BootstrapOptions = Options & {
   'package options': BootstrapPackageOptions;
   'target options': TargetOptions;
   sources: Sources[];
-  'build options': BuildOptions;
+  'build options': ModuleOptions;
+  'test strategy': TestStrategy;
   '.gitignore': string[];
 }
 
@@ -47,6 +49,7 @@ export const bootstrapOptions: BootstrapOptions = {
   directories,
   sources,
   'build options': {buildEsm: true, buildCommonJS: true},
+  'test strategy': defaultTestStrategy,
   '.gitignore': gitignore,
 }
 

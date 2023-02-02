@@ -44,7 +44,7 @@ export class SeriesPipe<SERIES_IN, SERIES_OUT> {
 
   /**
    * End of the series
-   * PIPE_OUT = SERIES PIPE_OUT, which is defined on the class
+   * PIPED_OUT = SERIES PIPED_OUT, which is defined on the class
    *
    */
   endSeries<TRANSFORM_CLASS extends Transform<any, any, any>, PASSED_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,

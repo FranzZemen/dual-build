@@ -20,7 +20,7 @@ export class ChangeWorkingDirectory extends TransformIn<Directory> {
     super(logDepth);
   }
 
-  executeImpl(rootDirectory: Directory): Promise<void> {
+  executeImplIn(rootDirectory: Directory): Promise<void> {
     if (rootDirectory) {
       try {
         const newCwd = rootDirectory.directoryPath;
