@@ -11,7 +11,7 @@ export class TransformPipe<PASSED_IN, PIPE_IN, PIPE_OUT> {
     TRANSFORM_CLASS extends Transform<any, any, any>,
     PASSED_IN,
     PIPE_IN,
-    PIPE_OUT>
+    PIPE_OUT = PIPE_IN>
   (transformClass: TransformConstructor<TRANSFORM_CLASS>, pipeline: Pipeline<any,any>, payloadOverride?: PASSED_IN): TransformPipe<PASSED_IN, PIPE_IN, PIPE_OUT> {
     // ----- Declaration separator ----- //
     return new TransformPipe<PASSED_IN, PIPE_IN, PIPE_OUT>(new transformClass(pipeline.log.depth + 1), payloadOverride);

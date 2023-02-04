@@ -3,7 +3,7 @@ Created by Franz Zemen 01/02/2023
 License Type: MIT
 */
 
-import _ from 'lodash';
+import {deepCopy} from '../util/deep-copy.js';
 import {Transform} from './transform.js';
 
 export type TransformPayloadInConstructor<CLASS extends TransformPayloadIn<PASSED_IN, PIPE_IN>, PASSED_IN, PIPE_IN> = new (logDepth: number) => CLASS;
@@ -27,7 +27,8 @@ export abstract class TransformPayloadIn<PASSED_IN, PIPE_IN> extends Transform<P
   }
 
   public executeImpl(pipeIn: PIPE_IN, passedIn: PASSED_IN): Promise<PIPE_IN> {
-    const pipedInCopy = _.merge({}, pipeIn);
+
+    const pipedInCopy = deepCopy(pipeIn);
     return this.executeImplPayloadIn(pipedInCopy, passedIn)
       .then(()=> pipeIn);
   }

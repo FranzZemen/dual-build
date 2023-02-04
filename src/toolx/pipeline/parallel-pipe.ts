@@ -6,9 +6,9 @@ import {Pipeline} from './pipeline.js';
 
 
 export type MergeFunction<T> = (parallelPayloads: any[]) => Promise<T>;
-export type MergeType = 'void' | 'asAttributes' | 'asMerged' | 'asMergeFunction';
+export type MergeType = 'void' | 'asAttributes' | 'asMerged' | 'asMergeFunction' | 'asPipedIn';
 
-export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
+export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT = PARALLEL_IN> {
   log: Log;
   protected _pipe: [transform: Transform<any, any, any>, payloadOverride: any][] = [];
   protected _mergeStrategy: [mergeType: MergeType, mergeFunction?: MergeFunction<PARALLEL_OUT>] = ['asAttributes'];
@@ -22,7 +22,7 @@ export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
     TRANSFORM_CLASS extends Transform<any, any, any>,
     PASSED_IN,
     PARALLEL_IN,
-    PARALLEL_OUT>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
+    PARALLEL_OUT = PARALLEL_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
               pipeline: Pipeline<any, any>,
               payloadOverride?: PASSED_IN): ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
 
@@ -33,7 +33,7 @@ export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
 
   parallel<
     TRANSFORM_CLASS extends Transform<any, any, any>,
-    PASSED_IN>(
+    PASSED_IN = undefined>(
     transformClass: TransformConstructor<TRANSFORM_CLASS>,
     payloadOverride?: PASSED_IN): ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
     // ----- Multiline Declaration Separator ----- //
@@ -43,8 +43,8 @@ export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
 
   endParallel<
     TRANSFORM_CLASS extends Transform<any, any, any>,
-    PASSED_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
-                     mergeStrategy: [mergeType: MergeType, mergeFunction?: MergeFunction<PARALLEL_OUT>] = ['asAttributes'],
+    PASSED_IN = undefined>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
+                     mergeStrategy: [mergeType: MergeType, mergeFunction?: MergeFunction<PARALLEL_OUT>] = ['asPipedIn'],
                      payloadOverride?: any): Pipeline<any, any> {
     // ----- Multiline Declaration Separator ----- //
     this._pipe.push([new transformClass(this.log.depth + 1), payloadOverride]);
@@ -84,6 +84,10 @@ export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
 
           case 'void': {
             return undefined as PARALLEL_OUT;
+          }
+          case 'asPipedIn': {
+            // Ignore any payload from parallel transforms and return what was piped in.
+            return payload as unknown as PARALLEL_OUT;
           }
           case 'asMergeFunction':
           case 'asMerged': {

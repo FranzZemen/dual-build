@@ -3,7 +3,7 @@ import {Transform, TransformConstructor} from '../transform/transform.js';
 import {processUnknownError} from '../util/process-unknown-error-message.js';
 import {Pipeline} from './pipeline.js';
 
-export class SeriesPipe<SERIES_IN, SERIES_OUT> {
+export class SeriesPipe<SERIES_IN, SERIES_OUT = SERIES_IN> {
   log: Log;
   protected _pipe: [transform: Transform<any, any, any>, payloadOverride: any | undefined][] = [];
 
@@ -22,7 +22,7 @@ export class SeriesPipe<SERIES_IN, SERIES_OUT> {
     TRANSFORM_CLASS extends Transform<any, any, any>,
     PASSED_IN,
     SERIES_IN,
-    SERIES_OUT>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
+    SERIES_OUT = SERIES_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
                 pipeline: Pipeline<any, any>,
                 payloadOverride?: PASSED_IN): SeriesPipe<SERIES_IN, SERIES_OUT> {
 
@@ -34,7 +34,7 @@ export class SeriesPipe<SERIES_IN, SERIES_OUT> {
 
   series<
     TRANSFORM_CLASS extends Transform<any, any, any>,
-    PASSED_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
+    PASSED_IN = undefined>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
                payloadOverride?: PASSED_IN): SeriesPipe<SERIES_IN, SERIES_OUT> {
     // ----- Multiline Declaration Separator ----- //
 
@@ -47,7 +47,7 @@ export class SeriesPipe<SERIES_IN, SERIES_OUT> {
    * PIPED_OUT = SERIES PIPED_OUT, which is defined on the class
    *
    */
-  endSeries<TRANSFORM_CLASS extends Transform<any, any, any>, PASSED_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
+  endSeries<TRANSFORM_CLASS extends Transform<any, any, any>, PASSED_IN = undefined>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
                                                                                      payloadOverride?: PASSED_IN): Pipeline<any, any> {
     this._pipe.push([new transformClass(this.log.depth + 1), payloadOverride]);
     return this._pipeline;

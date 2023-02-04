@@ -26,9 +26,9 @@ export function defaultPipelineOptions(): PipelineOptions {
 
 /**
  * PIPELINE_SERIES_AND_PIPE_IN = The payload starting the pipeline
- * PIPELINE_OUT = The payload coming out of the pipeline
+ * PIPELINE_OUT = The payload coming out of the pipeline (by default the payload remains the same throughout
  */
-export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
+export class Pipeline<PIPELINE_IN, PIPELINE_OUT = PIPELINE_IN> {
   protected static index = 1;
   log: Log;
   name: string;
@@ -46,120 +46,24 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
    *
    * @param options
    */
-  static options<PIPELINE_IN, PIPELINE_OUT>(options?: PipelineOptions) {
+  static options<PIPELINE_IN, PIPELINE_OUT = PIPELINE_IN>(options?: PipelineOptions) {
     if (options === undefined) {
       options = defaultPipelineOptions();
     }
     return new Pipeline<PIPELINE_IN, PIPELINE_OUT>(options);
   }
 
+
   /**
-   * Start the pipeline with an transform
-   * TRANSFORM_CLASS extends Transform = Transform class (constructor)
-   * Payload is DIRECTORIES = PIPELINE_SERIES_AND_PIPE_IN by definition since it is the start of the pipeline
-   * In general, transform payload out != pipeline payload out
+   * Execute a single Transform
+   *
+   * By default, the pipeline payload flows without alreration, so unless a pipeline element changed the payload upstream or the transform changes
+   * the output, the transform payload stays the same as the pipeline.  Otherwise the appropriate template types must be supplied
    *
    */
 
-  /*
-  static transform<
-    CLASS extends Transform<PASSED_IN, PIPED_IN, PIPED_OUT>,
-    PASSED_IN = DefaultPayload,
-    PIPELINE_IN = undefined,
-    PIPELINE_OUT = void,
-    PIPED_IN = undefined,
-    PIPED_OUT = void>(
-    transformClass: TransformConstructor<CLASS, PASSED_IN, PIPED_IN, PIPED_OUT>,
-    passedIn?: PASSED_IN): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
-
-    // ----- Declaration separator ----- //
-    const options = defaultPipelineOptions();
-    const pipeline = Pipeline.options<PIPELINE_IN, PIPELINE_OUT>(options);
-    pipeline._pipes.push(TransformPipe.transform<CLASS, PASSED_IN, PIPED_IN, PIPED_OUT>(transformClass, pipeline, passedIn));
-    return pipeline;
-  };
-  
-   
-  static transforms<
-    PIPELINE_IN = undefined,
-    PIPELINE_OUT = void>(transformClasses: TransformConstructor<any> | TransformConstructor<any>[],
-                         passedIns?: any | any [],
-                         options?: PipelineOptions): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
-    // ----- Declaration separator ----- //
-
-    const pipeline = Pipeline.options<PIPELINE_IN, PIPELINE_OUT>(options);
-    return pipeline.transforms(transformClasses, passedIns);
-  }
-
-
-
-  static startSeries<
-    TRANSFORM_CLASS extends Transform<PASSED_IN, PIPELINE_SERIES_AND_PIPE_IN, PIPED_OUT>,
-    PASSED_IN = DefaultPayload,
-    PIPELINE_SERIES_AND_PIPE_IN = undefined,
-    PIPELINE_OUT = void,
-    SERIES_OUT = void,
-    PIPED_OUT = void>(transformClass: TransformConstructor<TRANSFORM_CLASS, PASSED_IN, PIPELINE_SERIES_AND_PIPE_IN, PIPED_OUT>,
-                     passedIn?: PASSED_IN): SeriesPipe<PIPELINE_SERIES_AND_PIPE_IN, SERIES_OUT> {
-    // ----- Declaration separator ----- //
-    const options = defaultPipelineOptions();
-    const pipeline = Pipeline.options<PIPELINE_SERIES_AND_PIPE_IN, PIPELINE_OUT>(options);
-    const seriesPipe = SeriesPipe.start<
-      TRANSFORM_CLASS,
-      PASSED_IN,
-      PIPELINE_SERIES_AND_PIPE_IN,
-      SERIES_OUT,
-      PIPED_OUT>(transformClass, pipeline, passedIn);
-    pipeline._pipes.push(seriesPipe);
-    return seriesPipe;
-  };
-
-  static series<
-    PIPELINE_AND_SERIES_IN,
-    PIPELINE_OUT,
-    SERIES_OUT>(transformClasses: TransformConstructor<any>[],
-                passedIns: ArrayTwoOrMore<any | undefined> [],
-                options?: PipelineOptions): Pipeline<PIPELINE_AND_SERIES_IN, PIPELINE_OUT> {
-    const pipeline = Pipeline.options<PIPELINE_AND_SERIES_IN, PIPELINE_OUT>(options);
-    return pipeline.series<PIPELINE_AND_SERIES_IN, SERIES_OUT>(transformClasses, passedIns);
-  }
-
-
-  static startParallel<
-    TRANSFORM_CLASS extends Transform<PASSED_IN, PIPELINE_PARALLEL_AND_PIPE_IN, PIPED_OUT>,
-    PASSED_IN,
-    PIPELINE_PARALLEL_AND_PIPE_IN,
-    PIPELINE_OUT = void,
-    PARALLEL_OUT = void,
-    PIPED_OUT = void, >(transformClass: TransformConstructor<TRANSFORM_CLASS, PASSED_IN, PIPELINE_PARALLEL_AND_PIPE_IN, PIPED_OUT>,
-                       passedIn?: PASSED_IN): ParallelPipe<PIPELINE_PARALLEL_AND_PIPE_IN, PARALLEL_OUT> {
-    // ----- Declaration separator ----- //
-    const options = defaultPipelineOptions();
-    const pipeline = Pipeline.options<PIPELINE_PARALLEL_AND_PIPE_IN, PIPELINE_OUT>(options);
-    const parallelPipe = ParallelPipe.start<
-      TRANSFORM_CLASS,
-      PASSED_IN,
-      PIPELINE_PARALLEL_AND_PIPE_IN,
-      PARALLEL_OUT,
-      PIPED_OUT>(transformClass, pipeline, passedIn);
-    pipeline._pipes.push(parallelPipe);
-    return parallelPipe;
-  };
-
-  static parallels<
-    PIPELINE_AND_PARALLEL_IN,
-    PIPELINE_OUT,
-    PARALLEL_OUT>(transformClasses: TransformConstructor<any>[],
-                  mergeStrategy: [mergeType: MergeType, mergeFunction?: MergeFunction<PARALLEL_OUT>] = ['asAttributes'],
-                  passedIns: ArrayTwoOrMore<any | undefined> [],
-                  options?: PipelineOptions): Pipeline<PIPELINE_AND_PARALLEL_IN, PIPELINE_OUT> {
-    const pipeline = Pipeline.options<PIPELINE_AND_PARALLEL_IN, PIPELINE_OUT>(options);
-    return pipeline.parallels<PIPELINE_AND_PARALLEL_IN, PARALLEL_OUT>(transformClasses, mergeStrategy, passedIns);
-  }
-  */
-
-  transform<TRANSFORM_CLASS extends Transform<any, any, any>, PASSED_IN, PIPE_IN, PIPE_OUT>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
-                                                                                            passedIn?: PASSED_IN): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
+  transform<TRANSFORM_CLASS extends Transform<any, any, any>, PASSED_IN = undefined, PIPE_IN = PIPELINE_IN, PIPE_OUT = PIPE_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
+                                                                                                                    passedIn?: PASSED_IN): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
 
     // ----- Declaration separator ----- //
     this._pipes.push(TransformPipe.transform<TRANSFORM_CLASS, PASSED_IN, PIPE_IN, PIPE_OUT>(transformClass, this, passedIn));
@@ -207,13 +111,18 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     }
   }
 
-
+  /**
+   * Start a series of transforms.  Default is for the pipeline payload to be maintained (not altered)
+   * @param {TransformConstructor<TRANSFORM_CLASS>} transformClass
+   * @param {PASSED_IN} passedIn
+   * @returns {SeriesPipe<SERIES_IN, SERIES_OUT>}
+   */
   startSeries<
     TRANSFORM_CLASS extends Transform<any, any, any>,
-    PASSED_IN,
-    SERIES_IN,
-    SERIES_OUT>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
-                passedIn?: PASSED_IN): SeriesPipe<SERIES_IN, SERIES_OUT> {
+    PASSED_IN = undefined,
+    SERIES_IN = PIPELINE_IN,
+    SERIES_OUT = PIPELINE_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
+                              passedIn?: PASSED_IN): SeriesPipe<SERIES_IN, SERIES_OUT> {
 
     // ----- Declaration separator ----- //
     const seriesPipe = SeriesPipe.start<
@@ -225,10 +134,16 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     return seriesPipe;
   };
 
+  /**
+   * Continue the series, by default with the pipeline payload
+   * @param {TransformConstructor<any>[]} transformClasses
+   * @param {ArrayTwoOrMore<any>[]} passedIns
+   * @returns {Pipeline<PIPELINE_IN, PIPELINE_OUT>}
+   */
   series<
-    SERIES_IN,
-    SERIES_OUT>(transformClasses: TransformConstructor<any>[],
-                passedIns: ArrayTwoOrMore<any | undefined> []): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
+    SERIES_IN = PIPELINE_IN,
+    SERIES_OUT = PIPELINE_IN>(transformClasses: TransformConstructor<any>[],
+                              passedIns: ArrayTwoOrMore<any | undefined> []): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     return transformClasses.reduce((previousValue: any, currentValue, currentIndex) => {
       // Even though ArrayTwoOrMore guards minimum length from a type perspective, let's put in a run time check.  We have to match lengths between
       // Arrays anyway
@@ -250,11 +165,14 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
   }
 
 
+  /**
+   * Start parallel transforms, defaulting to pipeline payload in and out (and appropriate merge flag)
+   **/
   startParallel<
     TRANSFORM_CLASS extends Transform<any, any, any>,
-    PASSED_IN,
-    PARALLEL_IN,
-    PARALLEL_OUT>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
+    PASSED_IN = undefined,
+    PARALLEL_IN = PIPELINE_IN,
+    PARALLEL_OUT = PIPELINE_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
                   passedIn?: PASSED_IN): ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
     // ----- Declaration separator ----- //
     const parallelPipe = ParallelPipe.start<
@@ -266,7 +184,7 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     return parallelPipe;
   };
 
-  parallels<PARALLEL_IN, PARALLEL_OUT>(transformClasses: TransformConstructor<any>[],
+  parallels<PARALLEL_IN = PIPELINE_IN, PARALLEL_OUT = PIPELINE_IN>(transformClasses: TransformConstructor<any>[],
                                        mergeStrategy: [type: MergeType, mergeFunction?: MergeFunction<PARALLEL_OUT>] = ['asAttributes'],
                                        passedIns: ArrayTwoOrMore<any | undefined> []): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     return transformClasses.reduce((previousValue: any, currentValue, currentIndex) => {

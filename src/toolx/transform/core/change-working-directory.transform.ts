@@ -15,15 +15,15 @@ export type ChangeWorkingDirectoryPayload = {
   rootPath: string
 }
 
-export class ChangeWorkingDirectory extends TransformIn<Directory> {
+export class ChangeWorkingDirectory extends TransformIn<string> {
   constructor(logDepth: number) {
     super(logDepth);
   }
 
-  executeImplIn(rootDirectory: Directory): Promise<void> {
-    if (rootDirectory) {
+  executeImplIn(rootDirectorPath: string): Promise<void> {
+    if (rootDirectorPath) {
       try {
-        const newCwd = rootDirectory.directoryPath;
+        const newCwd = rootDirectorPath;
         this.log.info(`current working directory is ${cwd()}`, 'task-internal')
         const newCwdPath = resolve(cwd(), newCwd);
         chdir(newCwdPath);
@@ -37,7 +37,7 @@ export class ChangeWorkingDirectory extends TransformIn<Directory> {
     }
   }
 
-  public transformContext(rootDirectory: Directory): string {
-    return rootDirectory ? rootDirectory.directoryPath : '';
+  public transformContext(rootDirectoryPath: string): string {
+    return rootDirectoryPath;
   }
 }

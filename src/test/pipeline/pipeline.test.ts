@@ -18,18 +18,13 @@ import {simpleGit, SimpleGit} from 'simple-git';
 import {Log} from '../../toolx/log/log.js';
 import {defaultTargetOptions} from '../../toolx/options/tsconfig.options.js';
 import {Pipeline} from '../../toolx/pipeline/pipeline.js';
-import {ChangeWorkingDirectory} from '../../toolx/transform/bootstrap/change-working-directory.transform.js';
-import {CreateDirectories} from '../../toolx/transform/bootstrap/directories/create-directories.transform.js';
+import {ChangeWorkingDirectory} from '../../toolx/transform/core/change-working-directory.transform.js';
+import {CreateProjectDirectoriesAndCwd} from '../../toolx/transform/bootstrap/create-project-directories-and-cwd.transform.js';
 import {InstallGitignore} from '../../toolx/transform/bootstrap/git/install-gitignore.transform.js';
 import {SetupGit} from '../../toolx/transform/bootstrap/git/setup-git.transform.js';
 import {SaveOptionsPayload, SaveOptionsTransform} from '../../toolx/transform/bootstrap/save-options.transform.js';
-import {
-  BaseTsConfigTransform,
-  BaseTsConfigTransformPayload
-} from '../../toolx/transform/bootstrap/tsconfig/base-ts-config.transform.js';
-import {
-  TargetEnvTsConfigsTransform, GenerateTsConfigsPayload
-} from '../../toolx/transform/bootstrap/tsconfig/target-env-ts-configs.transform.js';
+import {BaseTsConfigTransform, BaseTsConfigTransformPayload} from '../../toolx/transform/bootstrap/tsconfig/base-ts-config.transform.js';
+import {GenerateTsConfigsPayload, TargetEnvTsConfigsTransform} from '../../toolx/transform/bootstrap/tsconfig/target-env-ts-configs.transform.js';
 import {processUnknownError} from '../../toolx/util/process-unknown-error-message.js';
 import '../transform/transform.test.js';
 
@@ -47,7 +42,7 @@ describe('dual-build tests', () => {
         _bootstrapOptions['git options'].username = 'SomeUser';
         const log = new Log();
         _bootstrapOptions.directories.root.directoryPath = projectDirectoryPath;
-        _bootstrapOptions.directories.root.folder = basename(_bootstrapOptions.directories.root.directoryPath);
+        _bootstrapOptions.directories.root.directoryPath = basename(_bootstrapOptions.directories.root.directoryPath);
         const oldCwd = cwd();
 
         const baseTsConfigPayload: BaseTsConfigTransformPayload = {
@@ -55,10 +50,9 @@ describe('dual-build tests', () => {
         }
 
         try {
-          await Pipeline.options<BootstrapOptions, void>({name: 'test-scaffolding', logDepth: 0})
-                        .transform<CreateDirectories,undefined, BootstrapOptions, Directory>(CreateDirectories)
-                        .startSeries<ChangeWorkingDirectory, undefined, Directory, void>(ChangeWorkingDirectory)
-                        .series<InstallGitignore, undefined>(InstallGitignore)
+          await Pipeline.options<BootstrapOptions>({name: 'Bootstrap', logDepth: 0})
+                        .transform<CreateProjectDirectoriesAndCwd, undefined>(CreateProjectDirectoriesAndCwd)
+                        .startSeries<InstallGitignore, undefined>(InstallGitignore)
                         .series<SetupGit, GitOptions>(SetupGit, _bootstrapOptions['git options'])
                         .endSeries<SaveOptionsTransform, SaveOptionsPayload>(
                           SaveOptionsTransform,
@@ -66,7 +60,7 @@ describe('dual-build tests', () => {
                             directory: _bootstrapOptions.directories['.dual-build/options'],
                             ..._bootstrapOptions}
                         )
-                        .startParallel<BaseTsConfigTransform, BaseTsConfigTransformPayload, undefined, undefined>(
+                        .startParallel<BaseTsConfigTransform, BaseTsConfigTransformPayload>(
                           BaseTsConfigTransform,
                           baseTsConfigPayload
                         )
