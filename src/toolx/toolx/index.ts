@@ -9,9 +9,9 @@ import {basename} from 'node:path';
 import {argv, exit} from 'node:process';
 import {Log} from '../log/log.js';
 // import {SetupGit} from '../transform/bootstrap/setup-git.js';
-import {bootstrapOptions} from '../options/bootstrap.options.js';
+import {bootstrapOptions} from '../options/index.js';
 //import {CreateDirectories} from '../transform/bootstrap/directories/create-directories.transform.js';
-import {processUnknownError} from '../util/process-unknown-error-message.js';
+import {processUnknownError} from '../util/index.js';
 
 const options = _.merge({}, bootstrapOptions);
 
@@ -19,7 +19,7 @@ const log = new Log();
 
 if(argv.length === 3 && argv[2].trim().length > 0) {
   options.directories.root.directoryPath = argv[2];
-  options.directories.root.folder = basename(options.directories.root.directoryPath);
+  options.directories.root.directoryPath = basename(options.directories.root.directoryPath);
 } else {
   log.info('No folder provided.  Specify project folder');
   exit(1);

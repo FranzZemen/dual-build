@@ -1,13 +1,13 @@
 /*
 Created by Franz Zemen 12/15/2022
-License Type: 
+License Type: MIT
 */
 
 import {v4 as uuidV4} from 'uuid';
-import {Log} from '../log/log.js';
-import {Transform, TransformConstructor} from '../transform/transform.js';
-import {processUnknownError} from '../util/process-unknown-error-message.js';
-import {clearTiming, endTiming, startTiming} from '../util/timing.js';
+import {Log} from '../../log/log.js';
+import {Transform, TransformConstructor} from '../../transform/index.js';
+import {processUnknownError} from '../../util/process-unknown-error-message.js';
+import {clearTiming, endTiming, startTiming} from '../../util/timing.js';
 import {MergeFunction, MergeType, ParallelPipe} from './parallel-pipe.js';
 import {Pipe, PipelineOptions} from './pipeline-aliases.js';
 import {SeriesPipe} from './series-pipe.js';
@@ -46,7 +46,7 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT = PIPELINE_IN> {
    *
    * @param options
    */
-  static options<PIPELINE_IN, PIPELINE_OUT = PIPELINE_IN>(options?: PipelineOptions) {
+  static options<PIPELINE_IN = undefined, PIPELINE_OUT = PIPELINE_IN>(options?: PipelineOptions) {
     if (options === undefined) {
       options = defaultPipelineOptions();
     }
@@ -57,13 +57,13 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT = PIPELINE_IN> {
   /**
    * Execute a single Transform
    *
-   * By default, the pipeline payload flows without alreration, so unless a pipeline element changed the payload upstream or the transform changes
+   * By default, the pipeline payload flows without altereration, so unless a pipeline element changed the payload upstream or the transform changes
    * the output, the transform payload stays the same as the pipeline.  Otherwise the appropriate template types must be supplied
    *
    */
 
   transform<TRANSFORM_CLASS extends Transform<any, any, any>, PASSED_IN = undefined, PIPE_IN = PIPELINE_IN, PIPE_OUT = PIPE_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
-                                                                                                                    passedIn?: PASSED_IN): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
+                                                                                                                                passedIn?: PASSED_IN): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
 
     // ----- Declaration separator ----- //
     this._pipes.push(TransformPipe.transform<TRANSFORM_CLASS, PASSED_IN, PIPE_IN, PIPE_OUT>(transformClass, this, passedIn));
@@ -113,9 +113,6 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT = PIPELINE_IN> {
 
   /**
    * Start a series of transforms.  Default is for the pipeline payload to be maintained (not altered)
-   * @param {TransformConstructor<TRANSFORM_CLASS>} transformClass
-   * @param {PASSED_IN} passedIn
-   * @returns {SeriesPipe<SERIES_IN, SERIES_OUT>}
    */
   startSeries<
     TRANSFORM_CLASS extends Transform<any, any, any>,
@@ -136,9 +133,6 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT = PIPELINE_IN> {
 
   /**
    * Continue the series, by default with the pipeline payload
-   * @param {TransformConstructor<any>[]} transformClasses
-   * @param {ArrayTwoOrMore<any>[]} passedIns
-   * @returns {Pipeline<PIPELINE_IN, PIPELINE_OUT>}
    */
   series<
     SERIES_IN = PIPELINE_IN,
@@ -173,7 +167,7 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT = PIPELINE_IN> {
     PASSED_IN = undefined,
     PARALLEL_IN = PIPELINE_IN,
     PARALLEL_OUT = PIPELINE_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
-                  passedIn?: PASSED_IN): ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
+                                passedIn?: PASSED_IN): ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
     // ----- Declaration separator ----- //
     const parallelPipe = ParallelPipe.start<
       TRANSFORM_CLASS,
@@ -185,8 +179,8 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT = PIPELINE_IN> {
   };
 
   parallels<PARALLEL_IN = PIPELINE_IN, PARALLEL_OUT = PIPELINE_IN>(transformClasses: TransformConstructor<any>[],
-                                       mergeStrategy: [type: MergeType, mergeFunction?: MergeFunction<PARALLEL_OUT>] = ['asAttributes'],
-                                       passedIns: ArrayTwoOrMore<any | undefined> []): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
+                                                                   mergeStrategy: [type: MergeType, mergeFunction?: MergeFunction<PARALLEL_OUT>] = ['asAttributes'],
+                                                                   passedIns: ArrayTwoOrMore<any | undefined> []): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     return transformClasses.reduce((previousValue: any, currentValue, currentIndex) => {
       if (transformClasses.length != passedIns.length) {
         throw new Error('Array lengths do not match');

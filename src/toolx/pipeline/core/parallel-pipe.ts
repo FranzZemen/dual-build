@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import {Log} from '../log/log.js';
-import {Transform, TransformConstructor} from '../transform/transform.js';
-import {processUnknownError} from '../util/process-unknown-error-message.js';
+import {Log} from '../../log/log.js';
+import {Transform, TransformConstructor} from '../../transform/transform.js';
+import {processUnknownError} from '../../util/process-unknown-error-message.js';
 import {Pipeline} from './pipeline.js';
 
 

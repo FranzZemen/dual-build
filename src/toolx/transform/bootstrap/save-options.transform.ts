@@ -3,10 +3,11 @@ Created by Franz Zemen 01/05/2023
 License Type: MIT
 */
 
-import {Directory, Options, TransformPayload} from 'dual-build';
 import {writeFile} from 'fs/promises';
 import {join} from 'node:path';
-import {processUnknownError} from '../../util/process-unknown-error-message.js';
+import {Directory, Options} from '../../options/index.js';
+import {processUnknownError} from '../../util/index.js';
+import {TransformPayload} from '../transform-payload.js';
 
 export type SaveOptionsPayload = Options & {
   directory: Directory;
@@ -18,7 +19,7 @@ export class SaveOptionsTransform extends TransformPayload<SaveOptionsPayload> {
     super(depth);
   }
 
-  public async executeImpl(_undefined: undefined, payload?: SaveOptionsPayload): Promise<void> {
+  protected async executeImplPayload(payload: SaveOptionsPayload): Promise<void> {
     if (payload) {
       try {
         await writeFile(join(payload.directory.directoryPath, payload.filename),
@@ -36,5 +37,7 @@ export class SaveOptionsTransform extends TransformPayload<SaveOptionsPayload> {
   public transformContext(_undefined: undefined, payload?: SaveOptionsPayload): string {
     return payload?.filename ?? '';
   }
+
+
 
 }

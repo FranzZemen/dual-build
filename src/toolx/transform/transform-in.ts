@@ -22,7 +22,7 @@ export type TransformInConstructor<CLASS extends TransformIn<PIPE_IN>, PIPE_IN> 
  * The pipeline data out (piped out) is simply what was piped in.  Thus pipeline data is not impacted.
  * piped in data.
  *
- * If payload is passed in, it is ignored.
+ * If paylo@ad is passed in, it is ignored.
  */
 export abstract class TransformIn<PIPED_IN> extends Transform<undefined, PIPED_IN, PIPED_IN> {
 
@@ -34,11 +34,11 @@ export abstract class TransformIn<PIPED_IN> extends Transform<undefined, PIPED_I
     return super.execute(pipeIn, undefined);
   }
 
-  executeImpl(pipeIn: PIPED_IN, passedIn: undefined): Promise<PIPED_IN> {
+  protected executeImpl(pipeIn: PIPED_IN, passedIn: undefined): Promise<PIPED_IN> {
     const pipedInCopy = deepCopy(pipeIn)
     return this.executeImplIn(pipedInCopy)
       .then(()=>pipeIn);
   }
 
-  abstract executeImplIn(pipedIn: PIPED_IN): Promise<void>;
+  protected abstract executeImplIn(pipedIn: PIPED_IN): Promise<void>;
 }

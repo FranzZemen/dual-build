@@ -27,10 +27,10 @@ export abstract class TransformIndependent<PIPED_IN = any> extends Transform<und
                 .then(output => {return pipeIn;});
   }
 
-  executeImpl(pipeIn: PIPED_IN, passedIn: undefined): Promise<PIPED_IN> {
+  protected executeImpl(pipeIn: PIPED_IN, passedIn: undefined): Promise<PIPED_IN> {
     return this.executeImplIndependent()
                .then(() => pipeIn);
   }
 
-  abstract executeImplIndependent(): Promise<void>;
+  protected abstract executeImplIndependent(): Promise<void>;
 }

@@ -26,12 +26,12 @@ export abstract class TransformPayloadIn<PASSED_IN, PIPE_IN> extends Transform<P
     return super.execute(pipeIn, passedIn);
   }
 
-  public executeImpl(pipeIn: PIPE_IN, passedIn: PASSED_IN): Promise<PIPE_IN> {
+  protected executeImpl(pipeIn: PIPE_IN, passedIn: PASSED_IN): Promise<PIPE_IN> {
 
     const pipedInCopy = deepCopy(pipeIn);
     return this.executeImplPayloadIn(pipedInCopy, passedIn)
       .then(()=> pipeIn);
   }
 
-  public abstract executeImplPayloadIn(pipeIn: PIPE_IN , passedIn: PASSED_IN): Promise<void>;
+  protected abstract executeImplPayloadIn(pipeIn: PIPE_IN , passedIn: PASSED_IN): Promise<void>;
 }

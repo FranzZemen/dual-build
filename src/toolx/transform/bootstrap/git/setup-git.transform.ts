@@ -4,7 +4,7 @@ License Type: MI
 */
 import {simpleGit, SimpleGit} from 'simple-git';
 import {GitOptions} from 'dual-build';
-import {Pipeline} from '../../../pipeline/pipeline.js';
+import {Pipeline} from '../../../pipeline/core/pipeline.js';
 import {processUnknownError} from '../../../util/process-unknown-error-message.js';
 import {TransformPayload} from '../../transform-payload.js';
 import {GitAddOrigin} from './git-add-origin.transform.js';

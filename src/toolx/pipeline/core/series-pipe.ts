@@ -1,7 +1,8 @@
-import {Log} from '../log/log.js';
-import {Transform, TransformConstructor} from '../transform/transform.js';
-import {processUnknownError} from '../util/process-unknown-error-message.js';
+import {Log} from '../../log/log.js';
+import {Transform, TransformConstructor} from '../../transform/transform.js';
+import {processUnknownError} from '../../util/process-unknown-error-message.js';
 import {Pipeline} from './pipeline.js';
+import {TransformPipe} from './transform-pipe.js';
 
 export class SeriesPipe<SERIES_IN, SERIES_OUT = SERIES_IN> {
   log: Log;
@@ -41,7 +42,16 @@ export class SeriesPipe<SERIES_IN, SERIES_OUT = SERIES_IN> {
     this._pipe.push([new transformClass(this.log.depth + 1), payloadOverride]);
     return this;
   }
+/*
+  transform<TRANSFORM_CLASS extends Transform<any, any, any>, PASSED_IN = undefined, PIPE_IN = SERIES_IN, PIPE_OUT = SERIES_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
+                                                                                                                                passedIn?: PASSED_IN): SeriesPipe<SERIES_IN, SERIES_OUT> {
 
+    // ----- Declaration separator ----- //
+    this._pipes.push(TransformPipe.transform<TRANSFORM_CLASS, PASSED_IN, PIPE_IN, PIPE_OUT>(transformClass, this, passedIn));
+    return this;
+  };
+
+ */
   /**
    * End of the series
    * PIPED_OUT = SERIES PIPED_OUT, which is defined on the class

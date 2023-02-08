@@ -8,24 +8,23 @@ License Type: MIT
 */
 
 import * as chai from 'chai';
-import {BootstrapOptions, bootstrapOptions, Directory, GitOptions} from 'dual-build';
+import {BootstrapOptions, bootstrapOptions, GitOptions} from 'dual-build';
 import _ from 'lodash';
 import 'mocha';
 import {existsSync, rmSync} from 'node:fs';
 import {basename, join, sep} from 'node:path';
 import {chdir, cwd} from 'node:process';
 import {simpleGit, SimpleGit} from 'simple-git';
+import {defaultTargetOptions} from '../../toolx/index.js';
 import {Log} from '../../toolx/log/log.js';
-import {defaultTargetOptions} from '../../toolx/options/tsconfig.options.js';
-import {Pipeline} from '../../toolx/pipeline/pipeline.js';
-import {ChangeWorkingDirectory} from '../../toolx/transform/core/change-working-directory.transform.js';
+import {Pipeline} from '../../toolx/pipeline/index.js';
 import {CreateProjectDirectoriesAndCwd} from '../../toolx/transform/bootstrap/create-project-directories-and-cwd.transform.js';
-import {InstallGitignore} from '../../toolx/transform/bootstrap/git/install-gitignore.transform.js';
-import {SetupGit} from '../../toolx/transform/bootstrap/git/setup-git.transform.js';
-import {SaveOptionsPayload, SaveOptionsTransform} from '../../toolx/transform/bootstrap/save-options.transform.js';
-import {BaseTsConfigTransform, BaseTsConfigTransformPayload} from '../../toolx/transform/bootstrap/tsconfig/base-ts-config.transform.js';
-import {GenerateTsConfigsPayload, TargetEnvTsConfigsTransform} from '../../toolx/transform/bootstrap/tsconfig/target-env-ts-configs.transform.js';
-import {processUnknownError} from '../../toolx/util/process-unknown-error-message.js';
+import {InstallGitignore} from '../../toolx/index.js';
+import {SetupGit} from '../../toolx/index.js';
+import {SaveOptionsPayload, SaveOptionsTransform} from '../../toolx/index.js';
+import {BaseTsConfigTransform, BaseTsConfigTransformPayload} from '../../toolx/index.js';
+import {GenerateTsConfigsPayload, TargetEnvTsConfigsTransform} from '../../toolx/index.js';
+import {processUnknownError} from '../../toolx/index.js';
 import '../transform/transform.test.js';
 
 const should = chai.should();
@@ -86,7 +85,7 @@ describe('dual-build tests', () => {
           unreachableCode.should.be.true;
         } finally {
           chdir(oldCwd);
-          log.info(`reverting working directory to ${oldCwd}`);
+           log.info(`reverting working directory to ${oldCwd}`);
           existsSync(projectDirectoryPath).should.be.true;
           rmSync(projectDirectoryPath, {recursive: true, force: true});
         }

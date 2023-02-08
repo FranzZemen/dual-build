@@ -1,4 +1,5 @@
 import {licenseIds} from '../util/license-ids.cjs';
+import {Version} from '../util/semver.js';
 
 
 export enum PackageManager {
@@ -20,7 +21,6 @@ export const npxCommands: NpxCommands = {
   yarn: 'yarn dlx'
 };
 
-export type Version = `${number}.${number}.${number}`;
 
 
 enum ModuleType {

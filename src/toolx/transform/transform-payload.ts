@@ -26,10 +26,10 @@ export abstract class TransformPayload<PASSED_IN, PIPED_IN = any> extends Transf
     return super.execute(pipeIn, passedIn);
   }
 
-  public executeImpl(pipeIn: PIPED_IN, passedIn: PASSED_IN): Promise<PIPED_IN> {
+  protected executeImpl(pipeIn: PIPED_IN, passedIn: PASSED_IN): Promise<PIPED_IN> {
     return this.executeImplPayload(passedIn)
       .then(()=> pipeIn);
   }
 
-  public abstract executeImplPayload(payload: PASSED_IN): Promise<void>;
+  protected abstract executeImplPayload(payload: PASSED_IN): Promise<void>;
 }

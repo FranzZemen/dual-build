@@ -6,7 +6,7 @@ License Type: MIT
 
 import {BootstrapOptions} from '../../options/bootstrap.options.js';
 import {Directories, DirectoryPath} from '../../options/directories.js';
-import {Pipeline} from '../../pipeline/pipeline.js';
+import {Pipeline} from '../../pipeline/core/pipeline.js';
 import {ChangeWorkingDirectory} from '../core/change-working-directory.transform.js';
 import {CreateDirectory, CreateDirectoryPayload} from '../core/create-directory.transform.js';
 import {TransformConstructor} from '../transform.js';

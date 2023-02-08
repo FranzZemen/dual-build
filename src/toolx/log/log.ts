@@ -8,64 +8,9 @@ import EventEmitter from 'events';
 import {Console} from 'node:console';
 import {Writable} from 'node:stream';
 import {inspect} from 'node:util';
+import {BackgroundColor, ConsoleCode, ForegroundColor, utf8SpecialCharacters} from './console-types.js';
+import {LogInterface, LogLevel, TreatmentName, Treatments} from './log-interface.js';
 
-export enum ConsoleCode {
-  //  ref = 'https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797#colors--graphics-mode',
-  Reset      = '\x1b[0m',
-  Bright     = '\x1b[1m',
-  Dim        = '\x1b[2m',
-  Underscore = '\x1b[4m',
-  Blink      = '\x1b[5m',
-  Reverse    = '\x1b[7m',
-  Hidden     = '\x1b[8m',
-}
-
-export enum ForegroundColor {
-  // ref = 'https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797#colors--graphics-mode',
-  _8_ForegroundBlack         = '\x1b[30m',
-  _8_ForegroundRed           = '\x1b[31m',
-  _8_ForegroundGreen         = '\x1b[32m',
-  _8_ForegroundYellow        = '\x1b[33m',
-  _8_ForegroundBlue          = '\x1b[34m',
-  _8_ForegroundMagenta       = '\x1b[35m',
-  _8_ForegroundCyan          = '\x1b[36m',//console.log('\x1b[36m%s\x1b[0m', 'I am cyan');  //cyan
-  _8_ForegroundWhite         = '\x1b[37m',
-  _256_ForegroundBlueish27   = '\x1b[38;5;27m',
-  _256_ForegroundDullGreen29 = '\x1B[38;5;29m',
-  _256_ForegroundGrayish101  = '\x1B[38;5;101m',
-  _256_ForegroundOrange208   = '\x1B[38;5;208m'
-}
-
-export enum BackgroundColor {
-  _8_BackgroundBlack         = '\x1b[40m',
-  _8_BackgroundRed           = '\x1b[41m',
-  _8_BackgroundGreen         = '\x1b[42m',
-  _8_BackgroundYellow        = '\x1b[43m',
-  _8_BackgroundBlue          = '\x1b[44m',
-  _8_BackgroundMagenta       = '\x1b[45m',
-  _8_BackgroundCyan          = '\x1b[46m',
-  _8_BackgroundWhite         = '\x1b[47m',
-  _256_Blueish27             = '\x1b[48;5;27m',
-  _256_BackgroundGrayish101  = '\x1B[48;5;101m',
-  _256_BackgroundDullGreen29 = '\x1B[48;5;29m',
-  _256_BackgroundOrange208   = '\x1B[48;5;208m'
-
-};
-
-export enum utf8SpecialCharacters {
-  RighwardsArrow  = '\u2192',
-  WhiteRightArrow = '\u21E8',
-  WhiteHeavyCheckMark = '\u2705',
-  HeavyCheckmark  = '\u2714'
-}
-
-export type LogLevel = {
-  debug: 0;
-  info: 1;
-  warn: 2,
-  error: 3;
-  trace: 4;
-};
 
 const logLevelValues: LogLevel = {
   debug: 0,
@@ -76,22 +21,6 @@ const logLevelValues: LogLevel = {
 };
 
 export type LogLevelKey = keyof LogLevel;
-
-export type NamedScheme = 'task-internal' | 'task-detail' | 'task-done' | 'pipeline';
-
-export type TreatmentName = keyof LogLevel | NamedScheme
-
-export type Treatment = {
-  foreground: ForegroundColor,
-  background: BackgroundColor,
-  prefix?: string,
-  suffix?: string
-};
-
-
-export type Treatments = {
-  [key in TreatmentName]: Treatment;
-};
 
 export type LogConfig = {
   level: LogLevelKey,
@@ -132,16 +61,17 @@ export let logConfig: LogConfig = {
     },
     'task-done': {
       foreground: ForegroundColor._256_ForegroundDullGreen29,
-      background: BackgroundColor._8_BackgroundBlack,
+      background: BackgroundColor._8_BackgroundBlack
       //suffix:`
       // ${BackgroundColor._8_BackgroundBlack}${ForegroundColor._256_ForegroundDullGreen29}${ConsoleCode.Bright}${utf8SpecialCharacters.WhiteHeavyCheckMark}${ConsoleCode.Reset}`
     },
     'task-internal': {
       foreground: ForegroundColor._256_ForegroundDullGreen29,
       background: BackgroundColor._8_BackgroundBlack,
-      prefix:  `${utf8SpecialCharacters.RighwardsArrow} `
+      prefix: `${utf8SpecialCharacters.RighwardsArrow} `
       // prefix:
-      // `${BackgroundColor._8_BackgroundBlack}${ForegroundColor._8_ForegroundWhite}${ConsoleCode.Bright}${utf8SpecialCharacters.RighwardsArrow}${ConsoleCode.Reset} `
+      // `${BackgroundColor._8_BackgroundBlack}${ForegroundColor._8_ForegroundWhite}${ConsoleCode.Bright}${utf8SpecialCharacters.RighwardsArrow}${ConsoleCode.Reset}
+      // `
     },
     'task-detail': {
       foreground: ForegroundColor._256_ForegroundGrayish101,
@@ -211,8 +141,7 @@ export const no_console = new Console({
                                         stderr: noOptWriteable
                                       });
 
-
-export class Log {
+export class Log implements LogInterface {
   static TabLength = 2;
   static Tab = ' '.repeat(Log.TabLength);
   static InspectDepth: 10;
@@ -232,7 +161,6 @@ export class Log {
   public static setConsole(console: Console) {Log.console = console;};
 
   public static resetConsole() {Log.console = console;};
-
 
 
   error(data: Error | string) { // Force that error is always an Error or a string
@@ -315,15 +243,16 @@ export class Log {
       Log.console[logMethod](this.inspect(data));
     }
   }
+
   private assembleStringMessage(message: string, treatment: TreatmentName): string {
     return Log.Tab.repeat(this.depth)
       + (logConfig.treatments[treatment].prefix ? logConfig.treatments[treatment].prefix + ConsoleCode.Reset : '')
       + this.color(treatment) + message
       + ConsoleCode.Reset
-      + (logConfig.treatments[treatment].suffix ? logConfig.treatments[treatment].suffix + ConsoleCode.Reset: '');
+      + (logConfig.treatments[treatment].suffix ? logConfig.treatments[treatment].suffix + ConsoleCode.Reset : '');
   }
 
-  private inspect(data : any) {
+  private inspect(data: any) {
     return Log.Tab.repeat(this.depth + 1) + inspect(data, false, Log.InspectDepth, true).replaceAll('\n', '\n' + Log.Tab.repeat(this.depth + 1));
   }
 }

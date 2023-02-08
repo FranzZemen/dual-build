@@ -1,12 +1,13 @@
 {
   "name": "dual-build",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "type": "module",
+  "types": "transient/toolx/index.d.ts",
   "imports": {
     "#commands/*": "./publish/bin/*"
   },
   "exports": {
-    ".": "./transient/toolx/internal-index.js"
+    ".": "./transient/toolx/index.js"
   },
   "scripts": {
     "test": "mocha transient/test/**/*.test.js",
@@ -30,9 +31,11 @@
   "dependencies": {
     "fast-glob": "^3.2.12",
     "fastest-validator": "^1.16.0",
+    "inquirer": "^9.1.4",
+    "inquirer-autocomplete-prompt": "^3.0.0",
     "is-stream": "^3.0.0",
     "lodash": "^4.17.21",
-    "simple-git": "^3.15.1",
+    "simple-git": "^3.16.0",
     "spdx-license-ids": "^3.0.12",
     "test-scaffolding": "file:_test-scaffolding/transient",
     "tsconfig.d.ts": "^0.1.20",
@@ -41,14 +44,17 @@
   },
   "devDependencies": {
     "@types/chai": "^4.3.4",
+    "@types/inquirer": "^9.0.3",
+    "@types/inquirer-autocomplete-prompt": "^3.0.0",
     "@types/lodash": "^4.14.191",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^18.11.18",
+    "@types/node": "^18.11.19",
     "@types/uuid": "^9.0.0",
-    "@types/yargs": "^17.0.19",
+    "@types/yargs": "^17.0.22",
     "chai": "^4.3.7",
     "mocha": "^10.2.0",
     "nodemon": "^2.0.20",
-    "typescript": "^4.9.4"
+    "ts-to-jsdoc": "^1.2.1",
+    "typescript": "^4.9.5"
   }
 }

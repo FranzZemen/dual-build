@@ -30,9 +30,9 @@ export abstract class TransformInOut<PIPE_IN, PIPE_OUT> extends Transform<undefi
     return super.execute(payload, undefined);
   }
 
-  public executeImpl(pipeIn: PIPE_IN, passedIn?: undefined): Promise<PIPE_OUT> {
+  protected executeImpl(pipeIn: PIPE_IN, passedIn?: undefined): Promise<PIPE_OUT> {
     return this.executeImplInOut(pipeIn);
   }
 
-  public abstract executeImplInOut(pipedIn: PIPE_IN): Promise<PIPE_OUT>;
+  protected abstract executeImplInOut(pipedIn: PIPE_IN): Promise<PIPE_OUT>;
 }

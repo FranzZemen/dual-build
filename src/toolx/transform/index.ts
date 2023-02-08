@@ -10,5 +10,5 @@ export * from './transform-independent.js'
 export * from './transform-out.js';
 export * from './transform-payload-in.js';
 export * from './transform-payload-out.js';
-export * from './core/internal-index.js';
-export * from './bootstrap/internal-index.js';
+export * from './core/index.js';
+export * from './bootstrap/index.js';

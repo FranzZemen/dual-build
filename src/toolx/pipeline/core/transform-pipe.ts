@@ -1,4 +1,4 @@
-import {Transform, TransformConstructor} from '../transform/transform.js';
+import {Transform, TransformConstructor} from '../../transform/index.js';
 import {Pipeline} from './pipeline.js';
 
 export class TransformPipe<PASSED_IN, PIPE_IN, PIPE_OUT> {

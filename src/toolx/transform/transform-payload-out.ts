@@ -25,10 +25,10 @@ export abstract class TransformPayloadOut<PASSED_IN, PIPED_OUT, PIPED_IN = any, 
     return super.execute(pipeIn, passedIn);
   }
 
-  public executeImpl(pipeIn: PIPED_IN | undefined, passedIn: PASSED_IN): Promise<PIPED_OUT> {
+  protected executeImpl(pipeIn: PIPED_IN | undefined, passedIn: PASSED_IN): Promise<PIPED_OUT> {
     return this.executeImplPayloadOut(passedIn);
   }
 
-  public abstract executeImplPayloadOut(passedIn: PASSED_IN): Promise<PIPED_OUT>;
+  protected abstract executeImplPayloadOut(passedIn: PASSED_IN): Promise<PIPED_OUT>;
 
 }

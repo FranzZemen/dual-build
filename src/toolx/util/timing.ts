@@ -4,13 +4,13 @@ License Type: MIT
 */
 
 import {performance} from 'node:perf_hooks';
-import {Log} from '../log/log.js';
+import {LogInterface} from '../log/log-interface.js';
 
 export type TimingUnit = 'µs' | 'ms' | 's';
 
 const keys: string[] = [];
 
-export function startTiming(key: string, log: Log): boolean {
+export function startTiming(key: string, log: LogInterface): boolean {
   if(keys.includes(key)) {
     log.info(`timing key ${key} already used`, 'error');
     return false;
@@ -20,7 +20,7 @@ export function startTiming(key: string, log: Log): boolean {
   return true;
 }
 
-export function endTiming(key: string, log: Log): `in ${number} ${TimingUnit}` | '' {
+export function endTiming(key: string, log: LogInterface): `in ${number} ${TimingUnit}` | '' {
   if(keys.includes(key)) {
     const measure = performance.measure(key, key);
     let units:TimingUnit = 'ms';

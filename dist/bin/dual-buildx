@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+const dualBuildX = require('./dual-build').dualBuildX;
+
+dualBuildX('bin');

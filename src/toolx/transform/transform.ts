@@ -67,7 +67,7 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
     }
   }
 
-  abstract executeImpl(pipeIn: PIPED_IN | undefined, passedIn?: PASSED_IN): Promise<PIPE_OUT>;
+  protected abstract executeImpl(pipeIn: PIPED_IN | undefined, passedIn?: PASSED_IN): Promise<PIPE_OUT>;
 
-  abstract transformContext(pipeIn: PIPED_IN | undefined, passedIn?: PASSED_IN): string;
+  protected abstract transformContext(pipeIn: PIPED_IN | undefined, passedIn?: PASSED_IN): string;
 }

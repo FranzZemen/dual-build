@@ -4,8 +4,8 @@ License Type:
 */
 
 import {TargetOptions} from '../../../options/tsconfig.options.js';
-import {ParallelPipe} from '../../../pipeline/parallel-pipe.js';
-import {Pipeline} from '../../../pipeline/pipeline.js';
+import {ParallelPipe} from '../../../pipeline/core/parallel-pipe.js';
+import {Pipeline} from '../../../pipeline/core/pipeline.js';
 import {TransformPayload} from '../../transform-payload.js';
 import {TargetEnvTsConfigTransform, GenerateTsConfigPayload} from './target-env-ts-config.transform.js';
 
