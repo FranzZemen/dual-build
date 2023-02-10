@@ -842,3 +842,12 @@ Each of these is equivalent (aside from the arguments).
 <sup>1</sup> file or directory
 <sup>2</sup> added to git
 
+
+
+
+# IMPORTANT THOUGHTS
+
+On transforms that leverage standard configurations like tsconfig and package.json - philosphy 
+is to minmimize programmatic structures of the files, instead running actual configurations with 
+minimal programmatic manipulation.  This promotes the ability to run the same native commands 
+for the same effect.

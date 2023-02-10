@@ -23,7 +23,7 @@ export const npxCommands: NpxCommands = {
 
 
 
-enum ModuleType {
+export enum ModuleType {
   module   = 'module',
   commonjs = 'commonjs'
 }

@@ -17,16 +17,16 @@ export type TransformPayloadConstructor<CLASS extends TransformPayload<PASSED_IN
  * Pipeline data is altered:                               false
  * Pipeline out = Pipeline in
  */
-export abstract class TransformPayload<PASSED_IN, PIPED_IN = any> extends Transform<PASSED_IN, PIPED_IN, PIPED_IN> {
+export abstract class TransformPayload<PASSED_IN> extends Transform<PASSED_IN, undefined, void> {
   protected constructor(depth: number) {
     super(depth);
   }
 
-  public async execute(pipeIn: PIPED_IN, passedIn: PASSED_IN): Promise<PIPED_IN> {
+  public async execute(pipeIn: undefined, passedIn: PASSED_IN): Promise<void> {
     return super.execute(pipeIn, passedIn);
   }
 
-  protected executeImpl(pipeIn: PIPED_IN, passedIn: PASSED_IN): Promise<PIPED_IN> {
+  protected executeImpl(pipeIn: undefined, passedIn: PASSED_IN): Promise<void> {
     return this.executeImplPayload(passedIn)
       .then(()=> pipeIn);
   }
