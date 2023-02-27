@@ -1,6 +1,7 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.base.project.json",
   "compilerOptions": {
+    "tsBuildInfoFile": "../../buildInfo/test.tsbuildinfo",
     "outDir": "../../transient/test"
   },
   "watchOptions": {
@@ -11,5 +12,5 @@
     "excludeDirectories": ["**/node_modules"]
   },
   "include": ["**/*"],
-  "references": [{"path": "../toolx"}]
+  "references": [{"path": "../project/tsconfig.esm.json"}]
 }

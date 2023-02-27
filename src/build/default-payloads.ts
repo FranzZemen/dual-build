@@ -3,7 +3,7 @@ Created by Franz Zemen 02/08/2023
 License Type: 
 */
 
-import {ExecutablePayload} from '../toolx/index.js';
+import {ExecutablePayload} from '../project/index.js';
 
 export const transpilePayload: ExecutablePayload = {
   executable: 'npx tsc',

@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.project.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "../../buildInfo/project.esm.tsbuildinfo",
+    "declarationDir": "../../dist/types",
+    "outDir": "../../dist/esm",
+    "rootDir": "./src"
+  },
+  "include": ["**/*"]
+}

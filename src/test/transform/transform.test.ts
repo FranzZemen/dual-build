@@ -6,8 +6,8 @@ License Type: MIT
 import '../pid.test.js'
 import * as chai from 'chai';
 import 'mocha';
-import {Transform} from '../../toolx/index.js';
-import {EmittingConsole, Log} from '../../toolx/log/log.js';
+import {Transform} from '../../project/index.js';
+import {EmittingConsole, Log} from '../../project/src/log/log.js';
 
 const should = chai.should();
 
@@ -52,8 +52,8 @@ describe('dual-build tests', () => {
                      .finally(() => {
                        stderr.length.should.equal(0);
                        stdout.length.should.equal(2);
-                       stdout[0].should.contain('starting...');
-                       stdout[1].should.contain('...transform');
+                       stdout[0]?.should.contain('starting...');
+                       stdout[1]?.should.contain('...transform');
                        emittingConsole.removeAllListeners();
                        Log.resetConsole();
                      });

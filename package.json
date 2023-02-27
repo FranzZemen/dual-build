@@ -2,19 +2,19 @@
   "name": "dual-build",
   "version": "0.0.4",
   "type": "module",
-  "types": "transient/toolx/index.d.ts",
-  "imports": {
-    "#commands/*": "./publish/bin/*"
-  },
   "exports": {
-    ".": "./transient/toolx/index.js"
+    "./project": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js"
+    }
   },
   "scripts": {
     "test": "mocha transient/test/**/*.test.js",
     "clean-test": "rm -rf ./transient/test",
     "clean-toolx": "rm -rf ./transient/toolx",
     "clean": "rm -rf ./transient",
-    "build": "tsc -b tsconfig.json",
+    "build-package": "node ./transient/build",
+    "build-deprecated": "tsc -b tsconfig.json",
     "build-toolx deprecated": "npm run clean-toolx && npx tsc -p toolx.tsconfig.json && cp ./toolx.package.json ./toolx.publish/package.json",
     "publish-toolx deprecated ": "npm run build-toolx && npm publish ./toolx.publish"
   },

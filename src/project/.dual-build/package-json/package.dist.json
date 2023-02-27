@@ -1,0 +1,11 @@
+{
+  "main": "./cjm/index.js",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "require": "./cjm/index.js",
+      "import": "./esm/index.js"
+    }
+  }
+}

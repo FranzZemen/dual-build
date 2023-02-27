@@ -1,8 +1,9 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.base.project.json",
   "compilerOptions": {
-    "outDir": "../../transient/build"
+    "tsBuildInfoFile": "../../buildInfo/build.tsbuildinfo",
+    "outDir": "../../build"
   },
   "include": ["**/*"],
-  "references": [{"path": "../toolx"}]
+  "references": [{"path": "../project/tsconfig.esm.json"}]
 }

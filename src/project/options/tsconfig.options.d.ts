@@ -1,0 +1,32 @@
+import { EmitCompilerOptions, InteropConstraintsCompilerOptions, JavascriptSupportCompilerOptions, LanguageAndEnvironmentCompilerOptions, Module, ModuleResolution, ModulesCompilerOptions, OutputFormattingCompilerOptions, ProjectsCompilerOptions, Target, TsConfig, TypeCheckingCompilerOptions, WatchOptions } from 'tsconfig.d.ts';
+import { ModuleType } from './package.options.js';
+export type EnvSpecificEmitOptionKeys = 'outDir' | 'outFile' | 'declarationDir' | 'removeComments' | 'declaration' | 'declarationMap' | 'inlineSourceMap' | 'inlineSources' | 'sourceMap';
+export type NonEnvEmitOptions = Omit<EmitCompilerOptions, EnvSpecificEmitOptionKeys>;
+export type EnvEmitOptions = Pick<EmitCompilerOptions, EnvSpecificEmitOptionKeys>;
+export type BaseCompilerOptions = TypeCheckingCompilerOptions & JavascriptSupportCompilerOptions & InteropConstraintsCompilerOptions & NonEnvEmitOptions;
+export type TargetEnvironmentCompilerOptions = ModulesCompilerOptions & LanguageAndEnvironmentCompilerOptions & ProjectsCompilerOptions & EnvEmitOptions & OutputFormattingCompilerOptions;
+export declare const defaultBaseCompilerOptions: BaseCompilerOptions;
+export declare const defaultTargetEnvironmentOptions: TargetEnvironmentCompilerOptions;
+export declare const defaultWatchOptions: WatchOptions;
+export declare const projectTsConfig: TsConfig;
+export type WellKnownTargetOptions = 'ide' | 'es3' | 'es5' | 'es6' | 'nodenext' | 'esm';
+export type TargetOption = {
+    nickName: WellKnownTargetOptions | string;
+    target: Target;
+    module: Module;
+    moduleResolution: ModuleResolution;
+    packageType: ModuleType;
+};
+export type TargetOptions = {
+    options: TargetOption[];
+    'primary esm': WellKnownTargetOptions | string | undefined;
+    'primary commonjs': WellKnownTargetOptions | string | undefined;
+};
+export declare function isTargetOptions(target: TargetOptions | any): target is TargetOptions;
+export declare const es3: TargetOption;
+export declare const es5: TargetOption;
+export declare const es6: TargetOption;
+export declare const nodenext: TargetOption;
+export declare const esm: TargetOption;
+export declare const ideTsConfig: TargetOption;
+export declare const defaultTargetOptions: TargetOptions;

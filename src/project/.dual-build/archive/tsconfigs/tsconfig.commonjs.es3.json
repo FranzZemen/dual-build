@@ -1,0 +1,7 @@
+{
+  "extends": "src/toolx/.dual-build/archive/tsconfigs/tsconfig.base.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es3"
+  }
+}

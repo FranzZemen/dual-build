@@ -8,23 +8,30 @@ License Type: MIT
 */
 
 import * as chai from 'chai';
-import {BootstrapOptions, bootstrapOptions, GitOptions} from 'dual-build';
+import {
+  BaseTsConfigTransform,
+  BaseTsConfigTransformPayload,
+  BootstrapOptions,
+  bootstrapOptions,
+  CreateProjectDirectoriesAndCwd,
+  defaultTargetOptions,
+  GenerateTsConfigsPayload,
+  GitOptions,
+  Log,
+  Pipeline,
+  processUnknownError,
+  SaveOptionsPayload,
+  SaveOptionsTransform,
+  SetupGit,
+  TargetEnvTsConfigsTransform
+} from 'dual-build/project';
 import _ from 'lodash';
 import 'mocha';
-import {existsSync, rmSync} from 'node:fs';
+import {existsSync} from 'node:fs';
 import {basename, join, sep} from 'node:path';
 import {chdir, cwd} from 'node:process';
 import {simpleGit, SimpleGit} from 'simple-git';
-import {defaultTargetOptions} from '../../toolx/index.js';
-import {Log} from '../../toolx/log/log.js';
-import {Pipeline} from '../../toolx/pipeline/index.js';
-import {CreateProjectDirectoriesAndCwd} from '../../toolx/transform/bootstrap/create-project-directories-and-cwd.transform.js';
-import {InstallGitignore} from '../../toolx/index.js';
-import {SetupGit} from '../../toolx/index.js';
-import {SaveOptionsPayload, SaveOptionsTransform} from '../../toolx/index.js';
-import {BaseTsConfigTransform, BaseTsConfigTransformPayload} from '../../toolx/index.js';
-import {GenerateTsConfigsPayload, TargetEnvTsConfigsTransform} from '../../toolx/index.js';
-import {processUnknownError} from '../../toolx/index.js';
+import {InstallGitignore} from '../../project/index.js';
 import '../transform/transform.test.js';
 
 const should = chai.should();
@@ -79,6 +86,7 @@ describe('dual-build tests', () => {
           ///log.info(inspect(remotes, false, 10, true));
           Array.isArray(remotes).should.be.true;
           remotes.length.should.equal(1);
+          // @ts-ignore
           remotes[0]['name'].should.equal('origin');
         } catch (err) {
           processUnknownError(err, log);
@@ -87,7 +95,7 @@ describe('dual-build tests', () => {
           chdir(oldCwd);
            log.info(`reverting working directory to ${oldCwd}`);
           existsSync(projectDirectoryPath).should.be.true;
-          rmSync(projectDirectoryPath, {recursive: true, force: true});
+          // rmSync(projectDirectoryPath, {recursive: true, force: true});
         }
       });
     });
