@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.project.json",
+  "extends": "../../tsconfig.base.default-target.json",
   "compilerOptions": {
     "tsBuildInfoFile": "../../buildInfo/test.tsbuildinfo",
     "outDir": "../../transient/test"

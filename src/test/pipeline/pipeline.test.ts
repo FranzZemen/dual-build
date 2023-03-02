@@ -31,8 +31,7 @@ import {existsSync} from 'node:fs';
 import {basename, join, sep} from 'node:path';
 import {chdir, cwd} from 'node:process';
 import {simpleGit, SimpleGit} from 'simple-git';
-import {InstallGitignore} from '../../project/index.js';
-import '../transform/transform.test.js';
+import {InstallGitignore} from 'dual-build/project';
 
 const should = chai.should();
 const unreachableCode = false;

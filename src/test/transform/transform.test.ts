@@ -7,7 +7,7 @@ import '../pid.test.js'
 import * as chai from 'chai';
 import 'mocha';
 import {Transform} from '../../project/index.js';
-import {EmittingConsole, Log} from '../../project/src/log/log.js';
+import {EmittingConsole, Log} from '../../project/log/log.js';
 
 const should = chai.should();
 

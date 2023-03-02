@@ -1,6 +1,9 @@
 {
-  "extends": "../../tsconfig.base.project.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "module": "commonjs",
+    "target": "ESNext",
+    "moduleResolution": "NodeNext",
     "tsBuildInfoFile": "../../buildInfo/project.cjs.tsbuildinfo",
     "declarationDir": "../../dist/types",
     "outDir": "../../dist/cjs"

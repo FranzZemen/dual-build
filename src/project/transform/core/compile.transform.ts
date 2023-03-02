@@ -18,7 +18,7 @@ export class CompileTransform extends TransformPayload<ContainsTargetOptions> {
       throw new BuildError('Unreachable code', undefined, BuildErrorNumber.UnreachableCode);
     } else {
       const _cwd = cwd();
-      const targetOptionsFileName = join(_cwd, './tsconfig.base.project.json');
+      const targetOptionsFileName = join(_cwd, './tsconfig.base.default-target.json');
       const packageFileName = join(_cwd,'./package.json');
       
       const targetOptionsStr = await readFile(targetOptionsFileName, {encoding:'utf-8'});
