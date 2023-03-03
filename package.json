@@ -1,6 +1,6 @@
 {
   "name": "dual-build",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "module",
   "exports": {
     "./project": {
@@ -29,6 +29,7 @@
     }
   },
   "dependencies": {
+    "dual-build": "file:dist",
     "fast-glob": "^3.2.12",
     "fastest-validator": "^1.16.0",
     "inquirer": "^9.1.4",

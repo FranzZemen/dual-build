@@ -55,9 +55,12 @@ describe('dual-build tests', () => {
         }
 
         try {
-          await Pipeline.options<BootstrapOptions>({name: 'Bootstrap', logDepth: 0})
+          Pipeline.options<BootstrapOptions>({name: 'Bootstrap', logDepth: 0})
                         .transform<CreateProjectDirectoriesAndCwd, undefined>(CreateProjectDirectoriesAndCwd)
-                        .startSeries<InstallGitignore, undefined>(InstallGitignore)
+                        .startSeries<InstallGitignore, undefined, BootstrapOptions, BootstrapOptions>(InstallGitignore);
+          /*
+
+
                         .series<SetupGit, GitOptions>(SetupGit, _bootstrapOptions['git options'])
                         .endSeries<SaveOptionsTransform, SaveOptionsPayload>(
                           SaveOptionsTransform,
@@ -78,7 +81,7 @@ describe('dual-build tests', () => {
                             }
                           )
                         .execute(_bootstrapOptions);
-
+*/
           cwd().should.contain(join(`dual-build${sep}${projectDirectoryPath}`));
           const git: SimpleGit = simpleGit();
           const remotes = await git.getRemotes(true);

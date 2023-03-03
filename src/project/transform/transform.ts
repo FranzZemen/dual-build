@@ -5,7 +5,7 @@ License Type: MIT
 
 
 import {Log} from '../log/log.js';
-import {processUnknownError} from '../util/process-unknown-error-message.js';
+import {processUnknownError} from '../util/index.js';
 import {endTiming, startTiming} from '../util/timing.js';
 
 export type TransformConstructor<CLASS extends Transform<any, any, any>> = new (logDepth: number) => CLASS;

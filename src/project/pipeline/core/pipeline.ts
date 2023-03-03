@@ -47,7 +47,7 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT = PIPELINE_IN> {
    *
    * @param options
    */
-  static options<PIPELINE_IN = undefined, PIPELINE_OUT = PIPELINE_IN>(options?: PipelineOptions) {
+  static options<PIPELINE_IN = undefined, PIPELINE_OUT = PIPELINE_IN>(options?: PipelineOptions): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     if (options === undefined) {
       options = defaultPipelineOptions();
     }
