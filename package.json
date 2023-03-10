@@ -1,6 +1,6 @@
 {
   "name": "dual-build",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "author": "Franz Zemen",
   "type": "module",
   "exports": {
