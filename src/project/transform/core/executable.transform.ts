@@ -102,7 +102,7 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
   }
 
   private processAsyncError(error: Error | null, stdout:string, stderr: string, logStdErrOnInfo?: boolean): void | BuildError {
-    logStdErrOnInfo = logStdErrOnInfo ?? false;
+    logStdErrOnInfo = logStdErrOnInfo === undefined ? false : logStdErrOnInfo;
     if(stdout) {
       this.log.info(stdout)
     }
