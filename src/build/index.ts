@@ -1,6 +1,6 @@
 /*
 Created by Franz Zemen 02/06/2023
-License Type: 
+License Type:
 */
 
 import {
@@ -34,13 +34,13 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                          })
                          .transform<CheckInTransform>(CheckInTransform)
                          .transform<CommitTransform, CommitPayload>(CommitTransform, undefined)
-                         .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, {
-                           executable: 'npm version',
-                           arguments: ['patch'],
-                           batchTarget: false,
-                           synchronous: true,
-                           cwd: './'
-                         })
+                        // .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, {
+                         //  executable: 'npm version',
+                       //    arguments: ['patch'],
+                  //         batchTarget: false,
+                    //       synchronous: true,
+                 //          cwd: './'
+                 //        })
                          .transform<MaleatePackageTransform, MaleatePackagePayload>(MaleatePackageTransform, {
                            targetPath: './out/dist/package.json',
                            exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
