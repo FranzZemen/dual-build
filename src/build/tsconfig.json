@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.base.default-target.json",
   "compilerOptions": {
     "tsBuildInfoFile": "../../buildInfo/build.tsbuildinfo",
-    "outDir": "../../build"
+    "outDir": "../../out.build"
   },
   "include": ["**/*"],
   "references": [{"path": "../project/tsconfig.esm.json"}]

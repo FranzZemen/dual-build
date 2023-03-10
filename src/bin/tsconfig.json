@@ -3,7 +3,7 @@
   "compilerOptions": {
     "tsBuildInfoFile": "../../buildInfo/bin.tsbuildinfo",
     "declarationMap": false,
-    "outDir": "../../bin"
+    "outDir": "../../out.bin"
   },
   "include": ["**/*"],
   "references": [{"path": "../project/tsconfig.esm.json"}]

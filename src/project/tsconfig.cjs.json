@@ -5,8 +5,8 @@
     "target": "ESNext",
     "moduleResolution": "NodeNext",
     "tsBuildInfoFile": "../../buildInfo/project.cjs.tsbuildinfo",
-    "declarationDir": "../../dist/types",
-    "outDir": "../../dist/cjs"
+    "declarationDir": "../../out.dist/types",
+    "outDir": "../../out.dist/cjs"
   },
   "include": ["**/*"]
 }

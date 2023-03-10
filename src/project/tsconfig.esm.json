@@ -5,8 +5,8 @@
     "target": "ESNext",
     "moduleResolution": "NodeNext",
     "tsBuildInfoFile": "../../buildInfo/project.esm.tsbuildinfo",
-    "declarationDir": "../../dist/types",
-    "outDir": "../../dist/esm",
+    "declarationDir": "../../out.dist/types",
+    "outDir": "../../out.dist/esm",
   },
   "include": ["**/*"]
 }

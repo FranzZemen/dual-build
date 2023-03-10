@@ -105,6 +105,7 @@ export type Package = {
   author?: string;
   dependencies?: Dependencies;
   devDependencies?: Dependencies;
+  [key: string]: any
 }
 
 export const defaultProjectPackage: Package = {
@@ -119,7 +120,7 @@ export const defaultProjectPackage: Package = {
   exports: {},
   imports: {},
   license: licenseIds.indexOf('MIT') >= 0 ? 'MIT' : 'UNLICENSED',
-  author: '%{Author}'
+  author: '%{Author}',
 };
 
 export const defaultExports: Package = {

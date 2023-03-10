@@ -143,7 +143,7 @@ bootstrap.pipe(stdout);
 
 /*
 - Resolve gitOptions (focus v first on using default)
-- Git Init
+- GitFunctions Init
 - Create noon toolx_ directories hierarchy
 - Save gitOptions to gitOptions file
 - Createxkages and tsconfigs from defaults

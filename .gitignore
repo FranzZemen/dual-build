@@ -1,8 +1,16 @@
 node_modules
 .zip
 .idea
+/bin/
+/build/
+/buildInfo/
+/dist/
+/bin/generate-base-tsconfig
+/out.bin/
+/out.build/
+/out.dist/
+/out.test/
 /publish/
-/.dual-build/
 /.dual-build.old/
 /toolx.publish/
 /testRoot/

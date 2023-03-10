@@ -17,6 +17,7 @@ import {
   defaultTargetOptions,
   GenerateTsConfigsPayload,
   GitOptions,
+  InstallGitignore,
   Log,
   Pipeline,
   processUnknownError,
@@ -24,14 +25,13 @@ import {
   SaveOptionsTransform,
   SetupGit,
   TargetEnvTsConfigsTransform
-} from 'dual-build/project';
+} from 'dual-build/project'
 import _ from 'lodash';
 import 'mocha';
 import {existsSync} from 'node:fs';
 import {basename, join, sep} from 'node:path';
 import {chdir, cwd} from 'node:process';
 import {simpleGit, SimpleGit} from 'simple-git';
-import {InstallGitignore} from 'dual-build/project';
 
 const should = chai.should();
 const unreachableCode = false;
@@ -51,13 +51,34 @@ describe('dual-build tests', () => {
         const oldCwd = cwd();
 
         const baseTsConfigPayload: BaseTsConfigTransformPayload = {
-          '.dual-build/tsconfigs': _bootstrapOptions.directories['.dual-build/tsconfigs'],
-        }
+          '.dual-build/tsconfigs': _bootstrapOptions.directories['.dual-build/tsconfigs']
+        };
 
         try {
-          Pipeline.options<BootstrapOptions>({name: 'Bootstrap', logDepth: 0})
+          await Pipeline.options<BootstrapOptions>({name: 'Bootstrap', logDepth: 0})
                         .transform<CreateProjectDirectoriesAndCwd, undefined>(CreateProjectDirectoriesAndCwd)
-                        .startSeries<InstallGitignore, undefined, BootstrapOptions, BootstrapOptions>(InstallGitignore);
+                        .startSeries<InstallGitignore, undefined, BootstrapOptions, BootstrapOptions>(InstallGitignore)
+                        .series<SetupGit, GitOptions>(SetupGit, _bootstrapOptions['git options'])
+                        .endSeries<SaveOptionsTransform, SaveOptionsPayload>(
+                          SaveOptionsTransform,
+                          {
+                            directory: _bootstrapOptions.directories['.dual-build/options'],
+                            ..._bootstrapOptions
+                          }
+                        )
+                        .startParallel<BaseTsConfigTransform, BaseTsConfigTransformPayload>(
+                          BaseTsConfigTransform,
+                          baseTsConfigPayload
+                        )
+                        .endParallel<TargetEnvTsConfigsTransform, GenerateTsConfigsPayload>(
+                          TargetEnvTsConfigsTransform,
+                          ['void'],
+                          {
+                            path: _bootstrapOptions.directories['.dual-build/tsconfigs'].directoryPath,
+                            targetOptions: defaultTargetOptions
+                          }
+                        )
+                        .execute(_bootstrapOptions);
           /*
 
 
@@ -95,7 +116,7 @@ describe('dual-build tests', () => {
           unreachableCode.should.be.true;
         } finally {
           chdir(oldCwd);
-           log.info(`reverting working directory to ${oldCwd}`);
+          log.info(`reverting working directory to ${oldCwd}`);
           existsSync(projectDirectoryPath).should.be.true;
           // rmSync(projectDirectoryPath, {recursive: true, force: true});
         }

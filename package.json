@@ -1,12 +1,16 @@
 {
   "name": "dual-build",
   "version": "0.0.5",
+  "author": "Franz Zemen",
   "type": "module",
   "exports": {
     "./project": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.js"
+      "types": "./out.dist/types/index.d.ts",
+      "import": "./out.dist/esm/index.js"
     }
+  },
+  "imports": {
+    "#project": "./out.dist/esm/index.js"
   },
   "scripts": {
     "test": "mocha transient/test/**/*.test.js",
@@ -29,7 +33,6 @@
     }
   },
   "dependencies": {
-    "dual-build": "file:dist",
     "fast-glob": "^3.2.12",
     "fastest-validator": "^1.16.0",
     "inquirer": "^9.1.4",

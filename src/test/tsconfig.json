@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.base.default-target.json",
   "compilerOptions": {
     "tsBuildInfoFile": "../../buildInfo/test.tsbuildinfo",
-    "outDir": "../../transient/test"
+    "outDir": "../../out.test"
   },
   "watchOptions": {
     "watchFile": "useFsEvents",

@@ -11,7 +11,6 @@ import {inspect} from 'node:util';
 import {BackgroundColor, ConsoleCode, ForegroundColor, utf8SpecialCharacters} from './console-types.js';
 import {LogInterface, LogLevel, TreatmentName, Treatments} from './log-interface.js';
 
-
 const logLevelValues: LogLevel = {
   debug: 0,
   info: 1,
