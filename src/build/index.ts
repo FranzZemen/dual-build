@@ -24,6 +24,16 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
   // Compile all typescript - what's needed for the local build as well as for the package build via tsc project
                          .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, transpilePayload)
   // For published distribution, maleate package.json appropriately
+                         .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
+                           targetPath: './out/dist/esm/package.json',
+                           package: {type: ModuleType.module}
+                         })
+                         .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
+                           targetPath: './out/dist/cjs/package.json',
+                           package: {type: ModuleType.commonjs}
+                         })
+                         .transform<CheckInTransform>(CheckInTransform)
+                         .transform<CommitTransform, CommitPayload>(CommitTransform, undefined)
                          .transform<MaleatePackageTransform, MaleatePackagePayload>(MaleatePackageTransform, {
                            targetPath: './out/dist/package.json',
                            exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
@@ -39,18 +49,17 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                              types: './types'
                            }
                          })
-                         .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
-                           targetPath: './out/dist/esm/package.json',
-                           package: {type: ModuleType.module}
+                         .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, {
+                           executable: 'npm version',
+                           arguments: ['patch'],
+                           batchTarget: false,
+                           synchronous: true,
+                           cwd: './'
                          })
-                         .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
-                           targetPath: './out/dist/cjs/package.json',
-                           package: {type: ModuleType.commonjs}
-                         })
+                         .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, publishPayload)
                          .transform<CheckInTransform>(CheckInTransform)
                          .transform<CommitTransform, CommitPayload>(CommitTransform, undefined)
                          .transform<PushBranchTransform>(PushBranchTransform)
-                         .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, publishPayload)
                          .execute(undefined);
 
 
