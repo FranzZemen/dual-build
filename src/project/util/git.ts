@@ -3,13 +3,14 @@ Created by Franz Zemen 03/07/2023
 License Type: 
 */
 
-import {simpleGit, SimpleGit, CommitResult} from 'simple-git';
+import {simpleGit, SimpleGit, CommitResult, PushResult} from 'simple-git';
 
 export type GitCommitResult = CommitResult;
 
 export interface Git {
   add(filesSpec: string[]): Promise<string>;
   commit(comment: string): Promise<GitCommitResult>;
+  push(): Promise<PushResult>;
 }
 
 class SimpleGitWrapper implements Git {
@@ -22,6 +23,10 @@ class SimpleGitWrapper implements Git {
 
   commit(comment: string): Promise<GitCommitResult> {
    return this.git.commit(comment);
+  }
+
+  push(): Promise<PushResult> {
+    return this.git.push();
   }
 }
 

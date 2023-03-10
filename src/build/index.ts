@@ -3,14 +3,20 @@ Created by Franz Zemen 02/06/2023
 License Type: 
 */
 
-import {DistributionPackageJsonPayload} from 'dual-build/project';
-import {Pipeline} from 'dual-build/project';
-import {ExecutablePayload, ExecutableTransform} from 'dual-build/project';
-import {DistributionPackageJsonTransform} from 'dual-build/project';
-import {CreatePackageTransform, CreatePackagePayload} from 'dual-build/project';
-import {ModuleType} from 'dual-build/project';
-import {CheckInTransform} from 'dual-build/project';
-import {CommitTransform, CommitPayload} from 'dual-build/project';
+import {
+  CheckInTransform,
+  CommitPayload,
+  CommitTransform,
+  CreatePackagePayload,
+  CreatePackageTransform,
+  DistributionPackageJsonPayload,
+  DistributionPackageJsonTransform,
+  ExecutablePayload,
+  ExecutableTransform,
+  ModuleType,
+  Pipeline,
+  PushBranchTransform
+} from 'dual-build/project';
 import {transpilePayload} from './default-payloads.js';
 
 
@@ -42,6 +48,7 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                          })
                          .transform<CheckInTransform>(CheckInTransform)
                          .transform<CommitTransform, CommitPayload>(CommitTransform, undefined)
+                         .transform<PushBranchTransform>(PushBranchTransform)
                          .execute(undefined);
 
 
