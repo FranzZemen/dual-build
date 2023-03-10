@@ -4,9 +4,9 @@
     "module": "commonjs",
     "target": "ESNext",
     "moduleResolution": "NodeNext",
-    "tsBuildInfoFile": "../../buildInfo/project.cjs.tsbuildinfo",
-    "declarationDir": "../../out.dist/types",
-    "outDir": "../../out.dist/cjs"
+    "tsBuildInfoFile": "../../out/buildInfo/project.cjs.tsbuildinfo",
+    "declarationDir": "../../out/dist/types",
+    "outDir": "../../out/dist/cjs"
   },
   "include": ["**/*"]
 }

@@ -3,9 +3,9 @@ node_modules
 .idea
 /bin/
 /build/
-/buildInfo/
 /dist/
 /bin/generate-base-tsconfig
+/out/
 /out.bin/
 /out.build/
 /out.dist/

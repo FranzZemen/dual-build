@@ -24,7 +24,7 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
   // Compile all typescript - what's needed for the local build as well as for the package build via tsc project
                          .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, transpilePayload)
                          .transform<DistributionPackageJsonTransform, DistributionPackageJsonPayload>(DistributionPackageJsonTransform, {
-                           targetPath: './out.dist/package.json',
+                           targetPath: './out/dist/package.json',
                            exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
                            inclusions: {
                              exports: {
@@ -39,11 +39,11 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                            }
                          })
                          .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
-                           targetPath: './out.dist/esm/package.json',
+                           targetPath: './out/dist/esm/package.json',
                            package: {type: ModuleType.module}
                          })
                          .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
-                           targetPath: './out.dist/cjs/package.json',
+                           targetPath: './out/dist/cjs/package.json',
                            package: {type: ModuleType.commonjs}
                          })
                          .transform<CheckInTransform>(CheckInTransform)

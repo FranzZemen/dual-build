@@ -5,12 +5,12 @@
   "type": "module",
   "exports": {
     "./project": {
-      "types": "./out.dist/types/index.d.ts",
-      "import": "./out.dist/esm/index.js"
+      "types": "./out/dist/types/index.d.ts",
+      "import": "./out/dist/esm/index.js"
     }
   },
   "imports": {
-    "#project": "./out.dist/esm/index.js"
+    "#project": "./out/dist/esm/index.js"
   },
   "scripts": {
     "test": "mocha transient/test/**/*.test.js",
