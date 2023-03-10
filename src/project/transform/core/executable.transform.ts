@@ -36,7 +36,7 @@ export type ExecutablePayload = {
   arguments: ExecArguments;
   batchTarget: boolean;
   synchronous: boolean;
-  logStdErrOnInfo?: boolean; // Some processes mixup stderr/stdio and provide own color coding etc.
+  ownColorCoding?: boolean; // Some processes mixup stderr/stdio and provide own color coding etc.
 }
 
 export type ExexcutableTransformConstructor<CLASS extends Transform<ExecutableTransform, any, any>> = new (logDepth: number) => CLASS;
@@ -68,7 +68,7 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
           this.log.info(execFileSync(command, payload.arguments, {cwd, windowsHide: false}));
         } else {
           const childProcess: ChildProcess = execFile(command, payload.arguments, {cwd, windowsHide: false}, (error, stdout, stderr) => {
-            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr, payload.logStdErrOnInfo);
+            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr, payload.ownColorCoding);
             if(buildError) {
               reject(buildError);
             } else {
@@ -89,7 +89,7 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
           }
         } else {
           const childProcess: ChildProcess = exec(command, {cwd, windowsHide: false}, (error, stdout, stderr) => {
-            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr, payload.logStdErrOnInfo);
+            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr, payload.ownColorCoding);
             if(buildError) {
               reject(buildError);
             } else {
@@ -101,14 +101,14 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
     });
   }
 
-  private processAsyncError(error: Error | null, stdout:string, stderr: string, logStdErrOnInfo?: boolean): void | BuildError {
-    logStdErrOnInfo = logStdErrOnInfo === undefined ? false : logStdErrOnInfo;
+  private processAsyncError(error: Error | null, stdout:string, stderr: string, ownColorCoding?: boolean): void | BuildError {
+    ownColorCoding = ownColorCoding === undefined ? false : ownColorCoding;
     if(stdout) {
-      this.log.info(stdout)
+      this.log.info(stdout, ownColorCoding === true ? 'no-treatment' : undefined);
     }
     if(stderr) {
-      if(logStdErrOnInfo) {
-        this.log.info(stderr);
+      if(ownColorCoding) {
+        this.log.info(stderr, ownColorCoding === true ? 'no-treatment' : undefined);
       } else {
         this.log.error(stderr);
       }

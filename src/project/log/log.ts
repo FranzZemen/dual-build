@@ -79,6 +79,10 @@ export let logConfig: LogConfig = {
     'pipeline': {
       foreground: ForegroundColor._8_ForegroundWhite,
       background: BackgroundColor._8_BackgroundBlack
+    },
+    'no-treatment': { // Special treatment - these are dummy values
+      foreground: ForegroundColor._8_ForegroundWhite,
+      background: BackgroundColor._8_BackgroundBlack
     }
   }
 };
@@ -244,11 +248,15 @@ export class Log implements LogInterface {
   }
 
   private assembleStringMessage(message: string, treatment: TreatmentName): string {
-    return Log.Tab.repeat(this.depth)
-      + (logConfig.treatments[treatment].prefix ? logConfig.treatments[treatment].prefix + ConsoleCode.Reset : '')
-      + this.color(treatment) + message
-      + ConsoleCode.Reset
-      + (logConfig.treatments[treatment].suffix ? logConfig.treatments[treatment].suffix + ConsoleCode.Reset : '');
+    if(treatment === 'no-treatment') {
+      return message;
+    } else {
+      return Log.Tab.repeat(this.depth)
+        + (logConfig.treatments[treatment].prefix ? logConfig.treatments[treatment].prefix + ConsoleCode.Reset : '')
+        + this.color(treatment) + message
+        + ConsoleCode.Reset
+        + (logConfig.treatments[treatment].suffix ? logConfig.treatments[treatment].suffix + ConsoleCode.Reset : '');
+    }
   }
 
   private inspect(data: any) {

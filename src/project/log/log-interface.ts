@@ -15,7 +15,7 @@ export type LogLevel = {
 
 export type NamedScheme = 'task-internal' | 'task-detail' | 'task-done' | 'pipeline';
 
-export type TreatmentName = keyof LogLevel | NamedScheme
+export type TreatmentName = keyof LogLevel | NamedScheme | 'no-treatment';
 
 export type Treatment = {
   foreground: ForegroundColor,

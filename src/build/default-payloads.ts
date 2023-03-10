@@ -19,7 +19,7 @@ export const publishPayload: ExecutablePayload = {
   arguments: ['./out/dist'],
   batchTarget: false,
   synchronous: false,
-  logStdErrOnInfo: true
+  ownColorCoding: true
 }
 
 
