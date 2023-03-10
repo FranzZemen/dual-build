@@ -36,6 +36,7 @@ export type ExecutablePayload = {
   arguments: ExecArguments;
   batchTarget: boolean;
   synchronous: boolean;
+  logStdErrOnInfo?: boolean; // Some processes mixup stderr/stdio and provide own color coding etc.
 }
 
 export type ExexcutableTransformConstructor<CLASS extends Transform<ExecutableTransform, any, any>> = new (logDepth: number) => CLASS;
@@ -67,7 +68,7 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
           this.log.info(execFileSync(command, payload.arguments, {cwd, windowsHide: false}));
         } else {
           const childProcess: ChildProcess = execFile(command, payload.arguments, {cwd, windowsHide: false}, (error, stdout, stderr) => {
-            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr);
+            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr, payload.logStdErrOnInfo);
             if(buildError) {
               reject(buildError);
             } else {
@@ -88,7 +89,7 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
           }
         } else {
           const childProcess: ChildProcess = exec(command, {cwd, windowsHide: false}, (error, stdout, stderr) => {
-            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr);
+            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr, payload.logStdErrOnInfo);
             if(buildError) {
               reject(buildError);
             } else {
@@ -100,12 +101,17 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
     });
   }
 
-  private processAsyncError(error: Error | null, stdout:string, stderr: string): void | BuildError {
+  private processAsyncError(error: Error | null, stdout:string, stderr: string, logStdErrOnInfo?: boolean): void | BuildError {
+    logStdErrOnInfo = logStdErrOnInfo ?? false;
     if(stdout) {
       this.log.info(stdout)
     }
     if(stderr) {
-      this.log.error(stderr);
+      if(logStdErrOnInfo) {
+        this.log.info(stderr);
+      } else {
+        this.log.error(stderr);
+      }
     }
     if(error) {
       const buildError = new BuildError('exec error', {cause: error}, BuildErrorNumber.AsyncExecError);
