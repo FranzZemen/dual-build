@@ -58,7 +58,7 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                          })
                          .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, publishPayload)
                          .transform<CheckInTransform>(CheckInTransform)
-                         .transform<CommitTransform, CommitPayload>(CommitTransform, undefined)
+                         .transform<CommitTransform, CommitPayload>(CommitTransform, {comment: 'published'})
                          .transform<PushBranchTransform>(PushBranchTransform)
                          .execute(undefined);
 
