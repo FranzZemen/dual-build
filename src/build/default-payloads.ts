@@ -13,4 +13,12 @@ export const transpilePayload: ExecutablePayload = {
   synchronous: false
 }
 
+export const publishPayload: ExecutablePayload = {
+  executable: 'npm publish',
+  cwd: './',
+  arguments: ['./out/dist'],
+  batchTarget: false,
+  synchronous: false
+}
+
 
