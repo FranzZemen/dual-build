@@ -16,4 +16,4 @@ export class PushBranchTransform extends TransformIndependent {
     return 'Push origin [branch]';
   }
 
-}
+} 
