@@ -9,8 +9,8 @@ import {
   CommitTransform,
   CreatePackagePayload,
   CreatePackageTransform,
-  DistributionPackageJsonPayload,
-  DistributionPackageJsonTransform,
+  MaleatePackagePayload,
+  MaleatePackageTransform,
   ExecutablePayload,
   ExecutableTransform,
   ModuleType,
@@ -23,7 +23,7 @@ import {transpilePayload} from './default-payloads.js';
 const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
   // Compile all typescript - what's needed for the local build as well as for the package build via tsc project
                          .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, transpilePayload)
-                         .transform<DistributionPackageJsonTransform, DistributionPackageJsonPayload>(DistributionPackageJsonTransform, {
+                         .transform<MaleatePackageTransform, MaleatePackagePayload>(MaleatePackageTransform, {
                            targetPath: './out/dist/package.json',
                            exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
                            inclusions: {

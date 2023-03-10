@@ -9,7 +9,7 @@ import {Exports, Imports, Package, TargetOptions} from '../../options/index.js';
 import {TransformPayload} from '../transform-payload.js';
 
 
-export type DistributionPackageJsonPayload = {
+export type MaleatePackagePayload = {
   targetPath: string;
   exclusions?: (keyof Package)[];
   inclusions?: Package;
@@ -17,12 +17,12 @@ export type DistributionPackageJsonPayload = {
 } | undefined;
 
 
-export class DistributionPackageJsonTransform extends TransformPayload<DistributionPackageJsonPayload> {
+export class MaleatePackageTransform extends TransformPayload<MaleatePackagePayload> {
   constructor(depth: number) {
     super(depth);
   }
 
-  protected async executeImplPayload(payload: DistributionPackageJsonPayload): Promise<void> {
+  protected async executeImplPayload(payload: MaleatePackagePayload): Promise<void> {
     if (!payload) {
       return;
     }
@@ -42,7 +42,7 @@ export class DistributionPackageJsonTransform extends TransformPayload<Distribut
     await writeFile(path.join(process.cwd(), payload.targetPath), JSON.stringify(packageJson, undefined, 2), {encoding: 'utf-8'});
   }
 
-  protected transformContext(pipeIn: DistributionPackageJsonPayload | undefined, passedIn: DistributionPackageJsonPayload | undefined): string {
+  protected transformContext(pipeIn: MaleatePackagePayload | undefined, passedIn: MaleatePackagePayload | undefined): string {
     return '';
   }
 }

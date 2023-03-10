@@ -9,10 +9,10 @@ import {cwd} from 'node:process';
 import {esm} from '../../options/index.js';
 import {BuildError, BuildErrorNumber} from '../../util/index.js';
 import {TransformPayload} from '../transform-payload.js';
-import {DistributionPackageJsonPayload} from './distribution-package-json.transform.js';
+import {MaleatePackagePayload} from './maleate-package.transform.js';
 
-export class CompileTransform extends TransformPayload<DistributionPackageJsonPayload> {
-  protected async executeImplPayload(containsTargetOptions: DistributionPackageJsonPayload): Promise<void> {
+export class CompileTransform extends TransformPayload<MaleatePackagePayload> {
+  protected async executeImplPayload(containsTargetOptions: MaleatePackagePayload): Promise<void> {
     const targetOptions = containsTargetOptions?.targetOptions;
     if(!targetOptions) {
       throw new BuildError('Unreachable code', undefined, BuildErrorNumber.UnreachableCode);
@@ -34,7 +34,7 @@ export class CompileTransform extends TransformPayload<DistributionPackageJsonPa
     return Promise.resolve(undefined);
   }
 
-  protected transformContext(pipeIn: undefined, passedIn: DistributionPackageJsonPayload | undefined): string {
+  protected transformContext(pipeIn: undefined, passedIn: MaleatePackagePayload | undefined): string {
     return 'compiling';
   }
   
