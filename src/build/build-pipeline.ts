@@ -1,14 +1,15 @@
 /*
-Created by Franz Zemen 02/06/2023
-License Type:
+Created by Franz Zemen 03/11/2023
+License Type: MIT
 */
+
 
 import {
   CheckInTransform,
   CommitPayload,
   CommitTransform,
-  CopyTransform,
   CopyPayload,
+  CopyTransform,
   CreatePackagePayload,
   CreatePackageTransform,
   ExecutablePayload,
@@ -19,13 +20,9 @@ import {
   Pipeline,
   PushBranchTransform
 } from 'dual-build/project';
-import {publishPayload, transpilePayload} from './default-payloads.js';
 
 
-const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
-  // Compile all typescript - what's needed for the local build as well as for the package build via tsc project
-                         .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, transpilePayload)
-  // For published distribution, maleate package.json appropriately
+const pipeline = Pipeline.options({name: 'Compile', logDepth: 0})
                          .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
                            targetPath: './out/dist/esm/package.json',
                            package: {type: ModuleType.module}
@@ -37,7 +34,7 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                          .transform<CopyTransform, CopyPayload>(CopyTransform, {
                            src: './doc/project',
                            dest: './out/dist',
-                           glob: '**/*.md' 
+                           glob: '**/*.md'
                          })
                          .transform<CheckInTransform>(CheckInTransform)
                          .transform<CommitTransform, CommitPayload>(CommitTransform, undefined)
@@ -63,7 +60,10 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                              types: './types'
                            }
                          })
-                         .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, publishPayload)
+  /*
+  .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, publishPayload)
+
+   */
                          .transform<CheckInTransform>(CheckInTransform)
                          .transform<CommitTransform, CommitPayload>(CommitTransform, {comment: 'published'})
                          .transform<PushBranchTransform>(PushBranchTransform)
