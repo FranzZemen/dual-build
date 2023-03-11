@@ -240,7 +240,7 @@ export class Log implements LogInterface {
 
   protected _log(data: any, logMethod: keyof LogLevel, treatment: TreatmentName) {
     if (typeof data === 'string') {
-      if(data.includes(ConsoleCode.Reset)) {
+      if(data.indexOf(ConsoleCode.Reset) >= 0) {
         console.log('Found Reset');
       }
       data = this.assembleStringMessage(data, treatment);
