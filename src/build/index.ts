@@ -37,7 +37,7 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                          .transform<CopyTransform, CopyPayload>(CopyTransform, {
                            src: './doc/project',
                            dest: './out/dist',
-                           glob: '**/*.md'
+                           glob: '**/*.md' 
                          })
                          .transform<CheckInTransform>(CheckInTransform)
                          .transform<CommitTransform, CommitPayload>(CommitTransform, undefined)
