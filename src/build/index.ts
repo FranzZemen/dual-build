@@ -7,17 +7,19 @@ import {
   CheckInTransform,
   CommitPayload,
   CommitTransform,
+  CopyTransform,
+  CopyPayload,
   CreatePackagePayload,
   CreatePackageTransform,
-  MaleatePackagePayload,
-  MaleatePackageTransform,
   ExecutablePayload,
   ExecutableTransform,
+  MaleatePackagePayload,
+  MaleatePackageTransform,
   ModuleType,
   Pipeline,
   PushBranchTransform
 } from 'dual-build/project';
-import {transpilePayload, publishPayload} from './default-payloads.js';
+import {publishPayload, transpilePayload} from './default-payloads.js';
 
 
 const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
@@ -31,6 +33,11 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                          .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
                            targetPath: './out/dist/cjs/package.json',
                            package: {type: ModuleType.commonjs}
+                         })
+                         .transform<CopyTransform, CopyPayload>(CopyTransform, {
+                           src: './doc/project',
+                           dest: './out/dist',
+                           glob: '**/*.md'
                          })
                          .transform<CheckInTransform>(CheckInTransform)
                          .transform<CommitTransform, CommitPayload>(CommitTransform, undefined)
