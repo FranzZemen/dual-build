@@ -22,7 +22,7 @@ import {
 } from 'dual-build/project';
 
 
-const pipeline = Pipeline.options({name: 'Compile', logDepth: 0})
+const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                          .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
                            targetPath: './out/dist/esm/package.json',
                            package: {type: ModuleType.module}

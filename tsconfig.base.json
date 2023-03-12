@@ -39,6 +39,10 @@
     "newLine": "crlf",
     "composite": true,
     "incremental": true,
-    "declaration": true
+    "declaration": true,
+
+    "sourceMap": true,
+    "noErrorTruncation": true,
+    "pretty": true
   }
 }

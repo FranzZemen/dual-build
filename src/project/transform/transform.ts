@@ -4,6 +4,7 @@ License Type: MIT
 */
 
 
+import {ConsoleCode} from '../log/index.js';
 import {Log} from '../log/log.js';
 import {processUnknownError} from '../util/index.js';
 import {endTiming, startTiming} from '../util/timing.js';
@@ -25,12 +26,12 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
     this.log = new Log(depth);
   }
 
-  set logDepth(depth: number) {
-    this.log.depth = depth;
-  }
-
   get logDepth(): number {
     return this.log.depth;
+  }
+
+  set logDepth(depth: number) {
+    this.log.depth = depth;
   }
 
   get name(): string {
@@ -40,11 +41,18 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
   async execute(pipe_in: PIPED_IN, passedIn?: PASSED_IN): Promise<PIPE_OUT> {
     const transformContext = this.transformContext(pipe_in, passedIn);
     const maxLineLength = 100;
-    if(`transform ${this.name}${transformContext.length ? ' on ' + transformContext : ''} starting...`.length  > maxLineLength) {
-      this.log.info(`transform ${this.name}`);
-      this.log.info(`  on ${transformContext} starting...`);
+    if (typeof transformContext === 'string') {
+      const length = `transform ${this.name} on ${transformContext} starting...`.length;
+      if (length > maxLineLength) {
+        this.log.info(`transform ${this.name} on`);
+        this.log.info(`  ${transformContext}`);
+        this.log.info('  starting...');
+      } else {
+        this.log.infoSegments([`transform ${this} on `, transformContext, 'starting...']);
+      }
     } else {
-      this.log.info(`transform ${this.name}${transformContext.length ? ' on ' + transformContext : ''} starting...`);
+      this.log.info(`transform ${this.name} on`);
+      this.log.info(transformContext);
     }
     let startTimingSuccessful: boolean = true;
     const timingMark = `Timing ${Transform.name}:${transformContext}:${this.name}.execute`;
@@ -54,20 +62,29 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
     } catch (err) {
       return Promise.reject(processUnknownError(err, this.log));
     } finally {
-      if(`...transform ${this.name}${transformContext.length ? ' on ' + transformContext : ''} ${this.errorCondition ? 'failed' : 'completed'}`.length  > maxLineLength) {
-        this.log.info(`...transform ${this.name}`, this.errorCondition ? 'error' : 'task-done');
-        this.log.info(`  on ${transformContext} ${this.errorCondition ? 'failed' : 'completed'}  ${startTimingSuccessful ? endTiming(
-          timingMark,
-          this.log) : ''}`, this.errorCondition ? 'error' : 'task-done');
-      } else {
-        this.log.info(`...transform ${this.name}${transformContext.length ? ' on ' + transformContext : ''} ${this.errorCondition ? 'failed' : 'completed'} ${startTimingSuccessful ? endTiming(
-          timingMark,
-          this.log) : ''}`, this.errorCondition ? 'error' : 'task-done');
+      this.log.info(`...transform ${this.name} ${this.errorCondition ? 'failed' : 'completed'} ${startTimingSuccessful ? endTiming(timingMark, this.log) : ''}`, this.errorCondition ? 'error' : 'task-done');
+      /*
+      if (typeof transformContext === 'string') {
+        const length = `...transform ${this.name} on ${transformContext} ${this.errorCondition ? 'failed' : 'completed'}`.length;
+        if (length > maxLineLength) {
+          this.log.info(`...transform ${this.name} on`, this.errorCondition ? 'error' : 'task-done');
+          this.log.info(`  ${transformContext}`);
+          this.log.info(`${this.errorCondition ? 'failed' : 'completed'}  ${startTimingSuccessful ? endTiming(timingMark, this.log) : ''}`,
+                        this.errorCondition ? 'error' : 'task-done');
+        } else {
+          this.log.infoSegments([
+                                  `...transform ${this.name}`,
+                                  `${transformContext.length ? ' on ' + transformContext : ''}`,
+                                  ` ${this.errorCondition ? 'failed' : 'completed'} ${startTimingSuccessful ? endTiming(timingMark, this.log) : ''}`],
+                                  this.errorCondition ? 'error' : 'task-done');
+        }
       }
+      
+       */
     }
   }
 
   protected abstract executeImpl(pipeIn: PIPED_IN | undefined, passedIn?: PASSED_IN): Promise<PIPE_OUT>;
 
-  protected abstract transformContext(pipeIn: PIPED_IN | undefined, passedIn?: PASSED_IN): string;
+  protected abstract transformContext(pipeIn: PIPED_IN | undefined, passedIn?: PASSED_IN): string | object;
 }

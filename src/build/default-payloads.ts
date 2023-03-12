@@ -18,8 +18,7 @@ export const publishPayload: ExecutablePayload = {
   cwd: './',
   arguments: ['./out/dist'],
   batchTarget: false,
-  synchronous: false,
-  ownColorCoding: true
+  synchronous: false
 }
 
 

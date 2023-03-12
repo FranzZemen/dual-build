@@ -190,6 +190,12 @@ export class Log implements LogInterface {
     }
   }
 
+  infoSegments(dataSegments: any[], treatment?: TreatmentName) {
+    if(dataSegments && this.logLevelValue <= logLevelValues.info) {
+      this._logSegments(dataSegments, 'info', treatment ? treatment : 'info');
+    }
+  }
+
   debug(data: any, treatment?: TreatmentName) {
     if (data && this.logLevelValue <= logLevelValues.debug) {
       this._log(data, 'debug', treatment ? treatment : 'debug');
@@ -238,10 +244,34 @@ export class Log implements LogInterface {
     }
   }
 
+  protected _logSegments(data: any[], logMethod: keyof LogLevel, treatment: TreatmentName):void {
+    let currText = '';
+    for(let i = 0; i < data.length; i++) {
+      const nextData = data[i];
+      if(typeof nextData === 'string') {
+        if(nextData.indexOf(ConsoleCode.Escape) >= 0) {
+          currText += nextData;
+        } else {
+          currText += this.assembleStringMessage(nextData, treatment);
+        }
+      } else {
+        if(currText.length > 0) {
+          Log.console.log(currText);
+          currText = '';
+        }
+        Log.console[logMethod](this.inspect(nextData));
+      }
+    }
+    if(currText.length > 0) {
+      Log.console.log(currText);
+      currText = '';
+    }
+  }
+
   protected _log(data: any, logMethod: keyof LogLevel, treatment: TreatmentName) {
     if (typeof data === 'string') {
-      if(data.indexOf(ConsoleCode.Reset) >= 0) {
-        console.log('Found Reset');
+      if(data.indexOf(ConsoleCode.Escape) >= 0) {
+        treatment = 'no-treatment';
       }
       data = this.assembleStringMessage(data, treatment);
       Log.console.log(data);

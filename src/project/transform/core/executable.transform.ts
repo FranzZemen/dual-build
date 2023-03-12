@@ -3,9 +3,10 @@ Created by Franz Zemen 02/06/2023
 License Type: MIT
 */
 
-import {ChildProcess, exec, execSync, execFile, execFileSync} from 'node:child_process';
+import {ChildProcess, exec, execFile, execFileSync, execSync} from 'node:child_process';
 import * as process from 'node:process';
 import {BuildError, BuildErrorNumber} from '../../util/build-error.js';
+import {isExecSyncError} from '../../util/exec-sync-error.js';
 import {TransformPayload} from '../transform-payload.js';
 import {Transform} from '../transform.js';
 
@@ -36,7 +37,6 @@ export type ExecutablePayload = {
   arguments: ExecArguments;
   batchTarget: boolean;
   synchronous: boolean;
-  ownColorCoding?: boolean; // Some processes mixup stderr/stdio and provide own color coding etc.
 }
 
 export type ExexcutableTransformConstructor<CLASS extends Transform<ExecutableTransform, any, any>> = new (logDepth: number) => CLASS;
@@ -68,7 +68,7 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
           this.log.info(execFileSync(command, payload.arguments, {cwd, windowsHide: false}));
         } else {
           const childProcess: ChildProcess = execFile(command, payload.arguments, {cwd, windowsHide: false}, (error, stdout, stderr) => {
-            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr, payload.ownColorCoding);
+            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr);
             if(buildError) {
               reject(buildError);
             } else {
@@ -80,16 +80,23 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
         command += args;
         if (payload.synchronous) {
           try {
-            this.log.info(execSync(command, {cwd, windowsHide: false}));
+            this.log.info(execSync(command, {cwd, windowsHide: false, stdio: 'inherit'}));
             resolve();
           } catch (err) {
-            const buildError = new BuildError('execSync error', {cause: err}, BuildErrorNumber.SyncExecError);
-            this.log.error(buildError);
-            reject(buildError);
+            // Because we used stdio:'inherit' everything's already printed, and we just need to set "this" process error
+            if(isExecSyncError(err)) {
+              const error = new BuildError(err.message, undefined, BuildErrorNumber.SyncExecError);
+              this.log.error(error);
+              return reject(error);
+            } else {
+              const error = new BuildError('Unreachable code', undefined, BuildErrorNumber.UnreachableCode);
+              this.log.error(error);
+              return reject(error);
+            }
           }
         } else {
           const childProcess: ChildProcess = exec(command, {cwd, windowsHide: false}, (error, stdout, stderr) => {
-            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr, payload.ownColorCoding);
+            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr);
             if(buildError) {
               reject(buildError);
             } else {
@@ -101,17 +108,12 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
     });
   }
 
-  private processAsyncError(error: Error | null, stdout:string, stderr: string, ownColorCoding?: boolean): void | BuildError {
-    ownColorCoding = ownColorCoding === undefined ? false : ownColorCoding;
+  private processAsyncError(error: Error | null, stdout:string, stderr: string): void | BuildError {
     if(stdout) {
-      this.log.info(stdout, ownColorCoding === true ? 'no-treatment' : undefined);
+      this.log.infoSegments([stdout]);
     }
     if(stderr) {
-      if(ownColorCoding) {
-        this.log.info(stderr, ownColorCoding === true ? 'no-treatment' : undefined);
-      } else {
-        this.log.error(stderr);
-      }
+      this.log.infoSegments([stderr]);
     }
     if(error) {
       const buildError = new BuildError('exec error', {cause: error}, BuildErrorNumber.AsyncExecError);
@@ -120,11 +122,7 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
     }
   }
 
-  protected transformContext(pipeIn: any, payload: ExecutablePayload): string {
-    let args: string = '';
-    payload.arguments.forEach(argument => {
-      args += ` ${argument}`;
-    });
-    return `${payload.synchronous ? 'synchronous' : 'synchronous'} ${payload.batchTarget ? 'batch' : 'execution'} ${payload.executable} ${args}`;
+  protected transformContext(pipeIn: any, payload: ExecutablePayload): string | object {
+    return payload;
   }
 }
