@@ -48,7 +48,10 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
         this.log.info(`  ${transformContext}`);
         this.log.info('  starting...');
       } else {
-        this.log.infoSegments([`transform ${this.name} `, transformContext, 'starting...']);
+        this.log.infoSegments([
+                                {data: `transform ${this.name} `, treatment: 'info'},
+                                {data: transformContext, treatment: 'context'},
+                                {data: 'starting...', treatment: 'info'}]);
       }
     } else {
       this.log.info(`transform ${this.name}`);
@@ -62,7 +65,9 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
     } catch (err) {
       return Promise.reject(processUnknownError(err, this.log));
     } finally {
-      this.log.info(`...transform ${this.name} ${this.errorCondition ? 'failed' : 'completed'} ${startTimingSuccessful ? endTiming(timingMark, this.log) : ''}`, this.errorCondition ? 'error' : 'task-done');
+      this.log.info(`...transform ${this.name} ${this.errorCondition ? 'failed' : 'completed'} ${startTimingSuccessful ? endTiming(timingMark,
+                                                                                                                                   this.log) : ''}`,
+                    this.errorCondition ? 'error' : 'task-done');
       /*
       if (typeof transformContext === 'string') {
         const length = `...transform ${this.name} on ${transformContext} ${this.errorCondition ? 'failed' : 'completed'}`.length;

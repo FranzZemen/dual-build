@@ -110,10 +110,10 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
 
   private processAsyncError(error: Error | null, stdout:string, stderr: string): void | BuildError {
     if(stdout) {
-      this.log.infoSegments([stdout]);
+      this.log.infoSegments([{data: stdout, treatment:'info'}]);
     }
     if(stderr) {
-      this.log.infoSegments([stderr]);
+      this.log.infoSegments([{data: stderr, treatment: 'info'}]);
     }
     if(error) {
       const buildError = new BuildError('exec error', {cause: error}, BuildErrorNumber.AsyncExecError);

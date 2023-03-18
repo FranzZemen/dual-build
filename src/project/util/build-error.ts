@@ -14,6 +14,7 @@ export enum BuildErrorNumber {
   GitAddError            = `Error 600: Git add error`,
   // Miscellaneous
   VersionIsNotSemver     = 'Error 5000: Version string does not represent a semver',
+  Undefined              = 'Error 2: Unexpected undefined value'
 }
 
 export class BuildError extends Error {

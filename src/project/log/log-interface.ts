@@ -13,7 +13,7 @@ export type LogLevel = {
   trace: 4;
 };
 
-export type NamedScheme = 'task-internal' | 'task-detail' | 'task-done' | 'pipeline';
+export type NamedScheme = 'task-internal' | 'task-detail' | 'task-done' | 'pipeline' | 'context';
 
 export type TreatmentName = keyof LogLevel | NamedScheme | 'no-treatment';
 

@@ -8,6 +8,7 @@ import EventEmitter from 'events';
 import {Console} from 'node:console';
 import {Writable} from 'node:stream';
 import {inspect} from 'node:util';
+import {defined} from '../util/defined.js';
 import {BackgroundColor, ConsoleCode, ForegroundColor, utf8SpecialCharacters} from './console-types.js';
 import {LogInterface, LogLevel, TreatmentName, Treatments} from './log-interface.js';
 
@@ -80,6 +81,10 @@ export let logConfig: LogConfig = {
       foreground: ForegroundColor._8_ForegroundWhite,
       background: BackgroundColor._8_BackgroundBlack
     },
+    'context': {
+      foreground: ForegroundColor._8_ForegroundCyan,
+      background: BackgroundColor._8_BackgroundBlack
+    },
     'no-treatment': { // Special treatment - these are dummy values
       foreground: ForegroundColor._8_ForegroundWhite,
       background: BackgroundColor._8_BackgroundBlack
@@ -144,6 +149,11 @@ export const no_console = new Console({
                                         stderr: noOptWriteable
                                       });
 
+export type LogDataSegment = {
+  data: any;
+  treatment: TreatmentName
+}
+
 export class Log implements LogInterface {
   static TabLength = 2;
   static Tab = ' '.repeat(Log.TabLength);
@@ -190,9 +200,9 @@ export class Log implements LogInterface {
     }
   }
 
-  infoSegments(dataSegments: any[], treatment?: TreatmentName) {
+  infoSegments(dataSegments: LogDataSegment[]) {
     if(dataSegments && this.logLevelValue <= logLevelValues.info) {
-      this._logSegments(dataSegments, 'info', treatment ? treatment : 'info');
+      this._logSegments(dataSegments, 'info');
     }
   }
 
@@ -244,22 +254,24 @@ export class Log implements LogInterface {
     }
   }
 
-  protected _logSegments(data: any[], logMethod: keyof LogLevel, treatment: TreatmentName):void {
+  protected _logSegments(segment: LogDataSegment[], logMethod: keyof LogLevel):void {
     let currText = '';
-    for(let i = 0; i < data.length; i++) {
-      const nextData = data[i];
-      if(typeof nextData === 'string') {
-        if(nextData.indexOf(ConsoleCode.Escape) >= 0) {
-          currText += nextData;
+    for(let i = 0; i < segment.length; i++) {
+      const nextSegment = segment[i];
+      if(defined(nextSegment)) {
+        if (typeof nextSegment.data === 'string') {
+          if (nextSegment.data.indexOf(ConsoleCode.Escape) >= 0) {
+            currText += nextSegment.data;
+          } else {
+            currText += this.assembleStringMessage(nextSegment.data, nextSegment.treatment);
+          }
         } else {
-          currText += this.assembleStringMessage(nextData, treatment);
+          if (currText.length > 0) {
+            Log.console.log(currText);
+            currText = '';
+          }
+          Log.console[logMethod](this.inspect(nextSegment.data));
         }
-      } else {
-        if(currText.length > 0) {
-          Log.console.log(currText);
-          currText = '';
-        }
-        Log.console[logMethod](this.inspect(nextData));
       }
     }
     if(currText.length > 0) {
