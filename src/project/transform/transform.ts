@@ -39,7 +39,7 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
   }
 
   async execute(pipe_in: PIPED_IN, passedIn?: PASSED_IN): Promise<PIPE_OUT> {
-    const transformContext = this.transformContext(pipe_in, passedIn);
+    const transformContext: string | object = await this.transformContext(pipe_in, passedIn);
     const maxLineLength = 100;
     if (typeof transformContext === 'string') {
       const length = `transform ${this.name} ${transformContext} starting...`.length;
@@ -91,5 +91,5 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
 
   protected abstract executeImpl(pipeIn: PIPED_IN | undefined, passedIn?: PASSED_IN): Promise<PIPE_OUT>;
 
-  protected abstract transformContext(pipeIn: PIPED_IN | undefined, passedIn?: PASSED_IN): string | object;
+  protected abstract transformContext(pipeIn: PIPED_IN | undefined, passedIn?: PASSED_IN): string | object | Promise<string | object>;
 }

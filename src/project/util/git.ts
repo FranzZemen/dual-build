@@ -11,6 +11,7 @@ export interface Git {
   add(filesSpec: string[]): Promise<string>;
   commit(comment: string): Promise<GitCommitResult>;
   push(): Promise<PushResult>;
+  currentBranch(): Promise<string>;
 }
 
 class SimpleGitWrapper implements Git {
@@ -27,6 +28,10 @@ class SimpleGitWrapper implements Git {
 
   push(): Promise<PushResult> {
     return this.git.push();
+  }
+
+  currentBranch(): Promise<string> {
+    return this.git.branch().then(summary => summary.current);
   }
 }
 
