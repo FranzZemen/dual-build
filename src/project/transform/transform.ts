@@ -51,7 +51,7 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
         this.log.infoSegments([
                                 {data: `transform ${this.name} `, treatment: 'info'},
                                 {data: transformContext, treatment: 'context'},
-                                {data: 'starting...', treatment: 'info'}]);
+                                {data: ' starting...', treatment: 'info'}]);
       }
     } else {
       this.log.info(`transform ${this.name}`);
