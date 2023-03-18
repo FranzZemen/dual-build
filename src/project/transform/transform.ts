@@ -79,7 +79,7 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
                                   this.errorCondition ? 'error' : 'task-done');
         }
       }
-      
+      out
        */
     }
   }
