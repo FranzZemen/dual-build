@@ -21,7 +21,7 @@ export class CheckInTransform extends TransformIndependent {
   }
 
   protected transformContext(pipeIn: any, passedIn: undefined): string {
-    return '';
+    return 'git add';
   }
 
 }
