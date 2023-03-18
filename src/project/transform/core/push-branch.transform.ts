@@ -14,7 +14,7 @@ export class PushBranchTransform extends TransformIndependent {
 
   protected async transformContext(pipeIn: any, passedIn: undefined): Promise<string> {
     const branchName = await git().currentBranch();
-    return `Push origin ${branchName}`;
+    return `push origin ${branchName}`;
   }
 
 }
