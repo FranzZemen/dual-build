@@ -280,15 +280,17 @@ export class Log implements LogInterface {
     }
   }
 
-  private assembleStringMessage(message: string, treatment: TreatmentName): string {
+  private assembleStringMessage(message: string, treatment: TreatmentName, standalone = false): string {
     if(treatment === 'no-treatment') {
       return message;
     } else {
-      return Log.Tab.repeat(this.depth)
-        + (logConfig.treatments[treatment].prefix ? logConfig.treatments[treatment].prefix + ConsoleCode.Reset : '')
-        + this.color(treatment) + message
-        + ConsoleCode.Reset
-        + (logConfig.treatments[treatment].suffix ? logConfig.treatments[treatment].suffix + ConsoleCode.Reset : '');
+      const resetStr = logConfig.treatments[treatment].prefix ? logConfig.treatments[treatment].prefix + ConsoleCode.Reset : '';
+      let result = standalone ? Log.Tab.repeat(this.depth) : '';
+      result += resetStr;
+      result += this.color(treatment) + message;
+      result += ConsoleCode.Reset;
+      result += resetStr;
+      return result;
     }
   }
 
