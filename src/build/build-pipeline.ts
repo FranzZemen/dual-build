@@ -20,6 +20,7 @@ import {
   Pipeline,
   PushBranchTransform
 } from 'dual-build/project';
+import {publishPayload} from './default-payloads.js';
 
 
 const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
@@ -60,10 +61,13 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                              types: './types'
                            }
                          })
-  /*
-  .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, publishPayload)
-
-   */
+                         .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, {
+                           executable: 'npm publish',
+                           cwd: './',
+                           arguments: ['./out/dist'],
+                           batchTarget: false,
+                           synchronous: false
+                         })
                          .transform<CheckInTransform>(CheckInTransform)
                          .transform<CommitTransform, CommitPayload>(CommitTransform, {comment: 'published'})
                          .transform<PushBranchTransform>(PushBranchTransform)
