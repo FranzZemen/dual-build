@@ -42,16 +42,16 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
     const transformContext = this.transformContext(pipe_in, passedIn);
     const maxLineLength = 100;
     if (typeof transformContext === 'string') {
-      const length = `transform ${this.name} on ${transformContext} starting...`.length;
+      const length = `transform ${this.name} ${transformContext} starting...`.length;
       if (length > maxLineLength) {
-        this.log.info(`transform ${this.name} on`);
+        this.log.info(`transform ${this.name}`);
         this.log.info(`  ${transformContext}`);
         this.log.info('  starting...');
       } else {
-        this.log.infoSegments([`transform ${this.name} on `, transformContext, 'starting...']);
+        this.log.infoSegments([`transform ${this.name} `, transformContext, 'starting...']);
       }
     } else {
-      this.log.info(`transform ${this.name} on`);
+      this.log.info(`transform ${this.name}`);
       this.log.info(transformContext);
     }
     let startTimingSuccessful: boolean = true;
