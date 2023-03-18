@@ -48,7 +48,7 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
         this.log.info(`  ${transformContext}`);
         this.log.info('  starting...');
       } else {
-        this.log.infoSegments([`transform ${this} on `, transformContext, 'starting...']);
+        this.log.infoSegments([`transform ${this.name} on `, transformContext, 'starting...']);
       }
     } else {
       this.log.info(`transform ${this.name} on`);
