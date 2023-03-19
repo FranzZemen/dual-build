@@ -262,8 +262,10 @@ export class Log implements LogInterface {
         if (typeof nextSegment.data === 'string') {
 
           if (nextSegment.data.indexOf(ConsoleCode.Escape) >= 0) {
-            // Replace any newline with the appropriate newline + depth
+            // Replace any newline with the appropriate newline + depth.  This must be done after the if(escape) because it inserts escapes
             nextSegment.data = nextSegment.data.replaceAll('\n', `\n${Log.Tab.repeat(this.depth)}`);
+            // Add depth to any line that does not start with depth
+            //
             currText += nextSegment.data;
           } else {
             // Replace any newline with the appropriate newline + depth
