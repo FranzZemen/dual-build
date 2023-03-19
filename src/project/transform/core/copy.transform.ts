@@ -14,7 +14,8 @@ import {TransformPayload} from '../transform-payload.js';
 export type CopyPayload = {
   src: string,
   dest: string,
-  glob: string | '**/*.*'
+  glob: string | '**/*.*',
+  overwrite: true | false
 }
 
 export class CopyTransform extends TransformPayload<CopyPayload> {
@@ -25,7 +26,8 @@ export class CopyTransform extends TransformPayload<CopyPayload> {
       .then(files => {
         files.forEach(file => {
           // Use Promise.all to aggregate all the file copies
-          this.log.warn(file);
+          //return copyFile()
+          console.warn(file);
         })
         return;
       })
