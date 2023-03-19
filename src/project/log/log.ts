@@ -254,10 +254,10 @@ export class Log implements LogInterface {
     }
   }
 
-  protected _logSegments(segment: LogDataSegment[], logMethod: keyof LogLevel):void {
+  protected _logSegments(segments: LogDataSegment[], logMethod: keyof LogLevel):void {
     let currText = '';
-    for(let i = 0; i < segment.length; i++) {
-      const nextSegment = segment[i];
+    for(let i = 0; i < segments.length; i++) {
+      const nextSegment = segments[i];
       if(defined(nextSegment)) {
         if (typeof nextSegment.data === 'string') {
           if (nextSegment.data.indexOf(ConsoleCode.Escape) >= 0) {
