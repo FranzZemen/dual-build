@@ -38,7 +38,8 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                            overwrite: true
                          })
                          .transform<CheckInTransform>(CheckInTransform)
-                         .transform<CommitTransform, CommitPayload>(CommitTransform, undefined)
+                         //.transform<CommitTransform, CommitPayload>(CommitTransform, undefined)
+                         .transform<CommitTransform, CommitPayload>(CommitTransform, {comment:'testing'})
                          .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, {
                            executable: 'npm version',
                            arguments: ['patch'],
@@ -70,7 +71,7 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                          })
                          .transform<CheckInTransform>(CheckInTransform)
                          .transform<CommitTransform, CommitPayload>(CommitTransform, {comment: 'published'})
-                         .transform<PushBranchTransform>(PushBranchTransform)
+                         //.transform<PushBranchTransform>(PushBranchTransform)
                          .execute(undefined);
 
 
