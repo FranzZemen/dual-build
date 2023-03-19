@@ -62,6 +62,7 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                              types: './types'
                            }
                          })
+                         /*
                          .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, {
                            executable: 'npm publish',
                            cwd: './',
@@ -69,6 +70,8 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                            batchTarget: false,
                            synchronous: false
                          })
+                         
+                          */
                          .transform<CheckInTransform>(CheckInTransform)
                          .transform<CommitTransform, CommitPayload>(CommitTransform, {comment: 'published'})
                          //.transform<PushBranchTransform>(PushBranchTransform)
