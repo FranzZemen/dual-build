@@ -260,9 +260,14 @@ export class Log implements LogInterface {
       const nextSegment = segments[i];
       if(defined(nextSegment)) {
         if (typeof nextSegment.data === 'string') {
+
           if (nextSegment.data.indexOf(ConsoleCode.Escape) >= 0) {
+            // Replace any newline with the appropriate newline + depth
+            nextSegment.data = nextSegment.data.replaceAll('\n', '    \n');
             currText += nextSegment.data;
           } else {
+            // Replace any newline with the appropriate newline + depth
+            nextSegment.data = nextSegment.data.replaceAll('\n', '    \n');
             currText += this.assembleStringMessage(nextSegment.data, nextSegment.treatment);
           }
         } else {
