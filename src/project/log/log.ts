@@ -263,11 +263,11 @@ export class Log implements LogInterface {
 
           if (nextSegment.data.indexOf(ConsoleCode.Escape) >= 0) {
             // Replace any newline with the appropriate newline + depth
-            nextSegment.data = nextSegment.data.replaceAll('\n', '\n    ');
+            nextSegment.data = nextSegment.data.replaceAll('\n', `\n${Log.Tab.repeat(this.depth)}`);
             currText += nextSegment.data;
           } else {
             // Replace any newline with the appropriate newline + depth
-            nextSegment.data = nextSegment.data.replaceAll('\n', '\n    ');
+            nextSegment.data = nextSegment.data.replaceAll('\n', `\n${Log.Tab.repeat(this.depth)}`);
             currText += this.assembleStringMessage(nextSegment.data, nextSegment.treatment);
           }
         } else {
