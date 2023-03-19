@@ -20,7 +20,6 @@ import {
   Pipeline,
   PushBranchTransform
 } from 'dual-build/project';
-import {publishPayload} from './default-payloads.js';
 
 
 const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
