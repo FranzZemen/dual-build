@@ -311,7 +311,7 @@ export class Log implements LogInterface {
   }
 
   private inspect(data: any) {
-    return Log.Tab.repeat(this.depth) + inspect(data, false, Log.InspectDepth, true).replaceAll('\n', '\n' + Log.Tab.repeat(this.depth));
+    return Log.Tab.repeat(this.depth) + inspect(data, false, 10, true).replaceAll('\n', '\n' + Log.Tab.repeat(this.depth));
   }
 }
 
