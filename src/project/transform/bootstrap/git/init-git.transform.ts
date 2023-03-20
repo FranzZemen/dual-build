@@ -22,11 +22,11 @@ export class InitGit extends TransformInOut<SetupGitPipelinePayload, SetupGitPip
     if (pipeIn ) {
       if(gitOptions.useGit && gitOptions['git init']) {
         const result :InitResult= await pipeIn.git.init()
-        this.log.info(result, 'task-internal');
+        this.contextLog.info(result, 'task-internal');
         pipeIn.gitInitResult = {initialized: true, ...result}
         return Promise.resolve(pipeIn);
       } else {
-        this.log.warn('git init not configured, skipping');
+        this.contextLog.warn('git init not configured, skipping');
         pipeIn.gitInitResult = {initialized: false}
         return Promise.resolve(pipeIn);
       }

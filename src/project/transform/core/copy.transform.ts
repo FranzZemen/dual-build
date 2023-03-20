@@ -19,21 +19,26 @@ export type CopyPayload = {
 }
 
 export class CopyTransform extends TransformPayload<CopyPayload> {
-  constructor(depth: number) {super(depth);}
+  constructor(depth: number) {
+    super(depth);
+  }
 
   protected executeImplPayload(payload: CopyPayload): Promise<void> {
-    return FastGlob(payload.glob, {cwd: join(cwd(), payload.src)})
+    const currwd = cwd();
+    return FastGlob(payload.glob, {cwd: join(currwd, payload.src)})
       .then(files => {
         files.forEach(file => {
           // Use Promise.all to aggregate all the file copies
-          //return copyFile()
-          console.warn(file);
+          const promises: Promise<void>[] = [];
+          this.contextLog.info(`copying from ${join(currwd, payload.src, file)} to ${join(currwd, payload.dest, file)}`, 'context');
+          //return copyFile(join(cwd(), payload.src, file
+          // console.warn(file);
         })
         return;
       })
   }
 
-  protected transformContext(pipeIn: undefined, passedIn: CopyPayload | undefined): string {
-    return inspect(passedIn, false, 10, true);
+  protected transformContext(pipeIn: undefined, payload: CopyPayload): string | object {
+    return payload;
   }
 }

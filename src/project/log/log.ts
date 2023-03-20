@@ -35,7 +35,7 @@ export type LogConfig = {
  *   string, foreground: string}}, level: string}}
  */
 export let logConfig: LogConfig = {
-  level: 'info',
+  level: 'debug',
   treatments: {
     // Default log level schemes
     info: {
@@ -201,7 +201,7 @@ export class Log implements LogInterface {
   }
 
   infoSegments(dataSegments: LogDataSegment[]) {
-    if(dataSegments && this.logLevelValue <= logLevelValues.info) {
+    if (dataSegments && this.logLevelValue <= logLevelValues.info) {
       this._logSegments(dataSegments, 'info');
     }
   }
@@ -254,11 +254,12 @@ export class Log implements LogInterface {
     }
   }
 
-  protected _logSegments(segments: LogDataSegment[], logMethod: keyof LogLevel):void {
-    let currText = '';
-    for(let i = 0; i < segments.length; i++) {
+  protected _logSegments(segments: LogDataSegment[], logMethod: keyof LogLevel): void {
+    // Start the segment with the necessary depth
+    let currText = Log.Tab.repeat(this.depth);
+    for (let i = 0; i < segments.length; i++) {
       const nextSegment = segments[i];
-      if(defined(nextSegment)) {
+      if (defined(nextSegment)) {
         if (typeof nextSegment.data === 'string') {
 
           if (nextSegment.data.indexOf(ConsoleCode.Escape) >= 0) {
@@ -270,18 +271,19 @@ export class Log implements LogInterface {
           } else {
             // Replace any newline with the appropriate newline + depth
             nextSegment.data = nextSegment.data.replaceAll('\n', `\n${Log.Tab.repeat(this.depth)}`);
-            currText += this.assembleStringMessage(nextSegment.data, nextSegment.treatment);
+            currText += this.assembleStringMessage(nextSegment.data, nextSegment.treatment, false);
           }
         } else {
           if (currText.length > 0) {
             Log.console.log(currText);
-            currText = '';
+            // Reset with depth
+            currText = Log.Tab.repeat(this.depth);
           }
           Log.console[logMethod](this.inspect(nextSegment.data));
         }
       }
     }
-    if(currText.length > 0) {
+    if (currText.length > 0) {
       Log.console.log(currText);
       currText = '';
     }
@@ -289,32 +291,27 @@ export class Log implements LogInterface {
 
   protected _log(data: any, logMethod: keyof LogLevel, treatment: TreatmentName) {
     if (typeof data === 'string') {
-      if(data.indexOf(ConsoleCode.Escape) >= 0) {
-        treatment = 'no-treatment';
+      if (data.indexOf(ConsoleCode.Escape) < 0) {
+        data = this.assembleStringMessage(data, treatment);
       }
-      data = this.assembleStringMessage(data, treatment);
       Log.console.log(data);
     } else {
       Log.console[logMethod](this.inspect(data));
     }
   }
 
-  private assembleStringMessage(message: string, treatment: TreatmentName, standalone = false): string {
-    if(treatment === 'no-treatment') {
-      return message;
-    } else {
-      const resetStr = logConfig.treatments[treatment].prefix ? logConfig.treatments[treatment].prefix + ConsoleCode.Reset : '';
-      let result = standalone ? Log.Tab.repeat(this.depth) : '';
-      result += resetStr;
-      result += this.color(treatment) + message;
-      result += ConsoleCode.Reset;
-      result += resetStr;
-      return result;
-    }
+  private assembleStringMessage(message: string, treatment: TreatmentName, standalone = true): string {
+    const resetStr = logConfig.treatments[treatment].prefix ? logConfig.treatments[treatment].prefix + ConsoleCode.Reset : '';
+    let result = standalone ? Log.Tab.repeat(this.depth) : '';
+    result += resetStr;
+    result += this.color(treatment) + message;
+    result += ConsoleCode.Reset;
+    result += resetStr;
+    return result;
   }
 
   private inspect(data: any) {
-    return Log.Tab.repeat(this.depth + 1) + inspect(data, false, Log.InspectDepth, true).replaceAll('\n', '\n' + Log.Tab.repeat(this.depth + 1));
+    return Log.Tab.repeat(this.depth) + inspect(data, false, Log.InspectDepth, true).replaceAll('\n', '\n' + Log.Tab.repeat(this.depth));
   }
 }
 

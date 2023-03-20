@@ -26,7 +26,7 @@ export class SaveOptionsTransform extends TransformPayload<SaveOptionsPayload> {
                         JSON.stringify(payload).replaceAll('\n', '\r\n'),
                         {encoding: 'utf-8'});
       } catch (err) {
-        throw processUnknownError(err, this.log);
+        throw processUnknownError(err, this.contextLog);
       }
     } else {
       throw new Error('Payload is undefined');

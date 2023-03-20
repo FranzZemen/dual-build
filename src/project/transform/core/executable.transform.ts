@@ -65,7 +65,7 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
       });
       if (payload.batchTarget) {
         if (payload.synchronous) {
-          this.log.info(execFileSync(command, payload.arguments, {cwd, windowsHide: false}));
+          this.contextLog.info(execFileSync(command, payload.arguments, {cwd, windowsHide: false}));
         } else {
           const childProcess: ChildProcess = execFile(command, payload.arguments, {cwd, windowsHide: false}, (error, stdout, stderr) => {
             const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr);
@@ -80,17 +80,17 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
         command += args;
         if (payload.synchronous) {
           try {
-            this.log.info(execSync(command, {cwd, windowsHide: false, stdio: 'inherit'}));
+            this.contextLog.info(execSync(command, {cwd, windowsHide: false, stdio: 'inherit'}));
             resolve();
           } catch (err) {
             // Because we used stdio:'inherit' everything's already printed, and we just need to set "this" process error
             if(isExecSyncError(err)) {
               const error = new BuildError(err.message, undefined, BuildErrorNumber.SyncExecError);
-              this.log.error(error);
+              this.contextLog.error(error);
               return reject(error);
             } else {
               const error = new BuildError('Unreachable code', undefined, BuildErrorNumber.UnreachableCode);
-              this.log.error(error);
+              this.contextLog.error(error);
               return reject(error);
             }
           }
@@ -110,14 +110,14 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
 
   private processAsyncError(error: Error | null, stdout:string, stderr: string): void | BuildError {
     if(stdout) {
-      this.log.infoSegments([{data: stdout, treatment: 'context'}]);
+      this.contextLog.infoSegments([{data: stdout, treatment: 'context'}]);
     }
     if(stderr) {
-      this.log.infoSegments([{data: stderr, treatment: 'context'}]);
+      this.contextLog.infoSegments([{data: stderr, treatment: 'context'}]);
     }
     if(error) {
       const buildError = new BuildError('exec error', {cause: error}, BuildErrorNumber.AsyncExecError);
-      this.log.error(buildError);
+      this.contextLog.error(buildError);
       return buildError;
     }
   }

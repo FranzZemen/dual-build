@@ -41,7 +41,7 @@ export class CreateDirectory extends TransformPayloadIn<CreateDirectoryPayload, 
             throw new BuildError(`Directory ${directoryPayload.directory.name} with path ${path} already exists and rules = 'error on exist'`, undefined, BuildErrorNumber.DirectoryAlreadyExists);
           } else {
             const msg = `Project folder ${path} already exists, skipping`;
-            this.log.warn(msg);
+            this.contextLog.warn(msg);
             return;
           }
         })
@@ -50,7 +50,7 @@ export class CreateDirectory extends TransformPayloadIn<CreateDirectoryPayload, 
             throw err;
           } else {
             return mkdir(path, {recursive: true})
-              .then(() => {this.log.info(`created ${path}`, 'task-internal');
+              .then(() => {this.contextLog.info(`created ${path}`, 'task-internal');
                 return;
               })
           }

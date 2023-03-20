@@ -19,11 +19,11 @@ export class GitAddOrigin extends TransformIn<SetupGitPipelinePayload> {
         const repos = typeof pipeIn.gitOptions.repository === 'string' ? pipeIn.gitOptions.repository : pipeIn.gitOptions.repository();
         await git.addRemote('origin', `${pipeIn.gitOptions.protocol}${pipeIn.gitOptions.username}/${repos}`);
       } else {
-        this.log.warn('git not initialize, skipping');
+        this.contextLog.warn('git not initialize, skipping');
         return;
       }
     } catch (err) {
-      throw processUnknownError(err, this.log);
+      throw processUnknownError(err, this.contextLog);
     }
   }
 

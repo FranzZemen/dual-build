@@ -14,7 +14,7 @@ export class CheckInTransform extends TransformIndependent {
       .then(result => {
         if(result && result.length > 0) {
           const err = new BuildError(`Unexpected result from git.add: ${result}`, undefined, BuildErrorNumber.GitAddError)
-          this.log.error(err);
+          this.contextLog.error(err);
           throw err;
         }
       })

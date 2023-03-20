@@ -21,6 +21,7 @@ export class CreatePackageTransform extends TransformPayload<CreatePackagePayloa
     if(!payload) {
       return Promise.reject(new BuildError('Unreachable code',undefined, BuildErrorNumber.UnreachableCode));
     }
+    this.contextLog.debug(payload.package, 'info');
     return writeFile(path.join(process.cwd(), payload.targetPath), JSON.stringify(payload.package, undefined, 2), {encoding: 'utf-8'});
   }
 

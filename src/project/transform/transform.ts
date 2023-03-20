@@ -19,11 +19,13 @@ export type TransformConstructor<CLASS extends Transform<any, any, any>> = new (
  * The transform declares what kind of data it is sending down the Pipeline as output - this does not have to be the transformed data.
  */
 export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
-  protected log: Log;
+  private readonly log: Log;
+  protected contextLog: Log;
   protected errorCondition = false;
 
   protected constructor(protected depth: number) {
     this.log = new Log(depth);
+    this.contextLog = new Log(depth+1);
   }
 
   get logDepth(): number {
@@ -55,7 +57,8 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
       }
     } else {
       this.log.info(`transform ${this.name}`);
-      this.log.info(transformContext);
+      // Use contextLog to indent the object
+      this.contextLog.info(transformContext);
     }
     let startTimingSuccessful: boolean = true;
     const timingMark = `Timing ${Transform.name}:${transformContext}:${this.name}.execute`;

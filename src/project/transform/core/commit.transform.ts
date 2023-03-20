@@ -37,7 +37,7 @@ export class CommitTransform extends TransformPayload<CommitPayload> {
         });
     }
     if (comment) {
-      return git().commit(comment).then(result => this.log.info(result));
+      return git().commit(comment).then(result => this.contextLog.info(result));
     } else {
       throw new BuildError('Unreachable code', undefined, BuildErrorNumber.UnreachableCode);
     }

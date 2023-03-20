@@ -31,18 +31,18 @@ export class SetupGit extends TransformPayload<GitOptions> {
           git,
           gitOptions
         };
-        await Pipeline.options<SetupGitPipelinePayload, SetupGitPipelinePayload>({name: 'git setup', logDepth: self.log.depth + 1})
+        await Pipeline.options<SetupGitPipelinePayload, SetupGitPipelinePayload>({name: 'git setup', logDepth: self.contextLog.depth + 1})
                       .startSeries<InitGit, undefined, SetupGitPipelinePayload, void>(InitGit)
                       .endSeries<GitAddOrigin, undefined>(GitAddOrigin)
                       .execute(pipelinePayload);
       } catch (err) {
-        const error = processUnknownError(err, this.log);
-        this.log.info('Error processing git setup - not fatal but you will need to setup git yourself', 'error');
-        this.log.error(error);
+        const error = processUnknownError(err, this.contextLog);
+        this.contextLog.info('Error processing git setup - not fatal but you will need to setup git yourself', 'error');
+        this.contextLog.error(error);
         return;
       }
     } else {
-      this.log.warn('git gitOptions not enabled, skipping');
+      this.contextLog.warn('git gitOptions not enabled, skipping');
       return;
     }
   }

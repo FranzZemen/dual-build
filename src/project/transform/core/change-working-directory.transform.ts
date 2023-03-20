@@ -22,13 +22,13 @@ export class ChangeWorkingDirectory extends TransformIn<string> {
     if (rootDirectorPath) {
       try {
         const newCwd = rootDirectorPath;
-        this.log.info(`current working directory is ${cwd()}`, 'task-internal')
+        this.contextLog.info(`current working directory is ${cwd()}`, 'task-internal')
         const newCwdPath = resolve(cwd(), newCwd);
         chdir(newCwdPath);
-        this.log.info(`new working directory is ${cwd()}`, 'warn');
+        this.contextLog.info(`new working directory is ${cwd()}`, 'warn');
         return Promise.resolve();
       } catch (err) {
-        return Promise.reject(processUnknownError(err, this.log));
+        return Promise.reject(processUnknownError(err, this.contextLog));
       }
     } else {
       throw new Error('Undefined payload');
