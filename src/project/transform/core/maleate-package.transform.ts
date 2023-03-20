@@ -14,7 +14,7 @@ export type MaleatePackagePayload = {
   exclusions?: (keyof Package)[];
   inclusions?: Package;
   targetOptions?: TargetOptions | undefined;
-} | undefined;
+};
 
 
 export class MaleatePackageTransform extends TransformPayload<MaleatePackagePayload> {
@@ -42,7 +42,7 @@ export class MaleatePackageTransform extends TransformPayload<MaleatePackagePayl
     await writeFile(path.join(process.cwd(), payload.targetPath), JSON.stringify(packageJson, undefined, 2), {encoding: 'utf-8'});
   }
 
-  protected transformContext(pipeIn: MaleatePackagePayload | undefined, passedIn: MaleatePackagePayload | undefined): string {
-    return 'maleating';
+  protected transformContext(pipeIn: MaleatePackagePayload | undefined, passedIn: MaleatePackagePayload): string | object {
+    return passedIn;
   }
 }
