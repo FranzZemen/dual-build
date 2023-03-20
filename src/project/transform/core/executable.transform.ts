@@ -80,7 +80,8 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
         command += args;
         if (payload.synchronous) {
           try {
-            this.contextLog.info(execSync(command, {cwd, windowsHide: false, stdio: 'inherit'}));
+            const result = execSync(command, {cwd, windowsHide: false, stdio: 'inherit'});
+            this.contextLog.info(result.toString('utf-8'));
             resolve();
           } catch (err) {
             // Because we used stdio:'inherit' everything's already printed, and we just need to set "this" process error
