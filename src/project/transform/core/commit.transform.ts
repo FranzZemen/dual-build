@@ -29,7 +29,7 @@ export class CommitTransform extends TransformPayload<CommitPayload> {
                     name: 'comment',
                     message: 'Commit comment',
                     type: 'input',
-                    default: 'build'
+                    default: ''
                   }
                 ])
         .then(answers => {
