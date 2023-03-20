@@ -39,43 +39,41 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                          })
 
                          .transform<CheckInTransform>(CheckInTransform)
-                         //.transform<CommitTransform, CommitPayload>(CommitTransform, undefined)
+  //.transform<CommitTransform, CommitPayload>(CommitTransform, undefined)
 
-                      .transform<CommitTransform, CommitPayload>(CommitTransform, {comment:'testing'})
-                      .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, {
-                        executable: 'npm version',
-                        arguments: ['patch'],
-                        batchTarget: false,
-                        synchronous: true,
-                        cwd: './'
-                      })
-                      .transform<MaleatePackageTransform, MaleatePackagePayload>(MaleatePackageTransform, {
-                        targetPath: './out/dist/package.json',
-                        exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
-                        inclusions: {
-                          exports: {
-                            '.': {
-                              types: './types',
-                              import: './esm/index.js',
-                              require: './cjs/index.js'
-                            }
-                          },
-                          main: './cjs/index.js',
-                          types: './types'
-                        }
-                      })
-                      /*
-                      .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, {
-                        executable: 'npm publish',
-                        cwd: './',
-                        arguments: ['./out/dist'],
-                        batchTarget: false,
-                        synchronous: false
-                      })
-                      .transform<CheckInTransform>(CheckInTransform)
-                      .transform<CommitTransform, CommitPayload>(CommitTransform, {comment: 'published'})
-                      .transform<PushBranchTransform>(PushBranchTransform)
-*/
+                         .transform<CommitTransform, CommitPayload>(CommitTransform, {comment: 'testing'})
+                         .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, {
+                           executable: 'npm version',
+                           arguments: ['patch'],
+                           batchTarget: false,
+                           synchronous: true,
+                           cwd: './'
+                         })
+                         .transform<MaleatePackageTransform, MaleatePackagePayload>(MaleatePackageTransform, {
+                           targetPath: './out/dist/package.json',
+                           exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
+                           inclusions: {
+                             exports: {
+                               '.': {
+                                 types: './types',
+                                 import: './esm/index.js',
+                                 require: './cjs/index.js'
+                               }
+                             },
+                             main: './cjs/index.js',
+                             types: './types'
+                           }
+                         })
+                         .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, {
+                           executable: 'npm publish',
+                           cwd: './',
+                           arguments: ['./out/dist'],
+                           batchTarget: false,
+                           synchronous: false
+                         })
+                         .transform<CheckInTransform>(CheckInTransform)
+                         .transform<CommitTransform, CommitPayload>(CommitTransform, {comment: 'published'})
+                         .transform<PushBranchTransform>(PushBranchTransform)
                          .execute(undefined);
 
 
