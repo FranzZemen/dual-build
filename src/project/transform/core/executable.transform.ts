@@ -65,7 +65,9 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
       });
       if (payload.batchTarget) {
         if (payload.synchronous) {
-          this.contextLog.info(execFileSync(command, payload.arguments, {cwd, windowsHide: false}));
+          const result = execFileSync(command, payload.arguments, {cwd, windowsHide: false})
+          this.contextLog.info(result.toString('utf-8'), 'context');
+          resolve();
         } else {
           const childProcess: ChildProcess = execFile(command, payload.arguments, {cwd, windowsHide: false}, (error, stdout, stderr) => {
             const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr);
@@ -81,7 +83,7 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
         if (payload.synchronous) {
           try {
             const result = execSync(command);
-            this.contextLog.info(result.toString('utf-8'));
+            this.contextLog.info(result.toString('utf-8'), 'context');
             resolve();
           } catch (err) {
             // Because we used stdio:'inherit' everything's already printed, and we just need to set "this" process error
