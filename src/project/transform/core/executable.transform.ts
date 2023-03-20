@@ -80,7 +80,7 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
         command += args;
         if (payload.synchronous) {
           try {
-            const result = execSync(command, {cwd, windowsHide: false, stdio: 'inherit'});
+            const result = execSync(command);
             this.contextLog.info(result.toString('utf-8'));
             resolve();
           } catch (err) {
