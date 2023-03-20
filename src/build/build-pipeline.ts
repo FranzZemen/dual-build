@@ -39,8 +39,8 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                          })
 
                          .transform<CheckInTransform>(CheckInTransform)
-                         .transform<CommitTransform, CommitPayload>(CommitTransform, undefined)
-  /*
+                         //.transform<CommitTransform, CommitPayload>(CommitTransform, undefined)
+
                       .transform<CommitTransform, CommitPayload>(CommitTransform, {comment:'testing'})
                       .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, {
                         executable: 'npm version',
@@ -49,6 +49,7 @@ const pipeline = Pipeline.options({name: 'Build', logDepth: 0})
                         synchronous: true,
                         cwd: './'
                       })
+                         /*
                       .transform<MaleatePackageTransform, MaleatePackagePayload>(MaleatePackageTransform, {
                         targetPath: './out/dist/package.json',
                         exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],

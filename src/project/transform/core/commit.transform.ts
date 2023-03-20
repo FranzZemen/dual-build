@@ -16,6 +16,7 @@ export type CommitPayload = {
 export class CommitTransform extends TransformPayload<CommitPayload> {
 
   constructor(depdth: number) {super(depdth);}
+
   protected transformContext(pipeIn: any, passedIn: undefined): string {
     return '';
   }
