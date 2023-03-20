@@ -31,8 +31,16 @@ export class CopyTransform extends TransformPayload<CopyPayload> {
           // Use Promise.all to aggregate all the file copies
           const promises: Promise<void>[] = [];
           this.contextLog.info(`copying from ${join(currwd, payload.src, file)} to ${join(currwd, payload.dest, file)}`, 'context');
-          //return copyFile(join(cwd(), payload.src, file
-          // console.warn(file);
+          promises.push(copyFile(join(currwd, payload.src, file),join(currwd, payload.dest, file)));
+          Promise.allSettled(promises)
+            .then(results => {
+              results.forEach(result => {
+                if(result.status === 'rejected') {
+                  this.contextLog.error(result.reason);
+                }
+                this.contextLog.info('Evalute result','context');
+              })
+            })
         })
         return;
       })
