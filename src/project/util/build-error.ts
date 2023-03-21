@@ -5,7 +5,11 @@ License Type: MIT
 
 export enum BuildErrorNumber {
   UnreachableCode        = 'Error 1: Unreachable code or unexpected logic path',
+  Undefined              = 'Error 2: Unexpected undefined value',
+
   DirectoryAlreadyExists = 'Error 50: Directory already exists',
+  CopyFilesError         = 'Error 51: Error copying files',
+
   // Child Process Errors
   NoExecutablePayload    = 'Error 500: No payload provided for ExecutableTransform',
   AsyncExecError         = 'Error 501: Asynchronous executable errored out',
@@ -14,7 +18,6 @@ export enum BuildErrorNumber {
   GitAddError            = `Error 600: Git add error`,
   // Miscellaneous
   VersionIsNotSemver     = 'Error 5000: Version string does not represent a semver',
-  Undefined              = 'Error 2: Unexpected undefined value'
 }
 
 export class BuildError extends Error {
