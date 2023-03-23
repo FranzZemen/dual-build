@@ -10,7 +10,7 @@ import {join} from 'node:path';
 import {cwd} from 'node:process';
 import {Directory} from '../../options/directories.js';
 import {BuildError, BuildErrorNumber} from '../../util/build-error.js';
-import {TransformPayloadIn} from '../transform-payload-in.js';
+import {TransformPayloadIn} from '../core/transform-payload-in.js';
 
 
 export type CreateDirectoryPayload = {

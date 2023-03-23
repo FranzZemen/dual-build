@@ -9,7 +9,7 @@ import {Directories, DirectoryPath} from '../../options/index.js';
 import {Pipeline} from '../../pipeline/index.js';
 import {ChangeWorkingDirectory} from '../lib/index.js';
 import {CreateDirectory, CreateDirectoryPayload} from '../lib/index.js';
-import {TransformConstructor} from '../transform.js';
+import {TransformConstructor} from '../core/transform.js';
 import {BootstrapTransform} from './bootstrap-transform.js';
 
 /**

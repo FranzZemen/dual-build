@@ -5,7 +5,7 @@ License Type: MIT
 
 import {git} from '../../util/git.js';
 import {BuildError, BuildErrorNumber} from '../../util/index.js';
-import {TransformIndependent} from '../transform-independent.js';
+import {TransformIndependent} from '../core/transform-independent.js';
 
 export class CheckInTransform extends TransformIndependent {
   constructor(depth: number) {super(depth);}

@@ -4,7 +4,7 @@ License Type:
 */
 
 import {BootstrapOptions} from '../../options/bootstrap.options.js';
-import {TransformPayloadIn} from '../transform-payload-in.js';
+import {TransformPayloadIn} from '../core/transform-payload-in.js';
 
 export abstract class BootstrapTransform<PASSED_IN> extends TransformPayloadIn<PASSED_IN, BootstrapOptions> {
   public executeImplPayloadIn(pipeIn: BootstrapOptions, passedIn: PASSED_IN): Promise<void> {

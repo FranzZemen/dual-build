@@ -5,7 +5,7 @@ License Type:
 
 import {TargetOptions} from '../../../options/index.js';
 import {ParallelPipe, Pipeline} from '../../../pipeline/index.js';
-import {TransformPayload} from '../../transform-payload.js';
+import {TransformPayload} from '../../core/transform-payload.js';
 import {GenerateTsConfigPayload, TargetEnvTsConfigTransform} from './target-env-ts-config.transform.js';
 
 

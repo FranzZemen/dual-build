@@ -6,7 +6,7 @@ License Type:
 import {resolve} from 'node:path';
 import {chdir, cwd} from 'node:process';
 import {processUnknownError} from '../../util/index.js';
-import {TransformIn} from '../transform-in.js';
+import {TransformIn} from '../core/transform-in.js';
 
 
 export type ChangeWorkingDirectoryPayload = {

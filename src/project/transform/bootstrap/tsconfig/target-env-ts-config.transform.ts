@@ -6,7 +6,7 @@ import _ from 'lodash';
 import {writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 import {defaultTargetEnvironmentOptions, TargetOption} from '../../../options/index.js';
-import {TransformPayload} from '../../transform-payload.js';
+import {TransformPayload} from '../../core/transform-payload.js';
 
 
 export type GenerateTsConfigPayload = {

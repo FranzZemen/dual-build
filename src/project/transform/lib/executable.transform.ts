@@ -7,8 +7,8 @@ import {ChildProcess, exec, execFile, execFileSync, execSync} from 'node:child_p
 import * as process from 'node:process';
 import {BuildError, BuildErrorNumber} from '../../util/build-error.js';
 import {isExecSyncError} from '../../util/exec-sync-error.js';
-import {TransformPayload} from '../transform-payload.js';
-import {Transform} from '../transform.js';
+import {TransformPayload} from '../core/transform-payload.js';
+import {Transform} from '../core/transform.js';
 
 export type DoubleDashFlag = `--${string}`;
 export type DashFlag = `-${string}`;

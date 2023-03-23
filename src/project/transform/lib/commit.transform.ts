@@ -6,7 +6,7 @@ License Type: MIT
 import inquirer from 'inquirer';
 import {git} from '../../util/git.js';
 import {BuildError, BuildErrorNumber} from '../../util/index.js';
-import {TransformPayload} from '../transform-payload.js';
+import {TransformPayload} from '../core/transform-payload.js';
 
 
 export type CommitPayload = {
