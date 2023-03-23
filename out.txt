@@ -1,0 +1,38 @@
+[37m[40mstarting pipeline Build...[0m
+  [38;5;29m[40mtransform CreatePackageTransform [0m[36m[40mcreating ./out/dist/esm/package.json[0m[38;5;29m[40m starting...[0m
+    { type: [32m'module'[39m }
+  [38;5;29m[40m...transform CreatePackageTransform completed in 3 ms[0m
+  [38;5;29m[40mtransform CreatePackageTransform [0m[36m[40mcreating ./out/dist/cjs/package.json[0m[38;5;29m[40m starting...[0m
+    { type: [32m'commonjs'[39m }
+  [38;5;29m[40m...transform CreatePackageTransform completed in 771 µs[0m
+  [38;5;29m[40mtransform CopyTransform[0m
+    {
+      src: [32m'./doc/project'[39m,
+      dest: [32m'./out/dist'[39m,
+      glob: [32m'**/*.md'[39m,
+      overwrite: [33mtrue[39m
+    }
+    [36m[40mcopying from H:\dev\dual-build\doc\project\README.md to H:\dev\dual-build\out\dist\README.md[0m
+    [36m[40mcopying from H:\dev\dual-build\doc\project\scaffolding\SCAFFOLDING.md to H:\dev\dual-build\out\dist\scaffolding\SCAFFOLDING.md[0m
+  [38;5;29m[40m...transform CopyTransform completed in 7 ms[0m
+  [38;5;29m[40mtransform CheckInTransform [0m[36m[40mgit add[0m[38;5;29m[40m starting...[0m
+  [38;5;29m[40m...transform CheckInTransform completed in 91 ms[0m
+  [38;5;29m[40mtransform CommitTransform [0m[36m[40m[0m[38;5;29m[40m starting...[0m
+    {
+      author: [1mnull[22m,
+      branch: [32m''[39m,
+      commit: [32m''[39m,
+      root: [33mfalse[39m,
+      summary: { changes: [33m0[39m, insertions: [33m0[39m, deletions: [33m0[39m }
+    }
+  [38;5;29m[40m...transform CommitTransform completed in 55 ms[0m
+  [38;5;29m[40mtransform ExecutableTransform[0m
+    {
+      executable: [32m'npm version'[39m,
+      arguments: [ [32m'patch'[39m ],
+      batchTarget: [33mfalse[39m,
+      synchronous: [33mtrue[39m,
+      cwd: [32m'./'[39m
+    }
+  [38;5;29m[40m...transform ExecutableTransform completed in 807 ms[0m
+[31m[40m...pipeline Build failed[0m
