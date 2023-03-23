@@ -8,7 +8,8 @@ export enum BuildErrorNumber {
   Undefined              = 'Error 2: Unexpected undefined value',
 
   DirectoryAlreadyExists = 'Error 50: Directory already exists',
-  CopyFilesError         = 'Error 51: Error copying files',
+  CopyFileError          = 'Error 51: Error copying file',
+  CopyFilesError         = 'Error 52: Error copying files',
 
   // Child Process Errors
   NoExecutablePayload    = 'Error 500: No payload provided for ExecutableTransform',
@@ -18,6 +19,7 @@ export enum BuildErrorNumber {
   GitAddError            = `Error 600: Git add error`,
   // Miscellaneous
   VersionIsNotSemver     = 'Error 5000: Version string does not represent a semver',
+
 }
 
 export class BuildError extends Error {
