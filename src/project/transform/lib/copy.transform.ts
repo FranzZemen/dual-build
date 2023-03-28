@@ -15,7 +15,9 @@ import {TransformPayload} from '../core/transform-payload.js';
 export type CopyPayload = {
   src: string,
   dest: string,
-  glob: string | '**/*.*',
+  glob: string | string[],
+  ignoreGlob?: string[],
+  followSymbolicLinks?: boolean,
   overwrite: true | false
 }
 
@@ -28,7 +30,7 @@ export class CopyTransform extends TransformPayload<CopyPayload> {
     const currwd = cwd();
 
 
-    await FastGlob(payload.glob, {cwd: join(currwd, payload.src)})
+    await FastGlob(payload.glob, {cwd: join(currwd, payload.src), followSymbolicLinks: payload.followSymbolicLinks ?? true, ignore: payload.ignoreGlob ?? []})
       .then(files => {
         const copyPromises: Promise<void>[] = [];
         const sourceFileNames: string[] = [];
