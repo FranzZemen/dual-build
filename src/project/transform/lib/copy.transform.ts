@@ -27,17 +27,17 @@ export class CopyTransform extends TransformPayload<CopyPayload> {
   }
 
   protected async executeImplPayload(payload: CopyPayload): Promise<void> {
-    const currwd = cwd();
+    const currentWorkingDirectory = cwd();
 
 
-    await FastGlob(payload.glob, {cwd: join(currwd, payload.src), followSymbolicLinks: payload.followSymbolicLinks ?? true, ignore: payload.ignoreGlob ?? []})
+    await FastGlob(payload.glob, {cwd: join(currentWorkingDirectory, payload.src), followSymbolicLinks: payload.followSymbolicLinks ?? true, ignore: payload.ignoreGlob ?? []})
       .then(files => {
         const copyPromises: Promise<void>[] = [];
         const sourceFileNames: string[] = [];
         files.forEach(file => {
           // Use Promise.all to aggregate all the file copies
-          const sourceFileName = join(currwd, payload.src, file);
-          const destFileName = join(currwd, payload.dest, file);
+          const sourceFileName = join(currentWorkingDirectory, payload.src, file);
+          const destFileName = join(currentWorkingDirectory, payload.dest, file);
           const destDirectory = dirname(destFileName);
           this.contextLog.debug(`copying from ${sourceFileName} to ${destFileName}`, 'context');
           sourceFileNames.push(sourceFileName);

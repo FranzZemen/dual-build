@@ -10,6 +10,10 @@ export enum BuildErrorNumber {
   DirectoryAlreadyExists = 'Error 50: Directory already exists',
   CopyFileError          = 'Error 51: Error copying file',
   CopyFilesError         = 'Error 52: Error copying files',
+  BacktrackedDeletion    = 'Error 53: Attempt to delete backtracked file (using ../)',
+  RmError                = 'Error 54: rm error',
+  RmGlob                 = 'Error 54: rm glob error',
+
 
   // Child Process Errors
   NoExecutablePayload    = 'Error 500: No payload provided for ExecutableTransform',
@@ -18,7 +22,7 @@ export enum BuildErrorNumber {
   // Git Errors
   GitAddError            = `Error 600: Git add error`,
   // Miscellaneous
-  VersionIsNotSemver     = 'Error 5000: Version string does not represent a semver',
+  VersionIsNotSemver     = 'Error 5000: Version string does not represent a semver'
 
 }
 
