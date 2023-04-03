@@ -214,7 +214,7 @@ export class Log implements LogInterface {
     }
   }
 
-  infoSegments(dataSegments: LogDataSegment[]) {
+  infoSegments(dataSegments: LogDataSegment[], treatment: TreatmentName = 'info') {
     if (dataSegments && this.logLevelValue <= logLevelValues.info) {
       this._logSegments(dataSegments, 'info');
     }
@@ -258,10 +258,8 @@ export class Log implements LogInterface {
       this.console[logMethodAndScheme](data);
     } else if (data && data instanceof Error) {
       if (data.stack) {
-        data.stack = data.stack.replaceAll(' at', `${Log.Tab.repeat(this.depth)}${this.color(logMethodAndScheme)} at`) + ConsoleCode.Reset;
+        data.stack = data.stack.replaceAll(' at', `${this.color(logMethodAndScheme)} at`) + ConsoleCode.Reset;
       }
-      data.stack = `${Log.Tab.repeat(this.depth)}${data.stack}`;
-      data.message = `${Log.Tab.repeat(this.depth)}${data.message}`;
       this.console[logMethodAndScheme](this.color(logMethodAndScheme));
       this.console[logMethodAndScheme](data);
       this.console[logMethodAndScheme](ConsoleCode.Reset);

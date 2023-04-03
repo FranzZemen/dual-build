@@ -5,6 +5,7 @@ License Type: MIT
 
 import {ChildProcess, exec, execFile, execFileSync, execSync} from 'node:child_process';
 import * as process from 'node:process';
+import {TreatmentName} from '../../log/index.js';
 import {BuildError, BuildErrorNumber} from '../../util/build-error.js';
 import {isExecSyncErrorThenStringifyBuffers} from '../../util/exec-sync-error.js';
 import {TransformPayload} from '../core/transform-payload.js';
@@ -37,6 +38,8 @@ export type ExecutablePayload = {
   arguments: ExecArguments;
   batchTarget: boolean;
   synchronous: boolean;
+  stdioTreatment?: TreatmentName;
+  stderrTreatment?: TreatmentName;
 }
 
 export type ExexcutableTransformConstructor<CLASS extends Transform<ExecutableTransform, any, any>> = new (logDepth: number) => CLASS;
@@ -70,7 +73,7 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
           resolve();
         } else {
           const childProcess: ChildProcess = execFile(command, payload.arguments, {cwd, windowsHide: false}, (error, stdout, stderr) => {
-            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr);
+            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr, payload.stdioTreatment, payload.stderrTreatment);
             if(buildError) {
               reject(buildError);
             } else {
@@ -100,7 +103,7 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
           }
         } else {
           const childProcess: ChildProcess = exec(command, {cwd, windowsHide: false}, (error, stdout, stderr) => {
-            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr);
+            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr, payload.stdioTreatment, payload.stderrTreatment);
             if(buildError) {
               reject(buildError);
             } else {
@@ -112,12 +115,12 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
     });
   }
 
-  private processAsyncError(error: Error | null, stdout:string, stderr: string): void | BuildError {
+  private processAsyncError(error: Error | null, stdout:string, stderr: string, stdioTreatment: TreatmentName = 'context', stderrTreatment: TreatmentName = 'context'): void | BuildError {
     if(stdout) {
-      this.contextLog.infoSegments([{data: stdout, treatment: 'context'}]);
+      this.contextLog.infoSegments([{data: stdout, treatment: stdioTreatment}]);
     }
     if(stderr) {
-      this.contextLog.infoSegments([{data: stderr, treatment: 'context'}]);
+      this.contextLog.infoSegments([{data: stderr, treatment: stderrTreatment}]);
     }
     if(error) {
       const buildError = new BuildError('exec error', {cause: error}, BuildErrorNumber.AsyncExecError);
