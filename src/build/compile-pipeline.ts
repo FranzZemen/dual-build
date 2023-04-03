@@ -14,7 +14,7 @@ const pipeline = Pipeline.options({name: 'Compile', logDepth: 0})
                            cwd: './',
                            arguments: ['-b'],
                            batchTarget: false,
-                           synchronous: true
+                           synchronous: false // Synchronization handled by transform
                          })
                          .execute(undefined)
                          .catch(err => {

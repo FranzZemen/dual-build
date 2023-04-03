@@ -4,6 +4,7 @@ License Type: MIT
 */
 
 
+import {Console} from 'node:console';
 import {ConsoleCode} from '../../log/index.js';
 import {Log} from '../../log/log.js';
 import {processUnknownError} from '../../util/index.js';

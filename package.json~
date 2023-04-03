@@ -17,7 +17,7 @@
     "test": "mocha transient/test/**/*.test.js",
     "clean-test": "rm -rf ./transient/test",
     "clean-toolx": "rm -rf ./transient/toolx",
-    "clean": "rm -rf ./transient"
+    "clean": "rm -rf ./transient",
   },
   "nodemonConfig": {
     "exec": "npx mocha ./transient/test/**/*.js",

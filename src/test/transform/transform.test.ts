@@ -43,7 +43,7 @@ describe('dual-build tests', () => {
         emittingConsole.on('stderr', (value: string) => {
           stderr.push(value);
         })
-        Log.setConsole(emittingConsole.console);
+        Log.setDefaultConsole(emittingConsole.console);
         const transform = new TestTransform();
         return transform.execute(5, 3)
                      .then(output => {
@@ -55,7 +55,7 @@ describe('dual-build tests', () => {
                        stdout[0]?.should.contain('starting...');
                        stdout[1]?.should.contain('...transform');
                        emittingConsole.removeAllListeners();
-                       Log.resetConsole();
+                       Log.resetDefaultConsole();
                      });
       });
     });

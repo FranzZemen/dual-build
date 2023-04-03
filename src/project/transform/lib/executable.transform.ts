@@ -6,7 +6,7 @@ License Type: MIT
 import {ChildProcess, exec, execFile, execFileSync, execSync} from 'node:child_process';
 import * as process from 'node:process';
 import {BuildError, BuildErrorNumber} from '../../util/build-error.js';
-import {isExecSyncError} from '../../util/exec-sync-error.js';
+import {isExecSyncErrorThenStringifyBuffers} from '../../util/exec-sync-error.js';
 import {TransformPayload} from '../core/transform-payload.js';
 import {Transform} from '../core/transform.js';
 
@@ -87,8 +87,9 @@ export class ExecutableTransform extends TransformPayload<ExecutablePayload> {
             resolve();
           } catch (err) {
             // Because we used stdio:'inherit' everything's already printed, and we just need to set "this" process error
-            if(isExecSyncError(err)) {
-              const error = new BuildError(err.message, undefined, BuildErrorNumber.SyncExecError);
+            if(isExecSyncErrorThenStringifyBuffers(err)) {
+
+              const error = new BuildError(err.message, {cause: err}, BuildErrorNumber.SyncExecError);
               this.contextLog.error(error);
               return reject(error);
             } else {

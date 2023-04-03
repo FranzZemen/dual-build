@@ -158,22 +158,31 @@ export class Log implements LogInterface {
   static TabLength = 2;
   static Tab = ' '.repeat(Log.TabLength);
   static InspectDepth: 10;
-  private static console: Console = console;
+  private static defaultConsole: Console = new Console({stdout: process.stdout, stderr: process.stderr});
+  private static originalDefaultConsole = Log.defaultConsole;
+  public static setDefaultConsole(console: Console) {
+    Log.defaultConsole = console;
+  }
+  public static resetDefaultConsole() {
+    Log.defaultConsole = Log.originalDefaultConsole;
+  }
+  // private console: Console = new Console({stdout: process.stdout, stderr: process.stderr});
   protected logLevel: LogLevelKey;
   protected foreground = ForegroundColor._8_ForegroundGreen;
   protected background = BackgroundColor._8_BackgroundBlack;
 
-  constructor(public depth = 0, protected maxDigestSize = 1000) {
+  constructor(public depth = 0, private console = Log.defaultConsole, private maxDigestSize = 1000) {
     this.logLevel = logConfig.level ?? 'info';
+    for(let i = 0; i < depth; i++) console.group();
   }
 
   protected get logLevelValue(): number {
     return logLevelValues[this.logLevel];
   }
 
-  public static setConsole(console: Console) {Log.console = console;};
+  public setConsole(console: Console) {this.console = console;};
 
-  public static resetConsole() {Log.console = console;};
+  // public resetConsole() {this.console = console;};
 
 
   error(data: Error | string) { // Force that error is always an Error or a string
@@ -241,16 +250,18 @@ export class Log implements LogInterface {
   protected errorImpl(data: string | any, logMethodAndScheme: keyof LogLevel) {
     if (typeof data === 'string') {
       data = this.assembleStringMessage(data, logMethodAndScheme);
-      Log.console[logMethodAndScheme](data);
+      this.console[logMethodAndScheme](data);
     } else if (data && data instanceof Error) {
       if (data.stack) {
-        data.stack = data.stack.replaceAll(' at', this.color(logMethodAndScheme) + ' at') + ConsoleCode.Reset;
+        data.stack = data.stack.replaceAll(' at', `${Log.Tab.repeat(this.depth)}${this.color(logMethodAndScheme)} at`) + ConsoleCode.Reset;
       }
-      Log.console[logMethodAndScheme](this.color(logMethodAndScheme));
-      Log.console[logMethodAndScheme](data);
-      Log.console[logMethodAndScheme](ConsoleCode.Reset);
+      data.stack = `${Log.Tab.repeat(this.depth)}${data.stack}`;
+      data.message = `${Log.Tab.repeat(this.depth)}${data.message}`;
+      this.console[logMethodAndScheme](this.color(logMethodAndScheme));
+      this.console[logMethodAndScheme](data);
+      this.console[logMethodAndScheme](ConsoleCode.Reset);
     } else {
-      Log.console[logMethodAndScheme](this.inspect(data));
+      this.console[logMethodAndScheme](this.inspect(data));
     }
   }
 
@@ -275,16 +286,16 @@ export class Log implements LogInterface {
           }
         } else {
           if (currText.length > 0) {
-            Log.console.log(currText);
+            this.console.log(currText);
             // Reset with depth
             currText = Log.Tab.repeat(this.depth);
           }
-          Log.console[logMethod](this.inspect(nextSegment.data));
+          this.console[logMethod](this.inspect(nextSegment.data));
         }
       }
     }
     if (currText.length > 0) {
-      Log.console.log(currText);
+      this.console.log(currText);
       currText = '';
     }
   }
@@ -294,9 +305,9 @@ export class Log implements LogInterface {
       if (data.indexOf(ConsoleCode.Escape) < 0) {
         data = this.assembleStringMessage(data, treatment);
       }
-      Log.console.log(data);
+      this.console.log(data);
     } else {
-      Log.console[logMethod](this.inspect(data));
+      this.console[logMethod](this.inspect(data));
     }
   }
 
@@ -311,7 +322,7 @@ export class Log implements LogInterface {
   }
 
   private inspect(data: any) {
-    return Log.Tab.repeat(this.depth) + inspect(data, false, 10, true).replaceAll('\n', '\n' + Log.Tab.repeat(this.depth));
+    return Log.Tab.repeat(this.depth) + inspect(data, false, Log.InspectDepth, true).replaceAll('\n', '\n' + Log.Tab.repeat(this.depth));
   }
 }
 

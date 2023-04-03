@@ -12,3 +12,4 @@ export * from './check-in.transform.js';
 export * from './commit.transform.js';
 export * from './push-branch.transform.js';
 export * from './copy.transform.js';
+export * from './del.transform.js';

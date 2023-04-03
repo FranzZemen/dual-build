@@ -15,6 +15,7 @@ export type DelPayload = {
   ignoreGlob?: string[],
   globReportsOnlyFiles?: boolean
   globFollowsSymbolicLinks?: boolean
+  recursive?: boolean
 }
 
 /**
@@ -25,13 +26,13 @@ export class DelTransform extends TransformPayload<DelPayload> {
   constructor(depth: number) {super(depth);}
 
 
-  private async _delSpecific(filtered: string): Promise<void> {
+  private async _delSpecific(filtered: string, recursive = false): Promise<void> {
     if(filtered.trim().length === 0) {
       this.contextLog.info(`{filtered} was filtered out, no deletion resulted`);
       return;
     }
     const absolute = join(cwd(), filtered);
-    return rm(absolute)
+    return rm(absolute, {recursive})
       .catch((err:unknown) => {
         const error = new BuildError(`Error deleting ${absolute}`, {cause: err}, BuildErrorNumber.RmError)
         this.contextLog.error(error);
@@ -39,7 +40,7 @@ export class DelTransform extends TransformPayload<DelPayload> {
       });
   }
 
-  private delSpecific(payload: DelPayload): Promise<void> {
+  private delSpecific(payload: DelPayload, recursive = false): Promise<void> {
     const filtered = this.filter(payload.pattern);
       return filtered.then(filteredFromPromise => {
         if(typeof filteredFromPromise === 'string') {
@@ -59,7 +60,7 @@ export class DelTransform extends TransformPayload<DelPayload> {
       throw error;
     }
     if (/\*/.test(payload.pattern)) {
-      return this.delSpecific(payload);
+      return this.delSpecific(payload, payload.recursive === undefined ? false : payload.recursive);
     } else {
       const currentWorkingDirectory = cwd();
       return FastGlob(payload.pattern,
@@ -84,7 +85,7 @@ export class DelTransform extends TransformPayload<DelPayload> {
             const candidate = join(currentWorkingDirectory, file);
             candidates.push(candidate);
             this.contextLog.debug(`deleting ${candidate}`, 'context');
-            promises.push(rm(candidate)); // Note we don't use the recursive flag.  We let the glob pattern decide that, including whther todelete directories
+            promises.push(rm(candidate, {recursive: payload.recursive == undefined ? false : payload.recursive}));
           });
           return Promise.allSettled(promises)
             .then(results => {
@@ -112,9 +113,9 @@ export class DelTransform extends TransformPayload<DelPayload> {
 
   protected filter(targets: string | string[]): Promise<string | string[]> {
     if(typeof targets === 'string') {
-      return Promise.resolve('');
+      return Promise.resolve(targets);
     } else {
-      return Promise.resolve([]);
+      return Promise.resolve(targets);
     }
   }
 
