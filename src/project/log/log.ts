@@ -161,7 +161,7 @@ export class Log implements LogInterface {
   private static defaultConsole: Console = new Console({stdout: process.stdout, stderr: process.stderr});
   private static originalDefaultConsole = Log.defaultConsole;
   public static setDefaultConsole(console: Console) {
-    Log.defaultConsole = console;
+    Log.defaultConsole = console
   }
   public static resetDefaultConsole() {
     Log.defaultConsole = Log.originalDefaultConsole;
@@ -173,7 +173,12 @@ export class Log implements LogInterface {
 
   constructor(public depth = 0, private console = Log.defaultConsole, private maxDigestSize = 1000) {
     this.logLevel = logConfig.level ?? 'info';
-    for(let i = 0; i < depth; i++) console.group();
+    /**
+     * It might be expected to use console.group() instead of manually inserting tabs.  However, if one has multiple process.stdio consoles,
+     * these group together, which is not the intended behavior.  Thus, we don't do this:
+     *
+     * for(let i = 0; i < depth; i++) console.group();
+     */
   }
 
   protected get logLevelValue(): number {
