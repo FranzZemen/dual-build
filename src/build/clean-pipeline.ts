@@ -4,11 +4,8 @@ License Type:
 */
 
 
-import {DelPayload} from 'dual-build/project';
-import {Pipeline} from 'dual-build/project';
-import {DelTransform} from  'dual-build/project';
+import {DelPayload, DelTransform, Pipeline} from 'dual-build/project';
 
-Pipeline
-  .options({name:'clean', logDepth: 0})
-  .transform<DelTransform, DelPayload>(DelTransform, {pattern: './out/bin'})
-  .execute(undefined);
+export const cleanPipeline = Pipeline
+  .options({name: 'clean', logDepth: 0})
+  .transform<DelTransform, DelPayload>(DelTransform, {pattern: './out', recursive: true});

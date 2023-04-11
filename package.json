@@ -1,12 +1,16 @@
 {
   "name": "dual-build",
-  "version": "0.0.86",
+  "version": "0.0.88",
   "author": "Franz Zemen",
   "type": "module",
   "exports": {
     "./project": {
       "types": "./out/dist/types/index.d.ts",
       "import": "./out/dist/esm/index.js"
+    },
+    "./build": {
+      "types": "./out/build/index.d.ts",
+      "import": "./out/build/index.js"
     }
   },
   "imports": {

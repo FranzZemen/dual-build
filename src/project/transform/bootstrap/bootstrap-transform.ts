@@ -3,7 +3,7 @@ Created by Franz Zemen 02/03/2023
 License Type: 
 */
 
-import {BootstrapOptions} from '../../options/bootstrap.options.js';
+import {BootstrapOptions} from '../../options/index.js';
 import {TransformPayloadIn} from '../core/transform-payload-in.js';
 
 export abstract class BootstrapTransform<PASSED_IN> extends TransformPayloadIn<PASSED_IN, BootstrapOptions> {
