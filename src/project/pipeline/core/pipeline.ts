@@ -181,7 +181,7 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT = PIPELINE_IN> {
 
   parallels<PARALLEL_IN = PIPELINE_IN, PARALLEL_OUT = PIPELINE_IN>(transformClasses: TransformConstructor<any>[],
                                                                    mergeStrategy: [type: MergeType, mergeFunction?: MergeFunction<PARALLEL_OUT>] = ['asAttributes'],
-                                                                   passedIns: ArrayTwoOrMore<any | undefined> []): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
+                                                                   passedIns: (any | undefined)[]): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
     return transformClasses.reduce((previousValue: any, currentValue, currentIndex) => {
       if (transformClasses.length != passedIns.length) {
         throw new Error('Array lengths do not match');

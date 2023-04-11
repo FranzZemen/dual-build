@@ -25,14 +25,6 @@ import {
 
 
 export const buildPipeline = Pipeline.options({name: 'Build', logDepth: 0})
-                                     .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
-                                       targetPath: './out/dist/esm/package.json',
-                                       package: {type: ModuleType.module}
-                                     })
-                                     .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
-                                       targetPath: './out/dist/cjs/package.json',
-                                       package: {type: ModuleType.commonjs}
-                                     })
                                      .transform<CreateDirectoryTransform, CreateDirectoryPayload>(CreateDirectoryTransform, {
                                        directory: {
                                          name: './out/dist/bin',
@@ -42,10 +34,42 @@ export const buildPipeline = Pipeline.options({name: 'Build', logDepth: 0})
                                        },
                                        errorOnExists: false
                                      })
-                                     .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
-                                       targetPath: './out/dist/bin/package.json',
-                                       package: {type: ModuleType.commonjs}
-                                     })
+                                     .parallels([CreatePackageTransform, CreatePackageTransform, CreatePackageTransform],
+                                                ['void'],
+                                                [
+                                                  {
+                                                    targetPath: './out/dist/esm/package.json',
+                                                    package: {
+                                                      type: ModuleType.module
+                                                    }
+                                                  }, {
+                                                  targetPath: './out/dist/cjs/package.json',
+                                                  package: {
+                                                    type: ModuleType.commonjs
+                                                  }
+                                                }, {
+                                                  targetPath: './out/dist/bin/package.json',
+                                                  package: {
+                                                    type: ModuleType.commonjs
+                                                  }
+                                                }]
+                                     )
+  /*
+  .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
+    targetPath: './out/dist/esm/package.json',
+    package: {type: ModuleType.module}
+  })
+  .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
+    targetPath: './out/dist/cjs/package.json',
+    package: {type: ModuleType.commonjs}
+  })
+
+  .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
+    targetPath: './out/dist/bin/package.json',
+    package: {type: ModuleType.commonjs}
+  })
+
+   */
                                      .transform<CopyTransform, CopyPayload>(CopyTransform, {
                                        src: './doc/project',
                                        dest: './out/dist',

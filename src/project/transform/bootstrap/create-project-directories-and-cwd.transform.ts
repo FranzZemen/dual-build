@@ -6,7 +6,7 @@ License Type: MIT
 
 import {BootstrapOptions} from '../../options/index.js';
 import {Directories, DirectoryPath} from '../../options/index.js';
-import {Pipeline} from '../../pipeline/index.js';
+import {ArrayTwoOrMore, Pipeline} from '../../pipeline/index.js';
 import {ChangeWorkingDirectory} from '../../lib/transform/index.js';
 import {CreateDirectoryTransform, CreateDirectoryPayload} from '../../lib/transform/index.js';
 import {TransformConstructor} from '../core/transform.js';
@@ -26,7 +26,7 @@ export class CreateProjectDirectoriesAndCwd extends BootstrapTransform<undefined
 
   public executeBootstrapImpl(bootstrapOptions: BootstrapOptions): Promise<void> {
       const directories: Directories = bootstrapOptions.directories;
-      const parallelWork: CreateDirectoryPayload[] = [];
+      let parallelWork: CreateDirectoryPayload[] = [];
       let createDirectoryTransforms: TransformConstructor<any>[] = []
       let key: DirectoryPath | 'root';
       for(key in directories) {
@@ -40,7 +40,7 @@ export class CreateProjectDirectoriesAndCwd extends BootstrapTransform<undefined
       return Pipeline
         .options<string>({name: 'Create project directories', logDepth: this.depth + 1})
         .transform<CreateDirectoryTransform, CreateDirectoryPayload>(CreateDirectoryTransform, {directory: directories.root, errorOnExists: true})
-        .parallels(createDirectoryTransforms, ['asPipedIn'], parallelWork as any [])
+        .parallels(createDirectoryTransforms, ['asPipedIn'], parallelWork)
         .transform<ChangeWorkingDirectory, undefined>(ChangeWorkingDirectory)
         .execute( directories.root.directoryPath)
         .then(() => {return;});
