@@ -10,4 +10,3 @@ export * from './core/transform-independent.js'
 export * from './core/transform-out.js';
 export * from './core/transform-payload-in.js';
 export * from './core/transform-payload-out.js';
-export * from './bootstrap/index.js'

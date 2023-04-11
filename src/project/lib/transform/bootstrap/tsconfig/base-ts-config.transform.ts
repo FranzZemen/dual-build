@@ -6,9 +6,9 @@ License Type:
 
 import {writeFile} from 'fs/promises';
 import {join} from 'node:path';
-import {Directory} from '../../../options/index.js';
-import {defaultBaseCompilerOptions} from '../../../options/index.js';
-import {TransformPayload} from '../../core/transform-payload.js';
+import {Directory} from '../../../../options/index.js';
+import {defaultBaseCompilerOptions} from '../../../../options/index.js';
+import {TransformPayload} from '../../../../transform/core/transform-payload.js';
 
 
 export type BaseTsConfigTransformPayload = {

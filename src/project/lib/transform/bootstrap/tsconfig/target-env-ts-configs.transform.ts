@@ -3,9 +3,9 @@ Created by Franz Zemen 01/10/2023
 License Type: 
 */
 
-import {TargetOptions} from '../../../options/index.js';
-import {ParallelPipe, Pipeline} from '../../../pipeline/index.js';
-import {TransformPayload} from '../../core/transform-payload.js';
+import {TargetOptions} from '../../../../options/index.js';
+import {ParallelPipe, Pipeline} from '../../../../pipeline/index.js';
+import {TransformPayload} from '../../../../transform/core/transform-payload.js';
 import {GenerateTsConfigPayload, TargetEnvTsConfigTransform} from './target-env-ts-config.transform.js';
 
 

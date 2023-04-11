@@ -5,9 +5,9 @@ License Type:
 
 import {writeFile} from 'node:fs/promises';
 import {EOL} from 'os';
-import {gitignore} from '../../../options/index.js';
-import {processUnknownError} from '../../../util/index.js';
-import {TransformIndependent} from '../../core/transform-independent.js';
+import {gitignore} from '../../../../options/index.js';
+import {processUnknownError} from '../../../../util/index.js';
+import {TransformIndependent} from '../../../../transform/core/transform-independent.js';
 
 /**
  * Assumes cwd has been set, but verifies it

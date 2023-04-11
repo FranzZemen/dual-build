@@ -34,40 +34,24 @@ export const buildPipeline = Pipeline.options({name: 'Build', logDepth: 0})
                                        },
                                        errorOnExists: false
                                      })
-                                     .startParallel<CreatePackageTransform,CreatePackagePayload>(CreatePackageTransform, {
-                                                    targetPath: './out/dist/esm/package.json',
-                                                    package: {
-                                                      type: ModuleType.module
-                                                    }
-                                                  })
-  .parallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
-                                                  targetPath: './out/dist/cjs/package.json',
-                                                  package: {
-                                                    type: ModuleType.commonjs
-                                                  }
-                                                })
-  .endParallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, ['void'],{
-                                                  targetPath: './out/dist/bin/package.json',
-                                                  package: {
-                                                    type: ModuleType.commonjs
-                                                  }
-                                                })
-  /*
-  .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
-    targetPath: './out/dist/esm/package.json',
-    package: {type: ModuleType.module}
-  })
-  .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
-    targetPath: './out/dist/cjs/package.json',
-    package: {type: ModuleType.commonjs}
-  })
-
-  .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
-    targetPath: './out/dist/bin/package.json',
-    package: {type: ModuleType.commonjs}
-  })
-
-   */
+                                     .startParallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
+                                       targetPath: './out/dist/esm/package.json',
+                                       package: {
+                                         type: ModuleType.module
+                                       }
+                                     })
+                                     .parallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
+                                       targetPath: './out/dist/cjs/package.json',
+                                       package: {
+                                         type: ModuleType.commonjs
+                                       }
+                                     })
+                                     .endParallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, ['void'], {
+                                       targetPath: './out/dist/bin/package.json',
+                                       package: {
+                                         type: ModuleType.commonjs
+                                       }
+                                     })
                                      .transform<CopyTransform, CopyPayload>(CopyTransform, {
                                        src: './doc/project',
                                        dest: './out/dist',
@@ -75,8 +59,6 @@ export const buildPipeline = Pipeline.options({name: 'Build', logDepth: 0})
                                        overwrite: true
                                      })
                                      .transform<CheckInTransform>(CheckInTransform)
-  //.transform<CommitTransform, CommitPayload>(CommitTransform, undefined)
-
                                      .transform<CommitTransform, CommitPayload>(CommitTransform, {comment: 'testing'})
                                      .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, {
                                        executable: 'npm version',
@@ -110,8 +92,6 @@ export const buildPipeline = Pipeline.options({name: 'Build', logDepth: 0})
                                      .transform<CheckInTransform>(CheckInTransform)
                                      .transform<CommitTransform, CommitPayload>(CommitTransform, {comment: 'published'})
                                      .transform<PushBranchTransform>(PushBranchTransform);
-
-// .execute(undefined);
 
 
 

@@ -7,16 +7,15 @@ import _ from 'lodash';
 import {basename} from 'node:path';
 import {cwd} from 'node:process';
 import {bootstrapOptions, BootstrapOptions, defaultTargetOptions, GitOptions} from '../../options/index.js';
+import {Pipeline} from '../../pipeline/index.js';
 import {
   BaseTsConfigTransform,
   BaseTsConfigTransformPayload,
   CreateProjectDirectoriesAndCwd, GenerateTsConfigsPayload,
-  InstallGitignore,
-  SaveOptionsPayload,
+  InstallGitignore, SaveOptionsPayload,
   SaveOptionsTransform,
   SetupGit, TargetEnvTsConfigsTransform
-} from '../../transform/index.js';
-import {Pipeline} from '../../pipeline/index.js';
+} from '../transform/index.js';
 
 const projectDirectoryPath = './test-scaffolding';
 
