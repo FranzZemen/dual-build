@@ -1,6 +1,6 @@
 {
   "name": "dual-build",
-  "version": "0.0.93",
+  "version": "0.0.94",
   "author": "Franz Zemen",
   "type": "module",
   "exports": {
@@ -23,7 +23,6 @@
     "clean-toolx": "rm -rf ./transient/toolx",
     "clean": "rm -rf ./transient"
   },
-
   "nodemonConfig": {
     "exec": "npx mocha ./transient/test/**/*.js",
     "watch": [
