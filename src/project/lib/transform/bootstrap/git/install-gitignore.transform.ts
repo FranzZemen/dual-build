@@ -7,7 +7,7 @@ import {writeFile} from 'node:fs/promises';
 import {EOL} from 'os';
 import {gitignore} from '../../../../options/index.js';
 import {processUnknownError} from '../../../../util/index.js';
-import {TransformIndependent} from '../../../../transform/core/transform-independent.js';
+import {TransformIndependent} from '../../../../transform/transform-independent.js';
 
 /**
  * Assumes cwd has been set, but verifies it

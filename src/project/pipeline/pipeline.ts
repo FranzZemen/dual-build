@@ -4,11 +4,11 @@ License Type: MIT
 */
 
 import {v4 as uuidV4} from 'uuid';
-import {Log} from '../../log/log.js';
-import {Transform, TransformConstructor} from '../../transform/index.js';
-import {BuildError, BuildErrorNumber} from '../../util/index.js';
-import {processUnknownError} from '../../util/process-unknown-error-message.js';
-import {clearTiming, endTiming, startTiming} from '../../util/timing.js';
+import {Log} from '../log/log.js';
+import {Transform, TransformConstructor} from '../transform/index.js';
+import {BuildError, BuildErrorNumber} from '../util/index.js';
+import {processUnknownError} from '../util/process-unknown-error-message.js';
+import {clearTiming, endTiming, startTiming} from '../util/timing.js';
 import {MergeFunction, MergeType, ParallelPipe} from './parallel-pipe.js';
 import {Pipe, PipelineOptions} from './pipeline-aliases.js';
 import {SeriesPipe} from './series-pipe.js';

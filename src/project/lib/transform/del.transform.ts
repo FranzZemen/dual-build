@@ -8,7 +8,7 @@ import {rm} from 'fs/promises';
 import {join} from 'node:path';
 import {cwd} from 'node:process';
 import {BuildError, BuildErrorNumber} from '../../util/index.js';
-import {TransformPayload} from '../../transform/core/transform-payload.js';
+import {TransformPayload} from '../../transform/index.js';
 
 export type DelPayload = {
   pattern: string | '**/*.*', // Can be a specific directory, symbolic link or file or a glob relative to project directory

@@ -7,7 +7,7 @@ import {writeFile} from 'fs/promises';
 import path from 'path';
 import {Package} from '../../options/index.js';
 import {BuildError, BuildErrorNumber} from '../../util/index.js';
-import {TransformPayload} from '../../transform/core/transform-payload.js';
+import {TransformPayload} from '../../transform/index.js';
 
 export type CreatePackagePayload = {
   targetPath: string;

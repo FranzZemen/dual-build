@@ -5,7 +5,7 @@ License Type: MIT
 
 import {InitResult} from 'simple-git';
 import {gitOptions} from '../../../../options/index.js';
-import {TransformInOut} from '../../../../transform/core/transform-in-out.js';
+import {TransformInOut} from '../../../../transform/transform-in-out.js';
 import {SetupGitPipelinePayload} from './setup-git.transform.js';
 
 export type GitInitResult = Partial<InitResult> & {initialized: boolean;}

@@ -8,7 +8,7 @@ import {join} from 'node:path';
 import {cwd} from 'node:process';
 import {esm} from '../../options/index.js';
 import {BuildError, BuildErrorNumber} from '../../util/index.js';
-import {TransformPayload} from '../../transform/core/transform-payload.js';
+import {TransformPayload} from '../../transform/index.js';
 import {MaleatePackagePayload} from './maleate-package.transform.js';
 
 export class CompileTransform extends TransformPayload<MaleatePackagePayload> {

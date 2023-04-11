@@ -6,7 +6,7 @@ import {simpleGit, SimpleGit} from 'simple-git';
 import {GitOptions} from '../../../../options/index.js';
 import {Pipeline} from '../../../../pipeline/index.js';
 import {processUnknownError} from '../../../../util/index.js';
-import {TransformPayload} from '../../../../transform/core/transform-payload.js';
+import {TransformPayload} from '../../../../transform/transform-payload.js';
 import {GitAddOrigin} from './git-add-origin.transform.js';
 import {GitInitResult, InitGit} from './init-git.transform.js';
 

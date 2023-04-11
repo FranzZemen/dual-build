@@ -5,10 +5,10 @@ License Type: MIT
 
 
 import {Console} from 'node:console';
-import {ConsoleCode} from '../../log/index.js';
-import {Log} from '../../log/log.js';
-import {processUnknownError} from '../../util/index.js';
-import {endTiming, startTiming} from '../../util/timing.js';
+import {ConsoleCode} from '../log/index.js';
+import {Log} from '../log/log.js';
+import {processUnknownError} from '../util/index.js';
+import {endTiming, startTiming} from '../util/timing.js';
 
 export type TransformConstructor<CLASS extends Transform<any, any, any>> = new (logDepth: number) => CLASS;
 

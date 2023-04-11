@@ -9,7 +9,7 @@ import {mkdir} from 'node:fs/promises';
 import {join, dirname} from 'node:path';
 import {cwd} from 'node:process';
 import {BuildError, BuildErrorNumber} from '../../util/index.js';
-import {TransformPayload} from '../../transform/core/transform-payload.js';
+import {TransformPayload} from '../../transform/index.js';
 
 
 export type CopyPayload = {

@@ -6,10 +6,10 @@ License Type: MIT
 import {ChildProcess, exec, execFile, execFileSync, execSync} from 'node:child_process';
 import * as process from 'node:process';
 import {TreatmentName} from '../../log/index.js';
-import {BuildError, BuildErrorNumber} from '../../util/build-error.js';
+import {BuildError, BuildErrorNumber} from '../../util/index.js';
 import {isExecSyncErrorThenStringifyBuffers} from '../../util/exec-sync-error.js';
-import {TransformPayload} from '../../transform/core/transform-payload.js';
-import {Transform} from '../../transform/core/transform.js';
+import {TransformPayload} from '../../transform/index.js';
+import {Transform} from '../../transform/index.js';
 
 export type DoubleDashFlag = `--${string}`;
 export type DashFlag = `-${string}`;

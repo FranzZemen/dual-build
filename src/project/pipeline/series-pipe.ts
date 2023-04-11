@@ -1,7 +1,7 @@
-import {Log} from '../../log/log.js';
-import {Transform, TransformConstructor} from '../../transform/core/transform.js';
-import {BuildError, BuildErrorNumber} from '../../util/index.js';
-import {processUnknownError} from '../../util/process-unknown-error-message.js';
+import {Log} from '../log/log.js';
+import {Transform, TransformConstructor} from '../transform/transform.js';
+import {BuildError, BuildErrorNumber} from '../util/index.js';
+import {processUnknownError} from '../util/process-unknown-error-message.js';
 import {Pipeline} from './pipeline.js';
 
 export class SeriesPipe<SERIES_IN, SERIES_OUT = SERIES_IN> {

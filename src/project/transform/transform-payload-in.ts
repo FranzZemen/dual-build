@@ -3,7 +3,7 @@ Created by Franz Zemen 01/02/2023
 License Type: MIT
 */
 
-import {deepCopy} from '../../util/deep-copy.js';
+import {deepCopy} from '../util/deep-copy.js';
 import {Transform} from './transform.js';
 
 export type TransformPayloadInConstructor<CLASS extends TransformPayloadIn<PASSED_IN, PIPE_IN>, PASSED_IN, PIPE_IN> = new (logDepth: number) => CLASS;

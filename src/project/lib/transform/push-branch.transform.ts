@@ -4,7 +4,7 @@ License Type: MIT
 */
 
 import {git} from '../../util/git.js';
-import {TransformIndependent} from '../../transform/core/transform-independent.js';
+import {TransformIndependent} from '../../transform/index.js';
 
 export class PushBranchTransform extends TransformIndependent {
   constructor(depth:number) {super(depth);}

@@ -8,9 +8,9 @@ import {access} from 'fs/promises';
 import {mkdir} from 'node:fs/promises';
 import {join} from 'node:path';
 import {cwd} from 'node:process';
-import {Directory} from '../../options/directories.js';
-import {BuildError, BuildErrorNumber} from '../../util/build-error.js';
-import {TransformPayloadIn} from '../../transform/core/transform-payload-in.js';
+import {Directory} from '../../options/index.js';
+import {BuildError, BuildErrorNumber} from '../../util/index.js';
+import {TransformPayloadIn} from '../../transform/index.js';
 
 
 export type CreateDirectoryPayload = {

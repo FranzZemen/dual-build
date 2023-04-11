@@ -5,7 +5,7 @@ License Type: MIT
 
 
 import {processUnknownError} from '../../../../util/index.js';
-import {TransformIn} from '../../../../transform/core/transform-in.js';
+import {TransformIn} from '../../../../transform/transform-in.js';
 import {SetupGitPipelinePayload} from './setup-git.transform.js';
 
 export class GitAddOrigin extends TransformIn<SetupGitPipelinePayload> {

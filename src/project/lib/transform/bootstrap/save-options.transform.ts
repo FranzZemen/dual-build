@@ -7,7 +7,7 @@ import {writeFile} from 'fs/promises';
 import {join} from 'node:path';
 import {Directory, Options} from '../../../options/index.js';
 import {processUnknownError} from '../../../util/index.js';
-import {TransformPayload} from '../../../transform/core/transform-payload.js';
+import {TransformPayload} from '../../../transform/transform-payload.js';
 
 export type SaveOptionsPayload = Options & {
   directory: Directory;

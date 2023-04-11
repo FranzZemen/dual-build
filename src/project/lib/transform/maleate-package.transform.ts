@@ -6,7 +6,7 @@ License Type:
 import {readFile, writeFile} from 'fs/promises';
 import * as path from 'path';
 import {Exports, Imports, Package, TargetOptions} from '../../options/index.js';
-import {TransformPayload} from '../../transform/core/transform-payload.js';
+import {TransformPayload} from '../../transform/index.js';
 
 
 export type MaleatePackagePayload = {

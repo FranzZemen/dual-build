@@ -5,7 +5,7 @@ License Type:
 
 import {TsConfig} from 'tsconfig.d.ts'
 import {Package, TargetOption} from '../../options/index.js';
-import {TransformPayload} from '../../transform/core/transform-payload.js';
+import {TransformPayload} from '../../transform/index.js';
 
 
 export type CompileTargetOptionPayload = {
