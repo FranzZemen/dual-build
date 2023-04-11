@@ -34,26 +34,24 @@ export const buildPipeline = Pipeline.options({name: 'Build', logDepth: 0})
                                        },
                                        errorOnExists: false
                                      })
-                                     .parallels([CreatePackageTransform, CreatePackageTransform, CreatePackageTransform],
-                                                ['void'],
-                                                [
-                                                  {
+                                     .startParallel<CreatePackageTransform,CreatePackagePayload>(CreatePackageTransform, {
                                                     targetPath: './out/dist/esm/package.json',
                                                     package: {
                                                       type: ModuleType.module
                                                     }
-                                                  }, {
+                                                  })
+  .parallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
                                                   targetPath: './out/dist/cjs/package.json',
                                                   package: {
                                                     type: ModuleType.commonjs
                                                   }
-                                                }, {
+                                                })
+  .endParallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, ['void'],{
                                                   targetPath: './out/dist/bin/package.json',
                                                   package: {
                                                     type: ModuleType.commonjs
                                                   }
-                                                }]
-                                     )
+                                                })
   /*
   .transform<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
     targetPath: './out/dist/esm/package.json',
