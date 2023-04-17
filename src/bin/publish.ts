@@ -1,21 +1,26 @@
 /*
 Created by Franz Zemen 04/05/2023
-License Type: 
+License Type: MIT
 */
+
 
 import {BuildPipelineType, getBuildPipeline} from 'dual-build/build';
 import {processUnknownError} from 'dual-build/project';
 
-getBuildPipeline(BuildPipelineType.Clean)
+getBuildPipeline(BuildPipelineType.Publish)
   .execute(undefined)
   .catch((err:unknown) => {
     processUnknownError(err, console, 'Unknown error');
   });
 
-/*
-cleanPipeline
+/*import {publishPipeline} from 'dual-build/build';
+import {processUnknownError} from 'dual-build/project';
+
+publishPipeline
   .execute(undefined)
   .catch((err: unknown) => {
     processUnknownError(err, console, 'Unknown error');
   });
-*/
+
+
+ */
