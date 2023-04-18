@@ -4,8 +4,9 @@ License Type:
 */
 
 
-import {DelPayload, DelTransform, Pipeline} from 'dual-build/project';
+import {DelPayload, DelTransform, Pipeline, MergeType} from 'dual-build/project';
 
 export const cleanPipeline = Pipeline
   .options({name: 'clean', logDepth: 0})
-  .transform<DelTransform, DelPayload>(DelTransform, {pattern: './out', recursive: true});
+  .parallels([DelTransform, DelTransform], ['void'], [{pattern: './out', recursive: true}, {pattern: './bin', recursive: true}])
+  //.transform<DelTransform, DelPayload>(DelTransform, {pattern: './out', recursive: true});
