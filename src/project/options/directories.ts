@@ -5,6 +5,21 @@ License Type: MIT
 
 import {ValidationSchema} from 'fastest-validator';
 
+export type DirectoryReference =
+  'transient';
+
+
+
+
+export type DBDirectory = {
+  reference: DirectoryReference;
+  name: string;
+  depth: number | 0;
+  subDirectories: DBDirectory[];
+}
+
+export type DBDirectoryMap = Map<DirectoryReference, DBDirectory>;
+
 export type DirectoryPath =
   '.git'
   | 'node_modules'

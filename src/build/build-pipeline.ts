@@ -84,6 +84,25 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
   }
   switch (type) {
     case BuildPipelineType.Build:
+      pipeline = pipeline
+        .transform<MaleatePackageTransform, MaleatePackagePayload>(MaleatePackageTransform, {
+          targetPath: './out/dist/package.json',
+          exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
+          inclusions: {
+            bin: {
+              "bootstrap": "node bin/bootstrap"
+            },
+            exports: {
+              '.': {
+                types: './types',
+                import: './esm/index.js',
+                require: './cjs/index.js'
+              }
+            },
+            main: './cjs/index.js',
+            types: './types'
+          }
+        })
       return pipeline;
     case BuildPipelineType.CheckIn:
     case BuildPipelineType.Push:
@@ -113,6 +132,9 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
           targetPath: './out/dist/package.json',
           exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
           inclusions: {
+            bin: {
+              "bootstrap": "node bin bootstrap"
+            },
             exports: {
               '.': {
                 types: './types',

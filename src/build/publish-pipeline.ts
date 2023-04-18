@@ -2,7 +2,7 @@
 Created by Franz Zemen 03/11/2023
 License Type: MIT
 */
-
+/*
 
 import {
   CheckInTransform,
@@ -55,7 +55,11 @@ export const publishPipeline = Pipeline.options({name: 'Build', logDepth: 0})
                                        .transform<CopyTransform, CopyPayload>(CopyTransform, {
                                        src: './doc/project',
                                        dest: './out/dist',
-                                       glob: '**/*.md',
+
+
+ */
+  //                                     glob: '**/*.md',
+/*
                                        overwrite: true
                                      })
                                        .transform<CheckInTransform>(CheckInTransform)
@@ -93,5 +97,4 @@ export const publishPipeline = Pipeline.options({name: 'Build', logDepth: 0})
                                        .transform<CommitTransform, CommitPayload>(CommitTransform, {comment: 'published'})
                                        .transform<PushBranchTransform>(PushBranchTransform);
 
-
-
+*/
