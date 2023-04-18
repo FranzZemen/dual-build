@@ -20,6 +20,8 @@
     "setup": "npx tsc -b && node bin/build",
     "compile": "npx tsc -b",
     "build": "node bin/build",
+    "check-in": "node bin/check-in",
+    "push": "node bin/push",
     "publish": "node bin/publish",
     "clean": "node bin/clean",
     "test": "mocha transient/test/**/*.test.js"

@@ -29,6 +29,7 @@ export enum BuildPipelineType {
   Clean   = 'Clean',
   Build   = 'Build',
   CheckIn = 'CheckIn',
+  Push = 'Push',
   Publish = 'Publish',
 }
 
@@ -41,6 +42,7 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
       return pipeline.transform<DelTransform, DelPayload>(DelTransform, {pattern: './out', recursive: true});
     case BuildPipelineType.Build:
     case BuildPipelineType.CheckIn:
+    case BuildPipelineType.Push:
     case BuildPipelineType.Publish:
       pipeline = pipeline
         .transform<CreateDirectoryTransform, CreateDirectoryPayload>(CreateDirectoryTransform, {
@@ -84,6 +86,7 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
     case BuildPipelineType.Build:
       return pipeline;
     case BuildPipelineType.CheckIn:
+    case BuildPipelineType.Push:
     case BuildPipelineType.Publish:
       pipeline = pipeline
         .transform<CheckInTransform>(CheckInTransform)
@@ -92,6 +95,10 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
   }
   switch (type) {
     case BuildPipelineType.CheckIn:
+      return pipeline;
+    case BuildPipelineType.Push:
+      pipeline = pipeline
+        .transform<PushBranchTransform>(PushBranchTransform);
       return pipeline;
     case BuildPipelineType.Publish:
       pipeline = pipeline
