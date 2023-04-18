@@ -29,6 +29,7 @@ export enum BuildPipelineType {
   Clean   = 'Clean',
   Build   = 'Build',
   CheckIn = 'CheckIn',
+  Push = 'Push',
   Publish = 'Publish',
 }
 
@@ -41,6 +42,7 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
       return pipeline.transform<DelTransform, DelPayload>(DelTransform, {pattern: './out', recursive: true});
     case BuildPipelineType.Build:
     case BuildPipelineType.CheckIn:
+    case BuildPipelineType.Push:
     case BuildPipelineType.Publish:
       pipeline = pipeline
         .transform<CreateDirectoryTransform, CreateDirectoryPayload>(CreateDirectoryTransform, {
@@ -82,8 +84,28 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
   }
   switch (type) {
     case BuildPipelineType.Build:
+      pipeline = pipeline
+        .transform<MaleatePackageTransform, MaleatePackagePayload>(MaleatePackageTransform, {
+          targetPath: './out/dist/package.json',
+          exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
+          inclusions: {
+            bin: {
+              "bootstrap": "node bin/bootstrap"
+            },
+            exports: {
+              '.': {
+                types: './types',
+                import: './esm/index.js',
+                require: './cjs/index.js'
+              }
+            },
+            main: './cjs/index.js',
+            types: './types'
+          }
+        })
       return pipeline;
     case BuildPipelineType.CheckIn:
+    case BuildPipelineType.Push:
     case BuildPipelineType.Publish:
       pipeline = pipeline
         .transform<CheckInTransform>(CheckInTransform)
@@ -92,6 +114,10 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
   }
   switch (type) {
     case BuildPipelineType.CheckIn:
+      return pipeline;
+    case BuildPipelineType.Push:
+      pipeline = pipeline
+        .transform<PushBranchTransform>(PushBranchTransform);
       return pipeline;
     case BuildPipelineType.Publish:
       pipeline = pipeline
@@ -106,6 +132,9 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
           targetPath: './out/dist/package.json',
           exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
           inclusions: {
+            bin: {
+              "bootstrap": "node bin bootstrap"
+            },
             exports: {
               '.': {
                 types: './types',
