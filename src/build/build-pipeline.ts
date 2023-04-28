@@ -87,7 +87,7 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
           exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
           inclusions: {
             bin: {
-              "bootstrap": "bootstrap"
+              "bootstrap": "./bin/bootstrap"
             },
             exports: {
               '.': {
@@ -130,7 +130,7 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
           exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
           inclusions: {
             bin: {
-              "bootstrap": "bootstrap"
+              "bootstrap": "./bin/bootstrap"
             },
             exports: {
               '.': {
