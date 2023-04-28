@@ -1,7 +1,7 @@
 import {AsyncCheckFunction, SyncCheckFunction, ValidationError, ValidationSchema} from 'fastest-validator';
 import pkg from '../util/validator.cjs';
 const getValidator = pkg.getValidator;
-import {Directories, directories, directoriesWrappedSchema} from './directories.js';
+import {Directories, defaultDirectories, directoriesWrappedSchema} from './directories.js';
 import {gitignore, gitOptions, GitOptions} from './git.options.js';
 import {Options} from './options.js';
 import {defaultBootstrapPackageOptions, BootstrapPackageOptions} from './package.options.js';
@@ -46,7 +46,7 @@ export const bootstrapOptions: BootstrapOptions = {
     'primary esm': 'nodenext',
     options: [es6, nodenext]
   },
-  directories,
+  directories: defaultDirectories,
   sources,
   'build options': {buildEsm: true, buildCommonJS: true},
   'test strategy': defaultTestStrategy,

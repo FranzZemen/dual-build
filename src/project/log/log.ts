@@ -157,7 +157,7 @@ export type LogDataSegment = {
 export class Log implements LogInterface {
   static TabLength = 2;
   static Tab = ' '.repeat(Log.TabLength);
-  static InspectDepth: 10;
+  static InspectDepth = 10;
   private static defaultConsole: Console = new Console({stdout: process.stdout, stderr: process.stderr});
   private static originalDefaultConsole = Log.defaultConsole;
   public static setDefaultConsole(console: Console) {

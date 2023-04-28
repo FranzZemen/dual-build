@@ -11,11 +11,3 @@ getBuildPipeline(BuildPipelineType.Clean)
   .catch((err:unknown) => {
     processUnknownError(err, console, 'Unknown error');
   });
-
-/*
-cleanPipeline
-  .execute(undefined)
-  .catch((err: unknown) => {
-    processUnknownError(err, console, 'Unknown error');
-  });
-*/
