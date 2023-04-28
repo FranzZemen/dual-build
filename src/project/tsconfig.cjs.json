@@ -8,5 +8,6 @@
     "declarationDir": "../../out/dist/types",
     "outDir": "../../out/dist/cjs"
   },
-  "include": ["**/*"]
+  "include": ["**/*"],
+  "exclude": ["./bin"]
 }

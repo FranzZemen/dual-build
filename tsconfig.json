@@ -4,6 +4,7 @@
   "references": [
     {"path": "./src/project/tsconfig.esm.json"},
     {"path": "./src/project/tsconfig.cjs.json"},
+    {"path": "./src/project/tsconfig.bin.json"},
     {"path": "./src/build"},
     {"path": "./src/bin"},
     {"path": "./src/test"}

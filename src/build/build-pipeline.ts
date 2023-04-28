@@ -66,7 +66,7 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
         .endParallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, ['void'], {
           targetPath: join(defaultDirectories['out/dist/bin'].directoryPath, 'package.json'),
           package: {
-            type: ModuleType.commonjs
+            type: ModuleType.module
           }
         })
         .transform<CopyTransform, CopyPayload>(CopyTransform, {
@@ -87,7 +87,7 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
           exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
           inclusions: {
             bin: {
-              "bootstrap": "node bin/bootstrap"
+              "bootstrap": "bootstrap"
             },
             exports: {
               '.': {
