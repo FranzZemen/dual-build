@@ -12,7 +12,7 @@ import {TransformPayload} from '../../transform/index.js';
 export type CreatePackagePayload = {
   targetPath: string;
   package: Package;
-}
+};
 
 export class CreatePackageTransform extends TransformPayload<CreatePackagePayload> {
   constructor(depth: number) {super(depth);}

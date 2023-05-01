@@ -16,17 +16,17 @@ export type TransformPayloadOutConstructor<CLASS extends TransformPayloadOut<PAS
  * Pipeline data is altered:                               true
  * Pipeline out = Derived class out
  */
-export abstract class TransformPayloadOut<PASSED_IN, PIPED_OUT, PIPED_IN = any, > extends Transform<PASSED_IN, PIPED_IN, PIPED_OUT> {
+export abstract class TransformPayloadOut<PASSED_IN, PIPED_OUT, PIPED_IN = any> extends Transform<PASSED_IN, PIPED_IN, PIPED_OUT> {
   protected constructor(depth: number) {
     super(depth);
   }
 
-  public override async execute(pipeIn: PIPED_IN, passedIn: PASSED_IN): Promise<PIPED_OUT> {
-    return super.execute(pipeIn, passedIn);
+  public override async execute(pipeIn: PIPED_IN, payload: PASSED_IN): Promise<PIPED_OUT> {
+    return super.execute(pipeIn, payload);
   }
 
-  protected executeImpl(pipeIn: PIPED_IN | undefined, passedIn: PASSED_IN): Promise<PIPED_OUT> {
-    return this.executeImplPayloadOut(passedIn);
+  protected executeImpl(pipeIn: PIPED_IN | undefined, payload: PASSED_IN): Promise<PIPED_OUT> {
+    return this.executeImplPayloadOut(payload);
   }
 
   protected abstract executeImplPayloadOut(passedIn: PASSED_IN): Promise<PIPED_OUT>;

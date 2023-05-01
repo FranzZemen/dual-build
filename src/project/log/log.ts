@@ -10,7 +10,7 @@ import {Writable} from 'node:stream';
 import {inspect} from 'node:util';
 import {defined} from '../util/defined.js';
 import {BackgroundColor, ConsoleCode, ForegroundColor, utf8SpecialCharacters} from './console-types.js';
-import {LogInterface, LogLevel, TreatmentName, Treatments} from './log-interface.js';
+import {LogInterface, LogLevel, LogTreatmentName, Treatments} from './log-interface.js';
 
 const logLevelValues: LogLevel = {
   debug: 0,
@@ -151,7 +151,7 @@ export const no_console = new Console({
 
 export type LogDataSegment = {
   data: any;
-  treatment: TreatmentName
+  treatment: LogTreatmentName
 }
 
 export class Log implements LogInterface {
@@ -208,19 +208,19 @@ export class Log implements LogInterface {
     }
   }
 
-  info(data: any, treatment?: TreatmentName) {
+  info(data: any, treatment?: LogTreatmentName) {
     if (data && this.logLevelValue <= logLevelValues.info) {
       this._log(data, 'info', treatment ? treatment : 'info');
     }
   }
 
-  infoSegments(dataSegments: LogDataSegment[], treatment: TreatmentName = 'info') {
+  infoSegments(dataSegments: LogDataSegment[], treatment: LogTreatmentName = 'info') {
     if (dataSegments && this.logLevelValue <= logLevelValues.info) {
       this._logSegments(dataSegments, 'info');
     }
   }
 
-  debug(data: any, treatment?: TreatmentName) {
+  debug(data: any, treatment?: LogTreatmentName) {
     if (data && this.logLevelValue <= logLevelValues.debug) {
       this._log(data, 'debug', treatment ? treatment : 'debug');
     }
@@ -234,7 +234,7 @@ export class Log implements LogInterface {
    * @param logMethod
    * @param treatment
    */
-  log(data: any, logMethod: keyof Exclude<LogLevel, 'trace | error | warn'>, treatment: TreatmentName) {
+  log(data: any, logMethod: keyof Exclude<LogLevel, 'trace | error | warn'>, treatment: LogTreatmentName) {
     this._log(data, logMethod, treatment);
   }
 
@@ -242,7 +242,7 @@ export class Log implements LogInterface {
    * Get the color string
    * @param treatment {LogLevel}
    */
-  protected color(treatment: TreatmentName): string {
+  protected color(treatment: LogTreatmentName): string {
     let foreground = this.foreground, background = this.background;
     if (treatment) {
       foreground = logConfig?.treatments[treatment]?.foreground ?? ForegroundColor._8_ForegroundGreen;
@@ -303,7 +303,7 @@ export class Log implements LogInterface {
     }
   }
 
-  protected _log(data: any, logMethod: keyof LogLevel, treatment: TreatmentName) {
+  protected _log(data: any, logMethod: keyof LogLevel, treatment: LogTreatmentName) {
     if (typeof data === 'string') {
       if (data.indexOf(ConsoleCode.Escape) < 0) {
         data = this.assembleStringMessage(data, treatment);
@@ -314,7 +314,7 @@ export class Log implements LogInterface {
     }
   }
 
-  private assembleStringMessage(message: string, treatment: TreatmentName, standalone = true): string {
+  private assembleStringMessage(message: string, treatment: LogTreatmentName, standalone = true): string {
     const resetStr = logConfig.treatments[treatment].prefix ? logConfig.treatments[treatment].prefix + ConsoleCode.Reset : '';
     let result = standalone ? Log.Tab.repeat(this.depth) : '';
     result += resetStr;

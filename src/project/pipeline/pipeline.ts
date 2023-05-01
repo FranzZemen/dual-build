@@ -10,12 +10,16 @@ import {BuildError, BuildErrorNumber} from '../util/index.js';
 import {processUnknownError} from '../util/process-unknown-error-message.js';
 import {clearTiming, endTiming, startTiming} from '../util/timing.js';
 import {MergeFunction, MergeType, ParallelPipe} from './parallel-pipe.js';
-import {Pipe, PipelineOptions} from './pipeline-aliases.js';
+import {AnyPipe} from './pipe.js';
 import {SeriesPipe} from './series-pipe.js';
 import {TransformPipe} from './transform-pipe.js';
 
 
 export type ArrayTwoOrMore<T> = [T, T, ...T[]];
+export type PipelineOptions = {
+  name: string;
+  logDepth: number;
+}
 
 
 export function defaultPipelineOptions(): PipelineOptions {
@@ -34,13 +38,14 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT = PIPELINE_IN> {
   log: Log;
   name: string;
   //logDepth: number;
-  protected _pipes: Pipe[] = [];
+  protected _pipes: AnyPipe[] = [];
 
   private constructor(options: PipelineOptions) {
     this.name = options.name;
     //this.logDepth = gitOptions.logDepth;
     this.log = new Log(options.logDepth);
   }
+
 
   /**
    * If this is not called, the defaultOptions function will be use.
@@ -54,6 +59,13 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT = PIPELINE_IN> {
     return new Pipeline<PIPELINE_IN, PIPELINE_OUT>(options);
   }
 
+  copy(newLogDepth?: number): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
+    const logDepth = newLogDepth ?? this.log.depth;
+    const pipeline = new Pipeline<PIPELINE_IN, PIPELINE_OUT>({name: this.name, logDepth});
+    this._pipes.forEach(pipe => pipeline._pipes.push(pipe.copy(pipeline)));
+    return pipeline;
+  }
+
 
   /**
    * Execute a single Transform
@@ -63,11 +75,15 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT = PIPELINE_IN> {
    *
    */
 
-  transform<TRANSFORM_CLASS extends Transform<any, any, any>, PASSED_IN = undefined, PIPE_IN = PIPELINE_IN, PIPE_OUT = PIPE_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
-                                                                                                                                passedIn?: PASSED_IN): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
+  transform<TRANSFORM_CLASS extends Transform<any, any, any>,
+    PASSED_IN = undefined,
+    PIPE_IN = PIPELINE_IN,
+    PIPE_OUT = PIPE_IN,
+    CONSTRUCTOR extends TransformConstructor<TRANSFORM_CLASS> = TransformConstructor<TRANSFORM_CLASS>>
+  (constructor: CONSTRUCTOR, payload?: PASSED_IN): Pipeline<PIPELINE_IN, PIPELINE_OUT> {
 
     // ----- Declaration separator ----- //
-    this._pipes.push(TransformPipe.transform<TRANSFORM_CLASS, PASSED_IN, PIPE_IN, PIPE_OUT>(transformClass, this, passedIn));
+    this._pipes.push(TransformPipe.transform<TRANSFORM_CLASS, PASSED_IN, PIPE_IN, PIPE_OUT>(constructor, this, payload));
     return this;
   };
 
@@ -167,14 +183,15 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT = PIPELINE_IN> {
     TRANSFORM_CLASS extends Transform<any, any, any>,
     PASSED_IN = undefined,
     PARALLEL_IN = PIPELINE_IN,
-    PARALLEL_OUT = PIPELINE_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
-                                passedIn?: PASSED_IN): ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
+    PARALLEL_OUT = PIPELINE_IN,
+    CONSTRUCTOR extends TransformConstructor<TRANSFORM_CLASS> = TransformConstructor<TRANSFORM_CLASS>>(constructor: CONSTRUCTOR,
+                                                                                                       payload?: PASSED_IN): ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
     // ----- Declaration separator ----- //
     const parallelPipe = ParallelPipe.start<
       TRANSFORM_CLASS,
       PASSED_IN,
       PARALLEL_IN,
-      PARALLEL_OUT>(transformClass, this, passedIn);
+      PARALLEL_OUT>(constructor, this, payload);
     this._pipes.push(parallelPipe);
     return parallelPipe;
   };
@@ -216,13 +233,13 @@ export class Pipeline<PIPELINE_IN, PIPELINE_OUT = PIPELINE_IN> {
     // const results: ExecutionResult<any, any, any, any> [] = [];
     try {
       for (let i = 0; i < this._pipes.length; i++) {
-        const pipe: Pipe | undefined = this._pipes[i];
-        if(pipe) {
+        const pipe: AnyPipe | undefined = this._pipes[i];
+        if (pipe) {
           let result = await pipe.execute(inputPayload);
           inputPayload = result;
           outputPayload = result;
         } else {
-          throw new BuildError('Unreachable code',undefined, BuildErrorNumber.UnreachableCode)
+          throw new BuildError('Unreachable code', undefined, BuildErrorNumber.UnreachableCode);
         }
       }
       this.log.info(`...pipeline ${this.name} completed ${startTimingSuccessful ? endTiming(timingMark, this.log) : ''}`, 'pipeline');

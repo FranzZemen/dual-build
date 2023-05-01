@@ -2,13 +2,14 @@ import _ from 'lodash';
 import {Log} from '../log/log.js';
 import {Transform, TransformConstructor} from '../transform/index.js';
 import {processUnknownError} from '../util/index.js';
+import {Pipe} from './pipe.js';
 import {Pipeline} from './pipeline.js';
 
 
 export type MergeFunction<T> = (parallelPayloads: any[]) => Promise<T>;
 export type MergeType = 'void' | 'asAttributes' | 'asMerged' | 'asMergeFunction' | 'asPipedIn';
 
-export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT = PARALLEL_IN> {
+export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT = PARALLEL_IN> implements Pipe<PARALLEL_IN, PARALLEL_OUT>{
   log: Log;
   protected _pipe: [transform: Transform<any, any, any>, payloadOverride: any][] = [];
   protected _mergeStrategy: [mergeType: MergeType, mergeFunction?: MergeFunction<PARALLEL_OUT>] = ['asAttributes'];
@@ -18,41 +19,54 @@ export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT = PARALLEL_IN> {
     this.log = new Log(depth);
   }
 
+
+  public copy(pipeline:Pipeline<any, any>): Pipe<PARALLEL_IN, PARALLEL_OUT> {
+    const parallelPipe = new ParallelPipe<PARALLEL_IN, PARALLEL_OUT>(pipeline, pipeline.log.depth + 1);
+
+    parallelPipe._pipe = this._pipe.map(([transform, payloadOverride]) => [transform.copy(), _.cloneDeep(payloadOverride)]);
+    parallelPipe._mergeStrategy = _.cloneDeep(this._mergeStrategy);
+    parallelPipe._mergeFunction = this._mergeFunction;
+    return parallelPipe;
+  }
+
+
   static start<
     TRANSFORM_CLASS extends Transform<any, any, any>,
     PASSED_IN,
     PARALLEL_IN,
-    PARALLEL_OUT = PARALLEL_IN>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
+    PARALLEL_OUT = PARALLEL_IN,
+    CONSTRUCTOR extends TransformConstructor<TRANSFORM_CLASS> = TransformConstructor<TRANSFORM_CLASS>>(constructor: CONSTRUCTOR,
               pipeline: Pipeline<any, any>,
               payloadOverride?: PASSED_IN): ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
 
     // ----- Multiline Declaration Separator ----- //
     const pipe = new ParallelPipe<PARALLEL_IN, PARALLEL_OUT>(pipeline, pipeline.log.depth + 1);
-    return pipe.parallel<TRANSFORM_CLASS, PASSED_IN>(transformClass, payloadOverride);
+    return pipe.parallel<TRANSFORM_CLASS, PASSED_IN, CONSTRUCTOR>(constructor, payloadOverride);
   }
 
   parallel<
     TRANSFORM_CLASS extends Transform<any, any, any>,
-    PASSED_IN = undefined>(
-    transformClass: TransformConstructor<TRANSFORM_CLASS>,
+    PASSED_IN = undefined,
+    CONSTRUCTOR extends TransformConstructor<TRANSFORM_CLASS> = TransformConstructor<TRANSFORM_CLASS>>(
+    constructor: CONSTRUCTOR,
     payloadOverride?: PASSED_IN): ParallelPipe<PARALLEL_IN, PARALLEL_OUT> {
     // ----- Multiline Declaration Separator ----- //
-    this._pipe.push([new transformClass(this.log.depth + 1), payloadOverride]);
+    this._pipe.push([new constructor(this.log.depth + 1), payloadOverride]);
     return this;
   }
 
   endParallel<
     TRANSFORM_CLASS extends Transform<any, any, any>,
-    PASSED_IN = undefined>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
+    PASSED_IN = undefined, CONSTRUCTOR extends TransformConstructor<TRANSFORM_CLASS> = TransformConstructor<TRANSFORM_CLASS>>(constructor: CONSTRUCTOR,
                      mergeStrategy: [mergeType: MergeType, mergeFunction?: MergeFunction<PARALLEL_OUT>] = ['asPipedIn'],
                      payloadOverride?: any): Pipeline<any, any> {
     // ----- Multiline Declaration Separator ----- //
-    this._pipe.push([new transformClass(this.log.depth + 1), payloadOverride]);
+    this._pipe.push([new constructor(this.log.depth + 1), payloadOverride]);
     this._mergeStrategy = mergeStrategy;
     return this._pipeline;
   }
 
-  async execute(payload: PARALLEL_IN): Promise<PARALLEL_OUT> {
+  async execute(pipeIn: PARALLEL_IN): Promise<PARALLEL_OUT> {
     this.log.info('starting parallel pipe...', 'pipeline');
 
     const transformPromises: Promise<any>[] = [];
@@ -61,7 +75,7 @@ export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT = PARALLEL_IN> {
         const thisPipeI = this._pipe[i];
         if(thisPipeI !== undefined) {
           const [transform, payloadOverride]: [Transform<any, any, any>, any] = thisPipeI;
-          transformPromises.push(transform.execute(payload, payloadOverride));
+          transformPromises.push(transform.execute(pipeIn, payloadOverride));
         }
       }
       const settlement = await Promise.allSettled(transformPromises);
@@ -91,7 +105,7 @@ export class ParallelPipe<PARALLEL_IN, PARALLEL_OUT = PARALLEL_IN> {
           }
           case 'asPipedIn': {
             // Ignore any payload from parallel transforms and return what was piped in.
-            return payload as unknown as PARALLEL_OUT;
+            return pipeIn as unknown as PARALLEL_OUT;
           }
           case 'asMergeFunction':
           case 'asMerged': {

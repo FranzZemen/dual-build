@@ -16,7 +16,9 @@ export type MaleatePackagePayload = {
   targetOptions?: TargetOptions | undefined;
 };
 
-
+/**
+ *  Updates the package.json file, adding or removing properties.
+ */
 export class MaleatePackageTransform extends TransformPayload<MaleatePackagePayload> {
   constructor(depth: number) {
     super(depth);
@@ -38,7 +40,6 @@ export class MaleatePackageTransform extends TransformPayload<MaleatePackagePayl
         }
       });
     }
-
     await writeFile(path.join(process.cwd(), payload.targetPath), JSON.stringify(packageJson, undefined, 2), {encoding: 'utf-8'});
   }
 

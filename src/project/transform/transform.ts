@@ -19,7 +19,7 @@ export type TransformConstructor<CLASS extends Transform<any, any, any>> = new (
  *
  * The transform declares what kind of data it is sending down the Pipeline as output - this does not have to be the transformed data.
  */
-export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
+export abstract class Transform<PAYLOAD, PIPED_IN, PIPE_OUT> {
   private readonly log: Log;
   protected contextLog: Log;
   protected errorCondition = false;
@@ -27,6 +27,12 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
   protected constructor(protected depth: number) {
     this.log = new Log(depth);
     this.contextLog = new Log(depth+1);
+  }
+
+  copy(newLogDepth?: number): Transform<PAYLOAD, PIPED_IN, PIPE_OUT> {
+    const logDepth = newLogDepth ?? this.log.depth;
+    const transform = new (this.constructor as TransformConstructor<Transform<PAYLOAD, PIPED_IN, PIPE_OUT>>)(logDepth);
+    return transform;
   }
 
   get logDepth(): number {
@@ -41,8 +47,8 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
     return this.constructor.name;
   }
 
-  async execute(pipe_in: PIPED_IN, passedIn?: PASSED_IN): Promise<PIPE_OUT> {
-    const transformContext: string | object = await this.transformContext(pipe_in, passedIn);
+  async execute(pipedIn: PIPED_IN, payloadIn?: PAYLOAD): Promise<PIPE_OUT> {
+    const transformContext: string | object = await this.transformContext(pipedIn, payloadIn);
     const maxLineLength = 100;
     if (typeof transformContext === 'string') {
       const length = `transform ${this.name} ${transformContext} starting...`.length;
@@ -65,7 +71,7 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
     const timingMark = `Timing ${Transform.name}:${transformContext}:${this.name}.execute`;
     try {
       startTimingSuccessful = startTiming(timingMark, this.log);
-      return await this.executeImpl(pipe_in, passedIn);
+      return await this.executeImpl(pipedIn, payloadIn);
     } catch (err) {
       return Promise.reject(processUnknownError(err, this.log));
     } finally {
@@ -93,7 +99,7 @@ export abstract class Transform<PASSED_IN, PIPED_IN, PIPE_OUT> {
     }
   }
 
-  protected abstract executeImpl(pipeIn: PIPED_IN | undefined, passedIn?: PASSED_IN): Promise<PIPE_OUT>;
+  protected abstract executeImpl(pipeIn: PIPED_IN | undefined, payload?: PAYLOAD): Promise<PIPE_OUT>;
 
-  protected abstract transformContext(pipeIn: PIPED_IN | undefined, passedIn?: PASSED_IN): string | object | Promise<string | object>;
+  protected abstract transformContext(pipeIn: PIPED_IN | undefined, payload?: PAYLOAD): string | object | Promise<string | object>;
 }

@@ -8,6 +8,7 @@ export * from './change-working-directory.transform.js';
 export * from './executable.transform.js';
 export * from './maleate-package.transform.js';
 export * from './create-package.transform.js';
+export * from './update-payloadd-package.transform.js'
 export * from './check-in.transform.js';
 export * from './commit.transform.js';
 export * from './push-branch.transform.js';

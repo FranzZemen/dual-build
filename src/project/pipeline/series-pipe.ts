@@ -1,15 +1,24 @@
+import _ from 'lodash';
 import {Log} from '../log/log.js';
-import {Transform, TransformConstructor} from '../transform/transform.js';
+import {Transform, TransformConstructor} from '../transform/index.js';
 import {BuildError, BuildErrorNumber} from '../util/index.js';
-import {processUnknownError} from '../util/process-unknown-error-message.js';
+import {processUnknownError} from '../util/index.js';
+import {Pipe} from './pipe.js';
 import {Pipeline} from './pipeline.js';
 
-export class SeriesPipe<SERIES_IN, SERIES_OUT = SERIES_IN> {
+export class SeriesPipe<SERIES_IN, SERIES_OUT = SERIES_IN> implements Pipe<SERIES_IN, SERIES_OUT>{
   log: Log;
-  protected _pipe: [transform: Transform<any, any, any>, payloadOverride: any | undefined][] = [];
+  protected _transforms: [transform: Transform<any, any, any>, payloadOverride: any | undefined][] = [];
 
-  private constructor(protected _pipeline: Pipeline<any, any>, depth: number) {
-    this.log = new Log(depth);
+  private constructor(protected _pipeline: Pipeline<any, any>) {
+    this.log = new Log(_pipeline.log.depth + 1);
+  }
+
+  copy(pipeline:Pipeline<any, any>): SeriesPipe<SERIES_IN, SERIES_OUT> {
+    const seriesPipe = new SeriesPipe<SERIES_IN, SERIES_OUT>(pipeline);
+
+    seriesPipe._transforms = this._transforms.map(([transform, payloadOverride]) => [transform.copy(), _.merge({},payloadOverride)]);
+    return seriesPipe;
   }
 
   /**
@@ -29,7 +38,7 @@ export class SeriesPipe<SERIES_IN, SERIES_OUT = SERIES_IN> {
 
     // ----- Multiline Declaration Separator ----- //
 
-    const pipe = new SeriesPipe<SERIES_IN, SERIES_OUT>(pipeline, pipeline.log.depth + 1);
+    const pipe = new SeriesPipe<SERIES_IN, SERIES_OUT>(pipeline);
     return pipe.series<TRANSFORM_CLASS, PASSED_IN>(transformClass, payloadOverride);
   }
 
@@ -39,7 +48,7 @@ export class SeriesPipe<SERIES_IN, SERIES_OUT = SERIES_IN> {
                payloadOverride?: PASSED_IN): SeriesPipe<SERIES_IN, SERIES_OUT> {
     // ----- Multiline Declaration Separator ----- //
 
-    this._pipe.push([new transformClass(this.log.depth + 1), payloadOverride]);
+    this._transforms.push([new transformClass(this.log.depth + 1), payloadOverride]);
     return this;
   }
 /*
@@ -59,19 +68,19 @@ export class SeriesPipe<SERIES_IN, SERIES_OUT = SERIES_IN> {
    */
   endSeries<TRANSFORM_CLASS extends Transform<any, any, any>, PASSED_IN = undefined>(transformClass: TransformConstructor<TRANSFORM_CLASS>,
                                                                                      payloadOverride?: PASSED_IN): Pipeline<any, any> {
-    this._pipe.push([new transformClass(this.log.depth + 1), payloadOverride]);
+    this._transforms.push([new transformClass(this.log.depth + 1), payloadOverride]);
     return this._pipeline;
   }
 
-  async execute(payload: SERIES_IN): Promise<SERIES_OUT> {
+  async execute(pipeIn: SERIES_IN): Promise<SERIES_OUT> {
     this.log.info('starting series pipe...', 'pipeline');
     let errorCondition = false;
     try {
-      let _payload = payload;
+      let _payload = pipeIn;
       let output: any;
-      for (let i = 0; i < this._pipe.length; i++) {
+      for (let i = 0; i < this._transforms.length; i++) {
         try {
-          const result = this._pipe[i];
+          const result = this._transforms[i];
           if(result) {
             const [transform, payloadOverride] = result;
             output = await transform.execute(_payload, payloadOverride);

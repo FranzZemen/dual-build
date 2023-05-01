@@ -13,11 +13,11 @@ export type LogLevel = {
   trace: 4;
 };
 
-export type NamedScheme = 'task-internal' | 'task-detail' | 'task-done' | 'pipeline' | 'context';
+export type NamedLogScheme = 'task-internal' | 'task-detail' | 'task-done' | 'pipeline' | 'context';
 
-export type TreatmentName = keyof LogLevel | NamedScheme | 'no-treatment';
+export type LogTreatmentName = keyof LogLevel | NamedLogScheme | 'no-treatment';
 
-export type Treatment = {
+export type LogTreatment = {
   foreground: ForegroundColor,
   background: BackgroundColor,
   prefix?: string,
@@ -25,17 +25,17 @@ export type Treatment = {
 };
 
 export type Treatments = {
-  [key in TreatmentName]: Treatment;
+  [key in LogTreatmentName]: LogTreatment;
 };
 
 export interface LogInterface {
-  debug(data: any, treatment?: TreatmentName): void;
+  debug(data: any, treatment?: LogTreatmentName): void;
 
   error(data: Error | string): void;
 
-  info(data: any, treatment?: TreatmentName): void;
+  info(data: any, treatment?: LogTreatmentName): void;
 
-  log(data: any, logMethod: keyof Exclude<LogLevel, 'trace | error | warn'>, treatment: TreatmentName): void;
+  log(data: any, logMethod: keyof Exclude<LogLevel, 'trace | error | warn'>, treatment: LogTreatmentName): void;
 
   trace(data: any): void;
 

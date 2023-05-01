@@ -3,11 +3,9 @@ Created by Franz Zemen 03/11/2023
 License Type: MIT
 */
 
-import {join} from 'node:path';
 import {
   BuildError,
   BuildErrorNumber,
-  DelPayload, DelTransform,
   CheckInTransform,
   CommitPayload,
   CommitTransform,
@@ -17,24 +15,133 @@ import {
   CreateDirectoryTransform,
   CreatePackagePayload,
   CreatePackageTransform,
+  defaultDirectories,
+  DelPayload,
+  DelTransform,
   ExecutablePayload,
   ExecutableTransform,
   MaleatePackagePayload,
   MaleatePackageTransform,
   ModuleType,
   Pipeline,
-  PushBranchTransform,
-  defaultDirectories
+  PushBranchTransform
 } from 'dual-build/project';
+import {join} from 'node:path';
+import {TransformConstructor, UpdatePayloaddPackageTransform, UpdatePayloadPackagePayload} from '../project/index.js';
 
 export enum BuildPipelineType {
   Clean   = 'Clean',
   Build   = 'Build',
   CheckIn = 'CheckIn',
-  Push = 'Push',
+  Push    = 'Push',
   Publish = 'Publish',
 }
 
+const cleanPipeline: Pipeline<any, any> = Pipeline.options({name: BuildPipelineType.Clean, logDepth: 0})
+                                                  .transform<DelTransform, DelPayload>(DelTransform, {pattern: './out', recursive: true});
+/*
+const createPackagePayload: CreatePackagePayload = {
+  targetPath: join(defaultDirectories['out/dist/esm'].directoryPath, 'package.json'),
+  package: {
+    type: ModuleType.module
+  }
+};
+
+let buildPipeline = Pipeline.options({name: BuildPipelineType.Build, logDepth: 0})
+                            .transform<CreateDirectoryTransform, CreateDirectoryPayload>(CreateDirectoryTransform, {
+                              directory: defaultDirectories['out/dist/bin'],
+                              errorOnExists: false
+                            });
+
+const parallel1 = buildPipeline.startParallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
+  targetPath: join(defaultDirectories['out/dist/esm'].directoryPath, 'package.json'),
+  package: {
+    type: ModuleType.module
+  }
+});
+
+ */
+
+const buildPipeline = Pipeline.options({name: BuildPipelineType.Build, logDepth: 0})
+                              .transform<CreateDirectoryTransform, CreateDirectoryPayload>(CreateDirectoryTransform, {
+                                directory: defaultDirectories['out/dist/bin'],
+                                errorOnExists: false
+                              })
+                              .startParallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
+                                targetPath: join(defaultDirectories['out/dist/esm'].directoryPath, 'package.json'),
+                                package: {
+                                  type: ModuleType.module
+                                }
+                              })
+                              .parallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
+                                targetPath: join(defaultDirectories['out/dist/cjs'].directoryPath, 'package.json'),
+                                package: {
+                                  type: ModuleType.commonjs
+                                }
+                              })
+                              .endParallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, ['void'], {
+                                targetPath: join(defaultDirectories['out/dist/bin'].directoryPath, 'package.json'),
+                                package: {
+                                  type: ModuleType.module
+                                }
+                              })
+                              .transform<CopyTransform, CopyPayload>(CopyTransform, {
+                                src: './doc/project',
+                                dest: './out/dist',
+                                glob: '**/*.md',
+                                overwrite: true
+                              })
+                              .transform<MaleatePackageTransform, MaleatePackagePayload>(MaleatePackageTransform, {
+                                targetPath: './out/dist/package.json',
+                                exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
+                                inclusions: {
+                                  bin: {
+                                    'bootstrap': './bin/bootstrap.js'
+                                  },
+                                  exports: {
+                                    '.': {
+                                      types: './types',
+                                      import: './esm/index.js',
+                                      require: './cjs/index.js'
+                                    }
+                                  },
+                                  main: './cjs/index.js',
+                                  types: './types'
+                                }
+                              });
+
+
+const checkInPipeline: Pipeline<any, any> = buildPipeline.copy()
+                                                         .transform<CheckInTransform>(CheckInTransform)
+                                                         .transform<CommitTransform, CommitPayload>(CommitTransform, {comment: 'testing'});
+
+const pushPipeline: Pipeline<any, any> = checkInPipeline.copy()
+                                                        .transform<PushBranchTransform>(PushBranchTransform);
+
+const publishPipeline: Pipeline<any, any> = pushPipeline.copy()
+                                                        .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, {
+                                                          executable: 'npm version',
+                                                          arguments: ['patch'],
+                                                          batchTarget: false,
+                                                          synchronous: true,
+                                                          cwd: './'
+                                                        })
+                                                        .transform<UpdatePayloaddPackageTransform, UpdatePayloadPackagePayload>(
+                                                          UpdatePayloaddPackageTransform,
+                                                          {
+                                                            targetPath: './out/dist/package.json',
+                                                            updates: {}
+                                                          })
+                                                        .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, {
+                                                          executable: 'npm publish',
+                                                          cwd: './',
+                                                          arguments: ['./out/dist'],
+                                                          batchTarget: false,
+                                                          synchronous: false
+                                                        })
+                                                        .transform<CheckInTransform>(CheckInTransform)
+                                                        .transform<CommitTransform, CommitPayload>(CommitTransform, {comment: 'published'})
+                                                        .transform<PushBranchTransform>(PushBranchTransform);
 
 export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
 
@@ -87,7 +194,7 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
           exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
           inclusions: {
             bin: {
-              "bootstrap": "./bin/bootstrap.js"
+              'bootstrap': './bin/bootstrap.js'
             },
             exports: {
               '.': {
@@ -99,7 +206,7 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
             main: './cjs/index.js',
             types: './types'
           }
-        })
+        });
       return pipeline;
     case BuildPipelineType.CheckIn:
     case BuildPipelineType.Push:
@@ -130,7 +237,7 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
           exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
           inclusions: {
             bin: {
-              "bootstrap": "./bin/bootstrap.js"
+              'bootstrap': './bin/bootstrap.js'
             },
             exports: {
               '.': {
