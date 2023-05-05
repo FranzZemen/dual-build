@@ -15,3 +15,4 @@ export * from './push-branch.transform.js';
 export * from './copy.transform.js';
 export * from './del.transform.js';
 export * from './bootstrap/index.js';
+export * from './npm-version.transform.js';

@@ -23,11 +23,14 @@ import {
   MaleatePackagePayload,
   MaleatePackageTransform,
   ModuleType,
+  NpmVersionIncrement,
+  NpmVersionTransform,
   Pipeline,
-  PushBranchTransform
+  PushBranchTransform,
+  UpdatePayloaddPackageTransform,
+  UpdatePayloadPackagePayload
 } from 'dual-build/project';
 import {join} from 'node:path';
-import {TransformConstructor, UpdatePayloaddPackageTransform, UpdatePayloadPackagePayload} from '../project/index.js';
 
 export enum BuildPipelineType {
   Clean   = 'Clean',
@@ -39,28 +42,7 @@ export enum BuildPipelineType {
 
 const cleanPipeline: Pipeline<any, any> = Pipeline.options({name: BuildPipelineType.Clean, logDepth: 0})
                                                   .transform<DelTransform, DelPayload>(DelTransform, {pattern: './out', recursive: true});
-/*
-const createPackagePayload: CreatePackagePayload = {
-  targetPath: join(defaultDirectories['out/dist/esm'].directoryPath, 'package.json'),
-  package: {
-    type: ModuleType.module
-  }
-};
 
-let buildPipeline = Pipeline.options({name: BuildPipelineType.Build, logDepth: 0})
-                            .transform<CreateDirectoryTransform, CreateDirectoryPayload>(CreateDirectoryTransform, {
-                              directory: defaultDirectories['out/dist/bin'],
-                              errorOnExists: false
-                            });
-
-const parallel1 = buildPipeline.startParallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
-  targetPath: join(defaultDirectories['out/dist/esm'].directoryPath, 'package.json'),
-  package: {
-    type: ModuleType.module
-  }
-});
-
- */
 
 const buildPipeline = Pipeline.options({name: BuildPipelineType.Build, logDepth: 0})
                               .transform<CreateDirectoryTransform, CreateDirectoryPayload>(CreateDirectoryTransform, {
@@ -225,13 +207,7 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
       return pipeline;
     case BuildPipelineType.Publish:
       pipeline = pipeline
-        .transform<ExecutableTransform, ExecutablePayload>(ExecutableTransform, {
-          executable: 'npm version',
-          arguments: ['patch'],
-          batchTarget: false,
-          synchronous: true,
-          cwd: './'
-        })
+        .transform<NpmVersionTransform, NpmVersionIncrement>(NpmVersionTransform, 'patch')
         .transform<MaleatePackageTransform, MaleatePackagePayload>(MaleatePackageTransform, {
           targetPath: './out/dist/package.json',
           exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],

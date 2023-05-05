@@ -5,9 +5,7 @@ License Type: MIT
 
 import {ChildProcess, exec, execFile, execFileSync, execSync} from 'node:child_process';
 import process from 'node:process';
-import {ExecArguments, ExecutablePayload} from '../lib/index.js';
-import {LogTreatmentName} from '../log/index.js';
-import {TransformPayloadOut} from '../transform/index.js';
+import {Log, LogTreatmentName} from '../log/index.js';
 import {BuildError, BuildErrorNumber} from './build-error.js';
 import {isExecSyncErrorThenStringifyBuffers} from './exec-sync-error.js';
 
@@ -46,11 +44,21 @@ export type ExecutablePayload = {
   stderrTreatment?: LogTreatmentName;
 }
 
-export class Executable<PAYLOAD>  {
-  public constructor() {}
+export type ExecutableResult = [stdout: string, stderr:string | undefined];
 
-  protected exec(payload: PAYLOAD): Promise<OUT> {
-    return new Promise<OUT>((resolve, reject) => {
+export class Executable<PAYLOAD extends ExecutablePayload> {
+  protected log: Log;
+
+  public constructor(log?: Log) {
+    if (!log) {
+      this.log = new Log(0);
+    } else {
+      this.log = log;
+    }
+  }
+
+  public exec(payload: PAYLOAD): Promise<ExecutableResult> {
+    return new Promise<ExecutableResult>((resolve, reject) => {
       if (!payload) {
         throw new BuildError('No executable payload', undefined, BuildErrorNumber.NoExecutablePayload);
       }
@@ -63,16 +71,16 @@ export class Executable<PAYLOAD>  {
       });
       if (payload.batchTarget) {
         if (payload.synchronous) {
-          const result = execFileSync(command, payload.arguments, {cwd, windowsHide: false})
-          this.contextLog.info(result.toString('utf-8'), 'context');
-          resolve(this.resolution(result));
+          const result = execFileSync(command, payload.arguments, {cwd, windowsHide: false});
+          this.log.info(result.toString('utf-8'), 'context');
+          resolve([result.toString('utf-8'), undefined]);
         } else {
           const childProcess: ChildProcess = execFile(command, payload.arguments, {cwd, windowsHide: false}, (error, stdout, stderr) => {
             const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr, payload.stdioTreatment, payload.stderrTreatment);
-            if(buildError) {
+            if (buildError) {
               reject(buildError);
             } else {
-              resolve(this.resolution(undefined));
+              resolve([stdout, stderr]);
             }
           });
         }
@@ -81,28 +89,27 @@ export class Executable<PAYLOAD>  {
         if (payload.synchronous) {
           try {
             const result = execSync(command);
-            this.contextLog.info(result.toString('utf-8'), 'context');
-            resolve(this.resolution(result));
+            this.log.info(result.toString('utf-8'), 'context');
+            resolve([result.toString('utf-8'), undefined]);
           } catch (err) {
             // Because we used stdio:'inherit' everything's already printed, and we just need to set "this" process error
-            if(isExecSyncErrorThenStringifyBuffers(err)) {
-
+            if (isExecSyncErrorThenStringifyBuffers(err)) {
               const error = new BuildError(err.message, {cause: err}, BuildErrorNumber.SyncExecError);
-              this.contextLog.error(error);
+              this.log.error(error);
               return reject(error);
             } else {
               const error = new BuildError('Unreachable code', undefined, BuildErrorNumber.UnreachableCode);
-              this.contextLog.error(error);
+              this.log.error(error);
               return reject(error);
             }
           }
         } else {
           const childProcess: ChildProcess = exec(command, {cwd, windowsHide: false}, (error, stdout, stderr) => {
             const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr, payload.stdioTreatment, payload.stderrTreatment);
-            if(buildError) {
+            if (buildError) {
               reject(buildError);
             } else {
-              resolve(this.resolution(undefined));
+              resolve([stdout, stderr]);
             }
           });
         }
@@ -110,84 +117,21 @@ export class Executable<PAYLOAD>  {
     });
   }
 
-  private processAsyncError(error: Error | null, stdout:string, stderr: string, stdioTreatment: LogTreatmentName = 'context', stderrTreatment: LogTreatmentName = 'context'): void | BuildError {
-    if(stdout) {
-      this.contextLog.infoSegments([{data: stdout, treatment: stdioTreatment}]);
+  private processAsyncError(error: Error | null,
+                            stdout: string,
+                            stderr: string,
+                            stdioTreatment: LogTreatmentName = 'context',
+                            stderrTreatment: LogTreatmentName = 'context'): void | BuildError {
+    if (stdout) {
+      this.log.infoSegments([{data: stdout, treatment: stdioTreatment}]);
     }
-    if(stderr) {
-      this.contextLog.infoSegments([{data: stderr, treatment: stderrTreatment}]);
+    if (stderr) {
+      this.log.infoSegments([{data: stderr, treatment: stderrTreatment}]);
     }
-    if(error) {
+    if (error) {
       const buildError = new BuildError('exec error', {cause: error}, BuildErrorNumber.AsyncExecError);
-      this.contextLog.error(buildError);
+      this.log.error(buildError);
       return buildError;
     }
   }
-
-  protected executeImplPayloadOut(payload: ExecutablePayload): Promise<OUT> {
-    return new Promise<OUT>((resolve, reject) => {
-      if (!payload) {
-        throw new BuildError('No executable payload', undefined, BuildErrorNumber.NoExecutablePayload);
-      }
-      // @ts-ignore
-      const cwd = payload.cwd ?? process.cwd();
-      let command = payload.executable;
-      let args: string = '';
-      payload.arguments.forEach(argument => {
-        args += ` ${argument}`;
-      });
-      if (payload.batchTarget) {
-        if (payload.synchronous) {
-          const result = execFileSync(command, payload.arguments, {cwd, windowsHide: false})
-          this.contextLog.info(result.toString('utf-8'), 'context');
-          resolve(this.resolution(result));
-        } else {
-          const childProcess: ChildProcess = execFile(command, payload.arguments, {cwd, windowsHide: false}, (error, stdout, stderr) => {
-            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr, payload.stdioTreatment, payload.stderrTreatment);
-            if(buildError) {
-              reject(buildError);
-            } else {
-              resolve(this.resolution(undefined));
-            }
-          });
-        }
-      } else {
-        command += args;
-        if (payload.synchronous) {
-          try {
-            const result = execSync(command);
-            this.contextLog.info(result.toString('utf-8'), 'context');
-            resolve(this.resolution(result));
-          } catch (err) {
-            // Because we used stdio:'inherit' everything's already printed, and we just need to set "this" process error
-            if(isExecSyncErrorThenStringifyBuffers(err)) {
-
-              const error = new BuildError(err.message, {cause: err}, BuildErrorNumber.SyncExecError);
-              this.contextLog.error(error);
-              return reject(error);
-            } else {
-              const error = new BuildError('Unreachable code', undefined, BuildErrorNumber.UnreachableCode);
-              this.contextLog.error(error);
-              return reject(error);
-            }
-          }
-        } else {
-          const childProcess: ChildProcess = exec(command, {cwd, windowsHide: false}, (error, stdout, stderr) => {
-            const buildError: BuildError | void = this.processAsyncError(error, stdout, stderr, payload.stdioTreatment, payload.stderrTreatment);
-            if(buildError) {
-              reject(buildError);
-            } else {
-              resolve(this.resolution(undefined));
-            }
-          });
-        }
-      }
-    });
-  }
-
-  protected abstract resolution(result: Buffer | undefined): Promise<OUT>;
-
-  protected transformContext(pipeIn: any, payload: ExecutablePayload): string | object {
-    return payload;
-  }
-} executeImplPayloadOut(payload: ExecutablePayload): Promise<OUT>
+}

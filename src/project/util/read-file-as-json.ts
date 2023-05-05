@@ -1,10 +1,10 @@
 import {readFile} from "fs/promises";
 
-export type IsT<T> = (t: T | any) => t is T;
+export type isT<T> = (t: T | any) => t is T;
 
-export function readFileAsJson<T>(filename: string, isT?: IsT<T>): Promise<T> {
+export function readFileAsJson<T>(filename: string, isT?: isT<T>): Promise<T> {
     return readFile(filename, {encoding: 'utf-8'})
-        .then((fileContents) => {
+        .then(fileContents => {
             const t =  JSON.parse(fileContents);
             if(isT) {
                 if(!isT(t)) {
