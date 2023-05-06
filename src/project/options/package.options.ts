@@ -55,17 +55,17 @@ export type ConditionalExportKeys =
   | 'deno';
 
 export type PackageSubPath = '.' | `./${string}`;
-export type ConditionalExports = { [key in ConditionalExportKeys]?: PackageSubPath };
+export type ConditionalExports = { [key in ConditionalExportKeys]?: PackageSubPath};
 export type ConditionalSubPathExports = {
   [key in PackageSubPath]?: {
-    [key in ConditionalExportKeys]?: PackageSubPath;
+    [key in ConditionalExportKeys]?: PackageSubPath | ConditionalExports
   };
 };
 export type Exports = PackageSubPath | ConditionalExports | ConditionalSubPathExports;
 
 export type ImportsKey = `#${string}`;
-export type ImportsSubPath = `./${string}` | string;
-export type ConditionalSubPathImports = {[key: ImportsKey]: { [key in ConditionalExportKeys]?: ImportsSubPath }};
+export type ImportsSubPath = `./${string}` | string | ConditionalExportKeys;
+export type ConditionalSubPathImports = {[key: ImportsKey]: { [key in ConditionalExportKeys]?: ImportsSubPath | ConditionalExports }};
 export type Imports = { [key: ImportsKey]: ImportsSubPath } | ConditionalSubPathImports;
 
 export type Main = PackageSubPath;

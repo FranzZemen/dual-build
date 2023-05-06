@@ -5,7 +5,7 @@
   "type": "module",
   "exports": {
     "./project": {
-      "types": "./out/dist/types/index.d.ts",
+      "types": "./out/dist/esm/types/index.d.ts",
       "import": "./out/dist/esm/index.js"
     },
     "./build": {
@@ -14,7 +14,16 @@
     }
   },
   "imports": {
-    "#project": "./out/dist/esm/index.js"
+    "#project": {
+      "import": {
+        "types": "./out/dist/esm/types/index.d.ts",
+        "default": "./out/dist/esm/index.js"
+      },
+      "require": {
+        "types": "./out/dist/cjs/types/index.d.ts",
+        "default": "./out/dist/cjs/index.js"
+      }
+    }
   },
   "scripts": {
     "setup": "npx tsc -b && node bin/build",
