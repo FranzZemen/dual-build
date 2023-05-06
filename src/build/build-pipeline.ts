@@ -246,6 +246,16 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
               'bootstrap': './bin/bootstrap.js'
             },
             exports: {
+              "./project": {
+                import: {
+                  types: './esm/types/index.d.ts',
+                  default: './esm/index.js'
+                },
+                require: {
+                  types: './cjs/types/index.d.ts',
+                  default: './cjs/index.js'
+                }
+              },
               '.': {
                 types: './types',
                 import: './esm/index.js',
