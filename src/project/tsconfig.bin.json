@@ -5,7 +5,7 @@
         "target": "ESNext",
         "moduleResolution": "NodeNext",
         "tsBuildInfoFile": "../../out/buildInfo/project.bin.tsbuildinfo",
-        "declarationDir": "../../out/bin/dist/types",
+        "declarationDir": "../../out/dist/bin/types",
         "outDir": "../../out/dist/bin",
         "rootDir": "./bin",
     },

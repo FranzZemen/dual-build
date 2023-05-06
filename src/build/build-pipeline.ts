@@ -81,6 +81,16 @@ const buildPipeline = Pipeline.options({name: BuildPipelineType.Build, logDepth:
                                     'bootstrap': './bin/bootstrap.js'
                                   },
                                   exports: {
+                                    "./project": {
+                                      import: {
+                                        types: './esm/types/index.d.ts',
+                                        default: './esm/index.js'
+                                      },
+                                      require: {
+                                        types: './cjs/types/index.d.ts',
+                                        default: './cjs/index.js'
+                                      }
+                                    },
                                     '.': {
                                       import: {
                                         types: './esm/types/index.d.ts',
@@ -184,6 +194,16 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
               'bootstrap': './bin/bootstrap.js'
             },
             exports: {
+              "./project": {
+                import: {
+                  types: './esm/types/index.d.ts',
+                  default: './esm/index.js'
+                },
+                require: {
+                  types: './cjs/types/index.d.ts',
+                  default: './cjs/index.js'
+                }
+              },
               '.': {
                 import: {
                   types: './esm/types/index.d.ts',
