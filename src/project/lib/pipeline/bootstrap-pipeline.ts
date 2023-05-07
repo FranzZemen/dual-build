@@ -11,17 +11,19 @@ import {Pipeline} from '../../pipeline/index.js';
 import {
   BaseTsConfigTransform,
   BaseTsConfigTransformPayload,
-  CreateProjectDirectoriesAndCwd, GenerateTsConfigsPayload,
-  InstallGitignore, SaveOptionsPayload,
+  CreateProjectDirectoriesAndCwd,
+  GenerateTsConfigsPayload,
+  InstallGitignore,
+  SaveOptionsPayload,
   SaveOptionsTransform,
-  SetupGit, TargetEnvTsConfigsTransform
+  SetupGit,
+  TargetEnvTsConfigsTransform
 } from '../transform/index.js';
 
 const projectDirectoryPath = './test-scaffolding';
 
-const _bootstrapOptions: BootstrapOptions = _.merge({}, bootstrapOptions);
+export const _bootstrapOptions: BootstrapOptions = _.merge({}, bootstrapOptions);
 _bootstrapOptions['git options'].username = 'SomeUser';
-// const log = new Log();
 _bootstrapOptions.directories.root.directoryPath = projectDirectoryPath;
 _bootstrapOptions.directories.root.directoryPath = basename(_bootstrapOptions.directories.root.directoryPath);
 const oldCwd = cwd();
@@ -30,7 +32,6 @@ const baseTsConfigPayload: BaseTsConfigTransformPayload = {
   '.dual-build/tsconfigs': _bootstrapOptions.directories['.dual-build/tsconfigs']
 };
 
-
 export const bootstrapPipeline =
                Pipeline
                  .options<BootstrapOptions>(
@@ -38,7 +39,8 @@ export const bootstrapPipeline =
                      name: 'Bootstrap',
                      logDepth: 0
                    })
-                 .transform<CreateProjectDirectoriesAndCwd, undefined>(CreateProjectDirectoriesAndCwd)
+                 .transform<CreateProjectDirectoriesAndCwd, undefined>(CreateProjectDirectoriesAndCwd);
+/*
                  .startSeries<InstallGitignore, undefined, BootstrapOptions, BootstrapOptions>(InstallGitignore)
                  .series<SetupGit, GitOptions>(SetupGit, _bootstrapOptions['git options'])
                  .endSeries<SaveOptionsTransform, SaveOptionsPayload>(
@@ -61,3 +63,5 @@ export const bootstrapPipeline =
                    }
                  );
 //.execute(_bootstrapOptions);
+
+ */
