@@ -514,17 +514,7 @@ bootstrap.ts-options.json.
 The following scaffolding will be created in the base directory targeted by bootstrap.ts
 
 ```
-base ─┬─ .git/  
-      │
-      ├─ .gitignore 
-      │
-      ├─ node_modules/ 
-      │
-      ├─ package.json (Ref: Top Level package.json)
-      │      
-      ├─ .dual-build/─┬─ options/─┬─ bootstrap.ts-options.json
-      │               │           ├─ ...
-      │               │           └─ [command]-options.json 
+         └─ [command]-options.json 
       │               │
       │               ├─ packages/─┬─ package.base.json 
       │               │            ├─ package.build.json
