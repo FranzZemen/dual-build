@@ -6,8 +6,8 @@ License Type: MIT
 import '../pid.test.js'
 import * as chai from 'chai';
 import 'mocha';
-import {Transform} from '../../project/index.js';
-import {EmittingConsole, Log} from '../../project/log/log.js';
+import {Transform} from '#project';
+import {EmittingConsole, Log} from '#project';
 
 const should = chai.should();
 

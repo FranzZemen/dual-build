@@ -13,6 +13,11 @@ import {BuildError, BuildErrorNumber} from '../../util/index.js';
 import {TransformPayloadIn} from '../../transform/index.js';
 
 
+/**
+ * Payload for CreateDirectoryTransform
+ * @property directory - the directory to create expressed as a Directory object
+ * @property errorOnExists - if true, an error is thrown if the directory already exists.  If false, the directory is not created and a warning is logged.
+ */
 export type CreateDirectoryPayload = {
   directory: Directory,
   errorOnExists: boolean
