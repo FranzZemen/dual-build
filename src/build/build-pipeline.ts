@@ -55,18 +55,21 @@ const buildPipeline = Pipeline.options({name: BuildPipelineType.Build, logDepth:
                                   type: ModuleType.module
                                 }
                               })
-                              .parallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
+                             // .parallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
+                              .endParallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform,['void'], {
                                 targetPath: join(defaultDirectories['out/dist/cjs'].directoryPath, 'package.json'),
                                 package: {
                                   type: ModuleType.commonjs
                                 }
                               })
+                              /*
                               .endParallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, ['void'], {
                                 targetPath: join(defaultDirectories['out/dist/bin'].directoryPath, 'package.json'),
                                 package: {
                                   type: ModuleType.module
                                 }
                               })
+                              */
                               .transform<CopyTransform, CopyPayload>(CopyTransform, {
                                 src: './doc/project',
                                 dest: './out/dist',
@@ -78,7 +81,7 @@ const buildPipeline = Pipeline.options({name: BuildPipelineType.Build, logDepth:
                                 exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
                                 inclusions: {
                                   bin: {
-                                    'bootstrap': './bin/bootstrap.js'
+                                    'bootstrap': './bin/bootstrap.mjs'
                                   },
                                   exports: {
                                     "./project": {
@@ -161,18 +164,21 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
             type: ModuleType.module
           }
         })
-        .parallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {
+        .endParallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform,['void'], {
           targetPath: join(defaultDirectories['out/dist/cjs'].directoryPath, 'package.json'),
           package: {
             type: ModuleType.commonjs
           }
         })
+          /*
         .endParallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, ['void'], {
           targetPath: join(defaultDirectories['out/dist/bin'].directoryPath, 'package.json'),
           package: {
             type: ModuleType.module
           }
         })
+
+           */
         .transform<CopyTransform, CopyPayload>(CopyTransform, {
           src: './doc/project',
           dest: './out/dist',
@@ -191,7 +197,7 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
           exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
           inclusions: {
             bin: {
-              'bootstrap': './bin/bootstrap.js'
+              'bootstrap': './bin/bootstrap.mjs'
             },
             exports: {
               "./project": {
@@ -243,7 +249,7 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
           exclusions: ['type', 'scripts', 'imports', 'exports', 'bin', 'devDependencies', 'nodemonConfig'],
           inclusions: {
             bin: {
-              'bootstrap': './bin/bootstrap.js'
+              'bootstrap': './bin/bootstrap.mjs'
             },
             exports: {
               "./project": {
