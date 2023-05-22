@@ -33,7 +33,7 @@
     "push": "npx tsc -b && node bin/push",
     "publish": "npx tsc -b && node bin/publish",
     "clean": "node bin/clean",
-    "test": "mocha transient/test/**/*.test.js"
+    "test": "mocha out/test/**/*.test.js"
   },
   "nodemonConfig": {
     "exec": "npx mocha ./transient/test/**/*.js",
