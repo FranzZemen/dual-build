@@ -25,7 +25,7 @@ import {
   SaveOptionsTransform,
   SetupGit,
   TargetEnvTsConfigsTransform
-} from 'dual-build/project'
+} from '#project'
 import _ from 'lodash';
 import 'mocha';
 import {existsSync} from 'node:fs';
