@@ -6,20 +6,17 @@ License Type: MIT
 
 import {access} from 'fs/promises';
 import {mkdir} from 'node:fs/promises';
-import {join} from 'node:path';
-import {cwd} from 'node:process';
-import {Directory} from '../../options/index.js';
 import {BuildError, BuildErrorNumber} from '../../util/index.js';
-import {TransformPayloadIn} from '../../transform/index.js';
+import {TransformPayload} from '../../transform/index.js';
 
 
 /**
  * Payload for CreateDirectoryTransform
- * @property directory - the directory to create expressed as a Directory object
+ * @property directory - the directory to create.  If relative, will be created in process.cwd.
  * @property errorOnExists - if true, an error is thrown if the directory already exists.  If false, the directory is not created and a warning is logged.
  */
 export type CreateDirectoryPayload = {
-  directory: Directory,
+  directory: string,
   errorOnExists: boolean
 };
 
@@ -27,51 +24,42 @@ export type CreateDirectoryPayload = {
  * Creates a directory asynchronously.  The piped in object is the root name or undefined.  If undefined, the path (relative or absolute) contained
  * in the Directory payload is used. If defined, that path is joined to the root path.
  */
-export class CreateDirectoryTransform extends TransformPayloadIn<CreateDirectoryPayload, string | undefined> {
+export class CreateDirectoryTransform extends TransformPayload<CreateDirectoryPayload> {
   constructor(logDepth: number) {
     super(logDepth);
   }
 
-  public executeImplPayloadIn(root: string | undefined, directoryPayload: CreateDirectoryPayload): Promise<void> {
-    if (directoryPayload?.directory?.directoryPath) {
-      let path: string;
-      if (root) {
-        path = join(cwd(), join(root, directoryPayload.directory.directoryPath));
-      } else {
-        path = directoryPayload.directory.directoryPath;
-      }
-      return access(path)
-        .then(()=> {
-          if(directoryPayload.errorOnExists) {
-            throw new BuildError(`Directory ${directoryPayload.directory.name} with path ${path} already exists and rules = 'error on exist'`, undefined, BuildErrorNumber.DirectoryAlreadyExists);
-          } else {
-            const msg = `Project folder ${path} already exists, skipping`;
-            this.contextLog.warn(msg);
-            return;
-          }
-        })
-        .catch((err:unknown) => {
-          if (err instanceof BuildError) {
-            throw err;
-          } else {
-            return mkdir(path, {recursive: true})
-              .then(() => {this.contextLog.info(`created ${path}`, 'task-internal');
-                return;
-              })
-          }
-        })
-    } else {
-      throw new Error('Undefined directory path');
-    }
+
+  protected executeImplPayload(payload: CreateDirectoryPayload): Promise<void> {
+    return access(payload.directory)
+      .then(() => {
+        if (paylaod.errorOnExists) {
+          throw new BuildError(
+            `Directory ${payload.directory} already exists and rules = 'error on exist'`,
+            undefined, BuildErrorNumber.DirectoryAlreadyExists);
+        } else {
+          const msg = `Project folder ${payload.directory} already exists, skipping`;
+          this.contextLog.warn(msg);
+          return;
+        }
+      })
+      .catch((err: unknown) => {
+        if (err instanceof BuildError) {
+          throw err;
+        } else {
+          return mkdir(payload.directory, {recursive: true})
+            .then(() => {
+              this.contextLog.info(`created ${payload.directory}`, 'task-internal');
+              return;
+            })
+        }
+      })
   }
 
-  public transformContext(root: string | undefined, directoryPayload: CreateDirectoryPayload): string {
-    let path: string;
-    if (root) {
-      path = join(cwd(), join(root, directoryPayload.directory.directoryPath));
-    } else {
-      path = directoryPayload.directory.directoryPath;
-    }
-    return path;
+
+
+  protected transformContext(pipeIn: undefined,
+                             payload: CreateDirectoryPayload | undefined): string | object | Promise<string | object> {
+    return payload.directory;
   }
 }

@@ -155,7 +155,7 @@ export function getBuildPipeline(type: BuildPipelineType): Pipeline<any, any> {
     case BuildPipelineType.Publish:
       pipeline = pipeline
         .transform<CreateDirectoryTransform, CreateDirectoryPayload>(CreateDirectoryTransform, {
-          directory: defaultDirectories['out/dist/bin'],
+          directory: defaultDirectories['out/dist/bin'].directoryPath,
           errorOnExists: false
         })
         .startParallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {

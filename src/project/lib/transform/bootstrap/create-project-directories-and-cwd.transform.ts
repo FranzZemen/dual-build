@@ -4,11 +4,9 @@ License Type: MIT
 */
 
 
-import {BootstrapOptions} from '../../../options/index.js';
-import {Directories, DirectoryPath} from '../../../options/index.js';
-import {ArrayTwoOrMore, Pipeline} from '../../../pipeline/index.js';
-import {ChangeWorkingDirectory} from '../index.js';
-import {CreateDirectoryTransform, CreateDirectoryPayload} from '../index.js';
+import {BootstrapOptions, Directories, DirectoryPath} from '../../../options/index.js';
+import {Pipeline} from '../../../pipeline/index.js';
+import {ChangeWorkingDirectory, CreateDirectoryPayload, CreateDirectoryTransform} from '../index.js';
 import {TransformConstructor} from '../../../transform/transform.js';
 import {BootstrapTransform} from './bootstrap-transform.js';
 
