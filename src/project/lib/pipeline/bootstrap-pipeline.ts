@@ -11,7 +11,6 @@ import {Pipeline} from '../../pipeline/index.js';
 import {
   BaseTsConfigTransform,
   BaseTsConfigTransformPayload,
-  CreateProjectDirectoriesAndCwd,
   GenerateTsConfigsPayload,
   InstallGitignore,
   SaveOptionsPayload,
@@ -19,6 +18,7 @@ import {
   SetupGit,
   TargetEnvTsConfigsTransform
 } from '../transform/index.js';
+import {CreateProjectDirectoriesTransform} from "../transform/bootstrap/create-project-directories.transform.js";
 
 const projectDirectoryPath = './test-scaffolding';
 
@@ -39,7 +39,7 @@ export const bootstrapPipeline =
                      name: 'Bootstrap',
                      logDepth: 0
                    })
-                 .transform<CreateProjectDirectoriesAndCwd, undefined>(CreateProjectDirectoriesAndCwd);
+                 .transform<CreateProjectDirectoriesTransform, undefined>(CreateProjectDirectoriesTransform);
 /*
                  .startSeries<InstallGitignore, undefined, BootstrapOptions, BootstrapOptions>(InstallGitignore)
                  .series<SetupGit, GitOptions>(SetupGit, _bootstrapOptions['git options'])

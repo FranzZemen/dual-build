@@ -9,10 +9,6 @@ import {processUnknownError} from '../../util/index.js';
 import {TransformIn} from '../../transform/index.js';
 
 
-export type ChangeWorkingDirectoryPayload = {
-  rootPath: string
-}
-
 export class ChangeWorkingDirectory extends TransformIn<string> {
   constructor(logDepth: number) {
     super(logDepth);

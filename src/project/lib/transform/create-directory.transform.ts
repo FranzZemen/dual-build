@@ -33,7 +33,7 @@ export class CreateDirectoryTransform extends TransformPayload<CreateDirectoryPa
   protected executeImplPayload(payload: CreateDirectoryPayload): Promise<void> {
     return access(payload.directory)
       .then(() => {
-        if (paylaod.errorOnExists) {
+        if (payload.errorOnExists) {
           throw new BuildError(
             `Directory ${payload.directory} already exists and rules = 'error on exist'`,
             undefined, BuildErrorNumber.DirectoryAlreadyExists);
@@ -57,9 +57,14 @@ export class CreateDirectoryTransform extends TransformPayload<CreateDirectoryPa
   }
 
 
-
+  /**
+   * Transforms the context into a string or object.  If the context is undefined, the payload is used.  If the payload is undefined, an empty string is returned.
+   * @param pipeIn - the piped in object
+   * @param payload - the payload
+   * @protected - override this method to transform the context into a string or object
+   */
   protected transformContext(pipeIn: undefined,
                              payload: CreateDirectoryPayload | undefined): string | object | Promise<string | object> {
-    return payload.directory;
+    return payload ? payload.directory : '' ;
   }
 }
