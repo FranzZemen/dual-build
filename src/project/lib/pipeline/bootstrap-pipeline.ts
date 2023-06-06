@@ -18,7 +18,10 @@ import {
   SetupGit,
   TargetEnvTsConfigsTransform
 } from '../transform/index.js';
-import {CreateProjectDirectoriesTransform} from "../transform/bootstrap/create-project-directories.transform.js";
+import {
+  CreateProjectDirectoriesTransform,
+  CreateProjectPayload
+} from "../transform/bootstrap/create-project-directories.transform.js";
 
 const projectDirectoryPath = './test-scaffolding';
 
@@ -39,7 +42,7 @@ export const bootstrapPipeline =
                      name: 'Bootstrap',
                      logDepth: 0
                    })
-                 .transform<CreateProjectDirectoriesTransform, undefined>(CreateProjectDirectoriesTransform);
+                 .transform<CreateProjectDirectoriesTransform, CreateProjectPayload>(CreateProjectDirectoriesTransform, {directories: _bootstrapOptions.directories});
 /*
                  .startSeries<InstallGitignore, undefined, BootstrapOptions, BootstrapOptions>(InstallGitignore)
                  .series<SetupGit, GitOptions>(SetupGit, _bootstrapOptions['git options'])
