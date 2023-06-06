@@ -46,7 +46,7 @@ const cleanPipeline: Pipeline<any, any> = Pipeline.options({name: BuildPipelineT
 
 const buildPipeline = Pipeline.options({name: BuildPipelineType.Build, logDepth: 0})
                               .transform<CreateDirectoryTransform, CreateDirectoryPayload>(CreateDirectoryTransform, {
-                                directory: defaultDirectories['out/dist/bin'],
+                                directory: defaultDirectories['out/dist/bin'].directoryPath,
                                 errorOnExists: false
                               })
                               .startParallel<CreatePackageTransform, CreatePackagePayload>(CreatePackageTransform, {

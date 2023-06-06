@@ -64,6 +64,6 @@ export class CreateProjectDirectoriesTransform extends TransformPayload<CreatePr
 
   protected transformContext(pipeIn: undefined,
                              payload: CreateProjectPayload | undefined): string | object | Promise<string | object> {
-    return payload;
+    return payload ?? '';
   }
 }

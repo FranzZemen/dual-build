@@ -12,9 +12,8 @@ import {
   BaseTsConfigTransform,
   BaseTsConfigTransformPayload,
   BootstrapOptions,
-  bootstrapOptions,
-  CreateProjectDirectoriesAndCwd,
-  defaultTargetOptions,
+  bootstrapOptions, defaultDirectories,
+  defaultTargetOptions, Directories,
   GenerateTsConfigsPayload,
   GitOptions,
   InstallGitignore,
@@ -32,6 +31,9 @@ import {existsSync} from 'node:fs';
 import {basename, join, sep} from 'node:path';
 import {chdir, cwd} from 'node:process';
 import {simpleGit, SimpleGit} from 'simple-git';
+import {
+  CreateProjectDirectoriesTransform, CreateProjectPayload
+} from "../../project/lib/transform/bootstrap/create-project-directories.transform.js";
 
 const should = chai.should();
 const unreachableCode = false;
@@ -56,7 +58,9 @@ describe('dual-build tests', () => {
 
         try {
           await Pipeline.options<BootstrapOptions>({name: 'Bootstrap', logDepth: 0})
-                        .transform<CreateProjectDirectoriesAndCwd, undefined>(CreateProjectDirectoriesAndCwd)
+                        .transform<CreateProjectDirectoriesTransform, CreateProjectPayload>(CreateProjectDirectoriesTransform, {
+                          directories: defaultDirectories}
+                        )
                         .startSeries<InstallGitignore, undefined, BootstrapOptions, BootstrapOptions>(InstallGitignore)
                         .series<SetupGit, GitOptions>(SetupGit, _bootstrapOptions['git options'])
                         .endSeries<SaveOptionsTransform, SaveOptionsPayload>(
