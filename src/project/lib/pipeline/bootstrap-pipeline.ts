@@ -42,7 +42,8 @@ export const bootstrapPipeline =
                      name: 'Bootstrap',
                      logDepth: 0
                    })
-                 .transform<CreateProjectDirectoriesTransform, CreateProjectPayload>(CreateProjectDirectoriesTransform, {directories: _bootstrapOptions.directories});
+                 .startSeries<CreateProjectDirectoriesTransform, CreateProjectPayload>(CreateProjectDirectoriesTransform, {directories: _bootstrapOptions.directories})
+                 .endSeries<InstallGitignore, undefined>(InstallGitignore);
 /*
                  .startSeries<InstallGitignore, undefined, BootstrapOptions, BootstrapOptions>(InstallGitignore)
                  .series<SetupGit, GitOptions>(SetupGit, _bootstrapOptions['git options'])

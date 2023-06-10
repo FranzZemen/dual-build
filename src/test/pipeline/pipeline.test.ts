@@ -23,7 +23,9 @@ import {
   SaveOptionsPayload,
   SaveOptionsTransform,
   SetupGit,
-  TargetEnvTsConfigsTransform
+  TargetEnvTsConfigsTransform,
+  CreateProjectDirectoriesTransform,
+  CreateProjectPayload
 } from '#project'
 import _ from 'lodash';
 import 'mocha';
@@ -31,9 +33,7 @@ import {existsSync} from 'node:fs';
 import {basename, join, sep} from 'node:path';
 import {chdir, cwd} from 'node:process';
 import {simpleGit, SimpleGit} from 'simple-git';
-import {
-  CreateProjectDirectoriesTransform, CreateProjectPayload
-} from "../../project/lib/transform/bootstrap/create-project-directories.transform.js";
+
 
 const should = chai.should();
 const unreachableCode = false;
@@ -58,31 +58,32 @@ describe('dual-build tests', () => {
 
         try {
           await Pipeline.options<BootstrapOptions>({name: 'Bootstrap', logDepth: 0})
-                        .transform<CreateProjectDirectoriesTransform, CreateProjectPayload>(CreateProjectDirectoriesTransform, {
-                          directories: defaultDirectories}
-                        )
-                        .startSeries<InstallGitignore, undefined, BootstrapOptions, BootstrapOptions>(InstallGitignore)
-                        .series<SetupGit, GitOptions>(SetupGit, _bootstrapOptions['git options'])
-                        .endSeries<SaveOptionsTransform, SaveOptionsPayload>(
-                          SaveOptionsTransform,
-                          {
-                            directory: _bootstrapOptions.directories['.dual-build/options'],
-                            ..._bootstrapOptions
-                          }
-                        )
-                        .startParallel<BaseTsConfigTransform, BaseTsConfigTransformPayload>(
-                          BaseTsConfigTransform,
-                          baseTsConfigPayload
-                        )
-                        .endParallel<TargetEnvTsConfigsTransform, GenerateTsConfigsPayload>(
-                          TargetEnvTsConfigsTransform,
-                          ['void'],
-                          {
-                            path: _bootstrapOptions.directories['.dual-build/tsconfigs'].directoryPath,
-                            targetOptions: defaultTargetOptions
-                          }
-                        )
-                        .execute(_bootstrapOptions);
+            .transform<CreateProjectDirectoriesTransform, CreateProjectPayload>(CreateProjectDirectoriesTransform, {
+                                                                                  directories: defaultDirectories
+                                                                                }
+            )
+            .startSeries<InstallGitignore, undefined, BootstrapOptions, BootstrapOptions>(InstallGitignore)
+            .series<SetupGit, GitOptions>(SetupGit, _bootstrapOptions['git options'])
+            .endSeries<SaveOptionsTransform, SaveOptionsPayload>(
+              SaveOptionsTransform,
+              {
+                directory: _bootstrapOptions.directories['.dual-build/options'],
+                ..._bootstrapOptions
+              }
+            )
+            .startParallel<BaseTsConfigTransform, BaseTsConfigTransformPayload>(
+              BaseTsConfigTransform,
+              baseTsConfigPayload
+            )
+            .endParallel<TargetEnvTsConfigsTransform, GenerateTsConfigsPayload>(
+              TargetEnvTsConfigsTransform,
+              ['void'],
+              {
+                path: _bootstrapOptions.directories['.dual-build/tsconfigs'].directoryPath,
+                targetOptions: defaultTargetOptions
+              }
+            )
+            .execute(_bootstrapOptions);
           /*
 
 
