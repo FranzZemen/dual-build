@@ -99,7 +99,7 @@ export abstract class Transform<PAYLOAD, PIPED_IN, PIPE_OUT> {
     }
   }
 
-  protected abstract executeImpl(pipeIn: PIPED_IN | undefined, payload?: PAYLOAD): Promise<PIPE_OUT>;
+  protected abstract executeImpl(pipeIn?: PIPED_IN, payload?: PAYLOAD): Promise<PIPE_OUT>;
 
-  protected abstract transformContext(pipeIn: PIPED_IN | undefined, payload?: PAYLOAD): string | object | Promise<string | object>;
+  protected abstract transformContext(pipeIn?: PIPED_IN, payload?: PAYLOAD): string | object | Promise<string | object>;
 }

@@ -21,7 +21,8 @@ import {
 import {
   CreateProjectDirectoriesTransform,
   CreateProjectPayload
-} from "../transform/bootstrap/create-project-directories.transform.js";
+} from "../transform/index.js";
+import {InquirerTransform, Questions} from "../transform/inquirer.transform.mjs";
 
 const projectDirectoryPath = './test-scaffolding';
 
@@ -42,11 +43,15 @@ export const bootstrapPipeline =
                      name: 'Bootstrap',
                      logDepth: 0
                    })
+                 .transform<InquirerTransform, Questions>(InquirerTransform, [{
+                    type: 'input',
+                    name: 'projectName',
+                    message: 'What is the name of the project?'
+                 }])
                  .startSeries<CreateProjectDirectoriesTransform, CreateProjectPayload>(CreateProjectDirectoriesTransform, {directories: _bootstrapOptions.directories})
-                 .endSeries<InstallGitignore, undefined>(InstallGitignore);
-/*
-                 .startSeries<InstallGitignore, undefined, BootstrapOptions, BootstrapOptions>(InstallGitignore)
-                 .series<SetupGit, GitOptions>(SetupGit, _bootstrapOptions['git options'])
+                 .series<InstallGitignore, undefined>(InstallGitignore)
+                 .endSeries<SetupGit, GitOptions>(SetupGit, _bootstrapOptions['git options'])
+                 /*
                  .endSeries<SaveOptionsTransform, SaveOptionsPayload>(
                    SaveOptionsTransform,
                    {
