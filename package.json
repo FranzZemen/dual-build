@@ -32,6 +32,7 @@
     "check-in": "npx tsc -b && node bin/check-in",
     "push": "npx tsc -b && node bin/push",
     "publish": "npx tsc -b && node bin/publish",
+    "local": "",
     "clean": "node bin/clean",
     "test": "mocha out/test/**/*.test.js"
   },

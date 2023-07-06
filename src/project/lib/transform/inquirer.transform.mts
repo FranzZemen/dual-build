@@ -1,7 +1,15 @@
 import inquirer, {Answers, Question} from 'inquirer';
 import {Transform} from "../../transform/index.js";
 
+export function isLikelyQuestion(obj: any | Question): obj is Question {
+  return obj && 'type' in obj && 'name' in obj && 'message' in obj;
+}
+
 export type Questions = Question[];
+
+export function isQuestions(arr: any | Questions): arr is Questions {
+  return arr && Array.isArray(arr) && arr.every(question => isLikelyQuestion(question));
+}
 
 
 export class InquirerTransform extends Transform<Questions,  Questions, any> {
@@ -16,7 +24,7 @@ export class InquirerTransform extends Transform<Questions,  Questions, any> {
 
   protected executeImpl(pipeIn?: Questions, payload?: Questions): Promise<any> {
    return inquirer
-      .prompt(pipeIn ?? payload ?? [])
+     .prompt (isQuestions(pipeIn) ? pipeIn : isQuestions(payload) ? payload : [])
       .then((answers: Answers) => {
         this.contextLog.info(answers);
       })
