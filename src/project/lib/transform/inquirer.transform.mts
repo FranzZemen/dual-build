@@ -22,13 +22,14 @@ export class InquirerTransform extends Transform<Questions,  Questions, any> {
   }
 
 
-  protected executeImpl(pipeIn?: Questions, payload?: Questions): Promise<any> {
-   return inquirer
+  protected async executeImpl(pipeIn?: Questions, payload?: Questions): Promise<any> {
+   return await inquirer
      .prompt (isQuestions(pipeIn) ? pipeIn : isQuestions(payload) ? payload : [])
       .then((answers: Answers) => {
         this.contextLog.info(answers);
+        return answers;
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.isTtyError) {
           // Prompt couldn't be rendered in the current environment
         } else {
